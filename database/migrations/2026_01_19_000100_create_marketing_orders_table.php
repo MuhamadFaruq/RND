@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('marketing_orders', function (Blueprint $table) {
             $table->id();
-            $table->integer('sap_no')->unique();
+            $table->bigInteger('sap_no')->unique();
             $table->string('art_no')->nullable();
             $table->date('tanggal');
             $table->text('pelanggan');

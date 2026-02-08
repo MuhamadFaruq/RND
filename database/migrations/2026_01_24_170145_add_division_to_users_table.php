@@ -9,20 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up() {
+    public function up()
+    {
         Schema::table('users', function (Blueprint $table) {
-            // Kolom ini akan menyimpan: knitting, dyeing, stenter, dll.
-            $table->string('division')->nullable()->after('role'); 
+            $table->foreignId('division_id')->nullable()->constrained('divisions');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down() // Tambahkan baris di bawah ini jika belum ada
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropForeign(['division_id']); // Hapus relasi jika ada
+            $table->dropColumn('division_id');    // Hapus kolomnya
         });
     }
 };

@@ -1,9 +1,13 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 
 export default function CreateOrder({ auth }) {
+    // 1. Deklarasi State untuk error SAP
+    const [sapError, setSapError] = useState(null);
+
+    // 2. Deklarasi useForm (Harus di paling atas komponen)
     const { data, setData, post, processing, errors, reset } = useForm({
         sap_no: '', art_no: '', tanggal: '', pelanggan: '',
         mkt: '', keperluan: '', konstruksi_greige: '',
@@ -13,8 +17,10 @@ export default function CreateOrder({ auth }) {
         roll_target: '', kg_target: '', keterangan_artikel: ''
     });
 
-    // Fungsi Validasi Real-time SAP
-    const checkSap = async (value) => {
+    // 3. Fungsi Validasi Real-time SAP
+    const handleSapChange = async (value) => {
+        setData('sap_no', value); // Update data form
+        
         if (value.length > 2) {
             try {
                 const response = await axios.get(route('api.check-sap', value));
@@ -29,17 +35,38 @@ export default function CreateOrder({ auth }) {
         }
     };
 
+    // 4. Fungsi Submit Utama
     const submit = (e) => {
         e.preventDefault();
-        if (sapError) return alert('Perbaiki nomor SAP sebelum mengirim!');
+        
+        // Validasi Manual sebelum kirim
+        if (!data.sap_no) {
+            setSapError("Nomor SAP wajib diisi!");
+            return;
+        }
+
+        if (sapError) {
+            alert('Perbaiki nomor SAP sebelum mengirim!');
+            return;
+        }
         
         post(route('marketing.orders.store'), {
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                alert('Order Berhasil Dipublikasikan!');
+            },
+            onError: (err) => {
+                console.log(err);
+                alert('Gagal menyimpan. Cek kembali inputan Anda.');
+            }
         });
     };
 
     return (
-        <AuthenticatedLayout user={auth.user} header={<h2 className="font-bold text-xl text-gray-800">Permintaan Marketing Baru</h2>}>
+        <AuthenticatedLayout 
+            user={auth.user} 
+            header={<h2 className="font-bold text-xl text-gray-800">Permintaan Marketing Baru</h2>}
+        >
             <Head title="Input Order Baru" />
             <div className="py-12 bg-gray-50">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -51,7 +78,15 @@ export default function CreateOrder({ auth }) {
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 uppercase">SAP NO (INT)</label>
-                                    <input type="number" value={data.sap_no} onChange={e => setData('sap_no', e.target.value)} className="w-full rounded-lg border-gray-300 focus:ring-red-500" required />
+                                    <input 
+                                        type="number" 
+                                        value={data.sap_no} 
+                                        onChange={e => handleSapChange(e.target.value)} 
+                                        className={`w-full rounded-lg border-gray-300 focus:ring-red-500 ${sapError ? 'border-red-500' : ''}`} 
+                                        required 
+                                    />
+                                    {sapError && <p className="text-red-500 text-[10px] mt-1 font-bold">{sapError}</p>}
+                                    {errors.sap_no && <p className="text-red-500 text-[10px] mt-1 font-bold">{errors.sap_no}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 uppercase">ART (INT)</label>
@@ -68,13 +103,13 @@ export default function CreateOrder({ auth }) {
                             </div>
                         </div>
 
-                        {/* SECTION 2: MARKETING & MATERIAL (DD Section) */}
+                        {/* SECTION 2: MARKETING & MATERIAL */}
                         <div className="mb-8">
                             <h3 className="text-red-600 font-bold mb-4 border-b pb-2">II. KLASIFIKASI & MATERIAL</h3>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 uppercase">MKT (DD)</label>
-                                    <select value={data.mkt} onChange={e => setData('mkt', e.target.value)} className="w-full rounded-lg border-gray-300">
+                                    <select value={data.mkt} onChange={e => setData('mkt', e.target.value)} className="w-full rounded-lg border-gray-300" required>
                                         <option value="">Pilih MKT</option>
                                         <option value="Sales 1">Sales 1</option>
                                         <option value="Sales 2">Sales 2</option>
@@ -82,7 +117,7 @@ export default function CreateOrder({ auth }) {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 uppercase">Keperluan (DD)</label>
-                                    <select value={data.keperluan} onChange={e => setData('keperluan', e.target.value)} className="w-full rounded-lg border-gray-300">
+                                    <select value={data.keperluan} onChange={e => setData('keperluan', e.target.value)} className="w-full rounded-lg border-gray-300" required>
                                         <option value="">Pilih Keperluan</option>
                                         <option value="Sample">Sample</option>
                                         <option value="Repeat Order">Repeat Order</option>
@@ -91,7 +126,7 @@ export default function CreateOrder({ auth }) {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 uppercase">Material (DD)</label>
-                                    <select value={data.material} onChange={e => setData('material', e.target.value)} className="w-full rounded-lg border-gray-300">
+                                    <select value={data.material} onChange={e => setData('material', e.target.value)} className="w-full rounded-lg border-gray-300" required>
                                         <option value="">Pilih Material</option>
                                         <option value="Cotton Combed">Cotton Combed</option>
                                         <option value="CVC">CVC</option>
@@ -100,7 +135,7 @@ export default function CreateOrder({ auth }) {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 uppercase">Benang (INT)</label>
-                                    <input type="number" value={data.benang} onChange={e => setData('benang', e.target.value)} className="w-full rounded-lg border-gray-300" />
+                                    <input type="text" value={data.benang} onChange={e => setData('benang', e.target.value)} className="w-full rounded-lg border-gray-300" />
                                 </div>
                             </div>
                         </div>
@@ -151,7 +186,7 @@ export default function CreateOrder({ auth }) {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 uppercase">Warna (Text)</label>
-                                    <input type="text" value={data.warna} onChange={e => setData('warna', e.target.value)} className="w-full rounded-lg border-gray-300" />
+                                    <input type="text" value={data.warna} onChange={e => setData('warna', e.target.value)} className="w-full rounded-lg border-gray-300" required />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 uppercase">Treatment Khusus</label>
@@ -160,7 +195,7 @@ export default function CreateOrder({ auth }) {
                             </div>
                         </div>
 
-                        {/* SECTION 4: TARGET QUANTITY & KETERANGAN */}
+                        {/* SECTION 4: TARGET QUANTITY */}
                         <div className="mb-8">
                             <h3 className="text-red-600 font-bold mb-4 border-b pb-2">IV. TARGET QUANTITY & KETERANGAN</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -182,7 +217,11 @@ export default function CreateOrder({ auth }) {
                         </div>
 
                         <div className="flex justify-end pt-6 border-t">
-                            <button type="submit" disabled={processing} className="bg-[#ED1C24] text-white px-12 py-3 rounded-xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-200">
+                            <button 
+                                type="submit" 
+                                disabled={processing} 
+                                className="bg-[#ED1C24] text-white px-12 py-3 rounded-xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-200 disabled:bg-gray-400"
+                            >
                                 {processing ? 'MENYIMPAN...' : 'PUBLISH ORDER'}
                             </button>
                         </div>

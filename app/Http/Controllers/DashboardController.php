@@ -30,10 +30,10 @@ class DashboardController extends Controller
             ['label' => 'User Terdaftar', 'value' => (string)$totalUsers, 'icon' => '👥', 'color' => 'text-green-600', 'desc' => 'Total akun dalam sistem'],
         ];
 
-        return Inertia::render('Dashboard', ['displayStats' => $displayStats]);
+        return view('Dashboard');
     }
 
-    public function monitoring(): Response
+    public function monitoring(Request $request): Response
     {
         // 1. Ambil data statistik di luar agar bisa dipakai di return
         $totalOrdersCount = MarketingOrder::count();
@@ -44,20 +44,34 @@ class DashboardController extends Controller
             ->where('tanggal', '<', now()->subDays(3))
             ->count();
 
-        // 2. Generate Weekly Trends
-       $weeklyTrends = [];
-        for ($i = 6; $i >= 0; $i--) {
-            // Ambil awal hari (00:00:00) dan akhir hari (23:59:59)
-            $date = now()->subDays($i);
-            $start = $date->copy()->startOfDay();
-            $end = $date->copy()->endOfDay();
+        // 2. Generate Trends Berdasarkan Periode
+        $period = $request->query('period', 'weekly');
+        $trends = [];
 
-            $count = \App\Models\ProductionActivity::whereBetween('created_at', [$start, $end])->count();
-
-            $weeklyTrends[] = [
-                'day' => $date->format('D'),
-                'total' => $count,
-            ];
+        if ($period === 'yearly') {
+            // Data per bulan dalam 1 tahun terakhir
+            for ($i = 11; $i >= 0; $i--) {
+                $month = now()->subMonths($i);
+                $count = \App\Models\ProductionActivity::whereMonth('created_at', $month->month)
+                    ->whereYear('created_at', $month->year)
+                    ->count();
+                $trends[] = ['day' => $month->format('M'), 'total' => $count];
+            }
+        } elseif ($period === 'monthly') {
+            // Data per minggu dalam 4 minggu terakhir
+            for ($i = 3; $i >= 0; $i--) {
+                $start = now()->subWeeks($i)->startOfWeek();
+                $end = now()->subWeeks($i)->endOfWeek();
+                $count = \App\Models\ProductionActivity::whereBetween('created_at', [$start, $end])->count();
+                $trends[] = ['day' => 'W'.($i+1), 'total' => $count];
+            }
+        } else {
+            // Default: Weekly (Tetap seperti kode lama Anda)
+            for ($i = 6; $i >= 0; $i--) {
+                $date = now()->subDays($i);
+                $count = \App\Models\ProductionActivity::whereDate('created_at', $date)->count();
+                $trends[] = ['day' => $date->format('D'), 'total' => $count];
+            }
         }
 
         // 3. Mapping Data Orders
@@ -82,19 +96,17 @@ class DashboardController extends Controller
                 ];
             });
 
-        return Inertia::render('Monitoring', [
-        'auth' => [
-            'user' => auth()->user(),
-        ],
-        'orders' => $orders,
-        'stats' => [
-            'total_pesanan' => $totalOrdersCount,
-            'order_aktif' => $inProgress,
-            'order_overdue' => $overdueCount,
-            'order_selesai' => $completed,
-        ],
-        'weeklyTrends' => $weeklyTrends, // PASTIKAN BARIS INI ADA
-    ]);
+            return Inertia::render('Admin/MonitoringDashboard', [ 
+                'auth' => ['user' => auth()->user()],
+                'orders' => $orders,
+                'weeklyTrends' => $trends,
+                'stats' => [
+                    'total_pesanan' => $totalOrdersCount,
+                    'order_aktif' => $inProgress,
+                    'order_overdue' => $overdueCount,
+                    'order_selesai' => $completed,
+                ]
+            ]);
     }
 
     public function getRealTimeStats()

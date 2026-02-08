@@ -2,12 +2,15 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { useState, useEffect, useMemo } from 'react'; // Tambahkan useMemo
 import axios from 'axios';
+import { router } from '@inertiajs/react';
 
 export default function MonitoringDashboard({ auth, stats, orders, weeklyTrends }) {
     const [realTimeData, setRealTimeData] = useState({ knitting: 0, dyeing: 0, stenter: 0, qc: 0, activities: [] });
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all'); // State baru untuk filter status
 
+    // 1. Tambahkan state baru di dalam komponen Dashboard Anda
+    const [period, setPeriod] = useState('weekly'); // Pilihan: weekly, monthly, yearly
     // Logika Filter Gabungan (Pencarian + Status)
     const filteredOrders = useMemo(() => {
         return orders.filter(order => {
@@ -39,6 +42,19 @@ export default function MonitoringDashboard({ auth, stats, orders, weeklyTrends 
         return () => clearInterval(interval);
     }, []);
 
+    // Fungsi untuk merubah periode dan mengambil data dari backend
+    const handlePeriodChange = (newPeriod) => {
+        setPeriod(newPeriod);
+        router.get(route('monitoring.dashboard'), 
+            { period: newPeriod }, 
+            { 
+                preserveState: true, 
+                preserveScroll: true,
+                only: ['weeklyTrends'] // Sangat penting: Hanya ambil data tren agar tidak reload seluruh halaman
+            }
+        );
+    };
+    
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Real-Time Production Monitoring" />
@@ -50,7 +66,7 @@ export default function MonitoringDashboard({ auth, stats, orders, weeklyTrends 
                     <div className="bg-[#ED1C24] rounded-[2rem] p-8 mb-4 text-white flex justify-between items-center shadow-xl">
                         <div className="flex items-center gap-3">
                             <span className="text-3xl">📊</span>
-                            <h2 className="text-3xl font-black uppercase italic tracking-tighter">DUNIATEX </h2>
+                            <h2 className="text-3xl font-black  italic tracking-tighter">DUNIATEX - Real Time Production Monitoring</h2>
                         </div>
                         <div className="relative">
                             <input 
@@ -63,13 +79,6 @@ export default function MonitoringDashboard({ auth, stats, orders, weeklyTrends 
                             <span className="absolute left-4 top-3.5 text-slate-400">🔍</span>
                         </div>
                     </div>
-
-                    {/* --- LETAKKAN DEBUGGER DI SINI --- */}
-                    <div className="bg-black text-lime-400 p-4 rounded-2xl mb-6 font-mono text-[10px] shadow-2xl border-2 border-lime-900/50">
-                        <p className="font-black uppercase mb-1 border-b border-lime-900 pb-1">🔧 System Data Debugger</p>
-                        <pre>weeklyTrends: {JSON.stringify(weeklyTrends, null, 2)}</pre>
-                    </div>
-                    {/* --- AKHIR DEBUGGER --- */}
 
                     {/* Filter Status */}
                     <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
@@ -96,55 +105,141 @@ export default function MonitoringDashboard({ auth, stats, orders, weeklyTrends 
                         <StatCard title="Input QC" value={realTimeData.qc} color="border-l-yellow-500" icon="🔍" />
                     </div>
 
-                    {/* --- TAMBAHKAN DI SINI: MODUL GRAFIK TREN MINGGUAN --- */}
-                    {/* --- MODUL GRAFIK TREN MINGGUAN --- */}
-<div className="bg-white rounded-[2rem] p-8 mb-8 shadow-sm border border-slate-100">
-    <div className="mb-6">
-        <h3 className="text-sm font-black uppercase italic tracking-tighter text-slate-800">
-            📈 Productivity Trends
-        </h3>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Aktivitas input 7 hari terakhir</p>
-    </div>
-
-    <div className="flex items-end justify-between h-48 gap-3 px-4 bg-slate-50/50 rounded-3xl p-6">
-        {Array.isArray(weeklyTrends) && weeklyTrends.length > 0 ? (
-            weeklyTrends.map((data, idx) => {
-                // Kalkulasi Max untuk skala (Proteksi agar tidak bagi nol)
-                const maxTotal = Math.max(...weeklyTrends.map(d => d.total || 0)) || 1;
-                const barHeight = ((data.total || 0) / maxTotal) * 100;
-                
-                return (
-                    <div key={idx} className="flex-1 flex flex-col items-center gap-3 group">
-                        <div className="relative w-full flex flex-col items-center justify-end h-full">
-                            {/* Tooltip Angka yang muncul saat hover */}
-                            <div className="absolute -top-10 bg-slate-900 text-white text-[10px] px-2 py-1 rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity font-bold z-10 whitespace-nowrap">
-                                {data.total} INPUTS
+                    {/* --- MODUL GRAFIK ANALYTICS (LINE CHART) --- */}
+                    <div className="bg-white rounded-[2rem] p-8 mb-8 shadow-sm border border-slate-100">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                            <div>
+                                <h3 className="text-sm font-black uppercase italic tracking-tighter text-slate-800 flex items-center gap-2">
+                                    <span className="p-1.5 bg-red-100 rounded-lg text-red-600">📈</span> 
+                                    Production Analytics
+                                </h3>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                                    Aktivitas input periode {period}
+                                </p>
                             </div>
-                            
-                            {/* Batang Grafik */}
-                            <div 
-                                className="w-full max-w-[40px] rounded-2xl transition-all duration-700 shadow-inner"
-                                style={{ 
-                                    height: `${barHeight}%`, 
-                                    minHeight: '4px',
-                                    backgroundColor: data.total > 0 ? '#ED1C24' : '#e2e8f0' 
-                                }}
-                            ></div>
+
+                            {/* Tombol Switcher Periode */}
+                            <div className="flex bg-slate-100 p-1 rounded-2xl">
+                                {['weekly', 'monthly', 'yearly'].map((p) => (
+                                    <button
+                                        key={p}
+                                        onClick={() => handlePeriodChange(p)}
+                                        className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all duration-300 ${
+                                            period === p 
+                                            ? 'bg-white text-red-600 shadow-md scale-105' 
+                                            : 'text-slate-400 hover:text-slate-600'
+                                        }`}
+                                    >
+                                        {p === 'weekly' ? 'Mingguan' : p === 'monthly' ? 'Bulanan' : 'Tahunan'}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                        <span className="text-[9px] font-black uppercase text-slate-400 italic">
-                            {data.day}
-                        </span>
+
+                        {/* Container Grafik Line */}
+                        <div className="relative h-64 w-full bg-slate-50/50 rounded-[2rem] p-10 border border-slate-50 shadow-inner overflow-hidden flex items-center justify-center">
+                            {Array.isArray(weeklyTrends) && weeklyTrends.length > 1 ? (
+                                <div className="w-full h-full">
+                                    <svg 
+                                        className="w-full h-full overflow-visible" 
+                                        viewBox="0 0 100 33" 
+                                        preserveAspectRatio="none"
+                                    >
+                                        {/* viewBox tinggi 30 memberikan kesan "cinematic" (lebar), 
+                                        sehingga grafik tidak terlihat tinggi/gepeng secara vertikal.
+                                        */}
+                                        {(() => {
+                                            const allTotals = weeklyTrends.map(d => Number(d.total) || 0);
+                                            const maxVal = Math.max(...allTotals) || 1;
+                                            const len = weeklyTrends.length - 1;
+                                            
+                                            // Margin agar elemen tidak menyentuh pinggir SVG
+                                            const topPadding = 2;      // Ruang untuk angka
+                                            const bottomPadding = 32;  // Batas bawah garis
+                                            const chartAreaHeight = bottomPadding - topPadding;
+                                            
+                                            const pointsData = weeklyTrends.map((d, i) => ({
+                                                x: (i / len) * 100, 
+                                                y: bottomPadding - ((Number(d.total) / maxVal) * chartAreaHeight), 
+                                                total: d.total,
+                                                day: d.day
+                                            }));
+
+                                            const linePath = pointsData.map(p => `${p.x},${p.y}`).join(' ');
+
+                                            return (
+                                                <>
+                                                    <defs>
+                                                        <linearGradient id="modernAreaGrad" x1="0" x2="0" y1="0" y2="1">
+                                                            <stop offset="0%" stopColor="#ED1C24" stopOpacity="0.1" />
+                                                            <stop offset="100%" stopColor="#ED1C24" stopOpacity="0" />
+                                                        </linearGradient>
+                                                    </defs>
+
+                                                    {/* Garis Horizontal Halus (Grid Dasar) */}
+                                                    <line x1="0" y1={bottomPadding} x2="100" y2={bottomPadding} stroke="#e2e8f0" strokeWidth="0.2" />
+
+                                                    {/* AREA GRADASI */}
+                                                    <polyline fill="url(#modernAreaGrad)" points={`0,${bottomPadding} ${linePath} 100,${bottomPadding}`} />
+
+                                                    {/* GARIS GRAFIK (Lebih Tebal agar Tegas) */}
+                                                    <polyline
+                                                        fill="none"
+                                                        stroke="#ED1C24"
+                                                        strokeWidth="0.6"
+                                                        strokeLinejoin="round"
+                                                        strokeLinecap="round"
+                                                        points={linePath}
+                                                    />
+
+                                                    {pointsData.map((p, i) => (
+                                                        <g key={i}>
+                                                            {/* TITIK DATA */}
+                                                            <circle 
+                                                                cx={p.x} 
+                                                                cy={p.y} 
+                                                                r="0.6" 
+                                                                fill="white" 
+                                                                stroke="#ED1C24" 
+                                                                strokeWidth="0.5" 
+                                                            />
+
+                                                            {/* ANGKA DI ATAS (Font Kecil & Bersih) */}
+                                                            <text 
+                                                                x={p.x} 
+                                                                y={p.y - 3} 
+                                                                textAnchor="middle" 
+                                                                className="font-black italic"
+                                                                style={{ fontSize: '2.5px', fill: '#1e293b' }}
+                                                            >
+                                                                {p.total}
+                                                            </text>
+
+                                                            {/* LABEL HARI (SAWAH) - Diletakkan tepat di bawah garis grid */}
+                                                            <text 
+                                                                x={p.x} 
+                                                                y={36} 
+                                                                textAnchor="middle" 
+                                                                className="font-bold uppercase tracking-tighter"
+                                                                style={{ fontSize: '2px', fill: '#94a3b8' }}
+                                                            >
+                                                                {p.day}
+                                                            </text>
+                                                        </g>
+                                                    ))}
+                                                </>
+                                            );
+                                        })()}
+                                    </svg>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center h-full text-slate-300 italic py-10">
+                                    <span className="text-4xl mb-2">📊</span>
+                                    <p className="text-xs font-black uppercase tracking-widest">Data sedang dianalisis...</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                );
-            })
-        ) : (
-            <div className="w-full flex flex-col items-center justify-center text-slate-300 italic py-10">
-                <span className="text-4xl mb-2">📊</span>
-                <p className="text-xs font-bold uppercase tracking-widest">Data Tren Belum Tersedia</p>
-            </div>
-        )}
-    </div>
-</div>
                     {/* --- AKHIR MODUL GRAFIK --- */}
 
                     {/* GRID CONTENT: TABLE & LIVE FEED */}

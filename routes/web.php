@@ -11,6 +11,33 @@ use App\Http\Controllers\Admin\BackupController;
 use App\Http\Middleware\CheckDivision;
 use App\Http\Controllers\Admin\DivisionController;
 
+use App\Livewire\Marketing\OrderList;
+use App\Livewire\Marketing\OrderForm;
+use App\Livewire\Marketing\EditOrder;
+use App\Livewire\Marketing\MarketingDashboard;
+use App\Livewire\Operator\Logbook;
+use App\Livewire\Operator\KnittingForm;
+use App\Livewire\Operator\DyeingForm;
+use App\Livewire\Operator\StenterForm;
+use App\Livewire\Operator\CompactorForm;
+use App\Livewire\Operator\TumblerForm;
+use App\Livewire\Operator\HeatSettingForm;
+use App\Livewire\Operator\RelaxDryerForm;
+use App\Livewire\Operator\FleeceForm;
+use App\Livewire\Operator\PengujianForm;
+use App\Livewire\Operator\QEForm;
+
+
+Route::get('/operator/dyeing', DyeingForm::class)->name('operator.dyeing');
+Route::get('/operator/stenter', StenterForm::class)->name('operator.stenter');
+Route::get('/operator/compactor', CompactorForm::class)->name('operator.compactor');
+Route::get('/operator/tumbler', TumblerForm::class)->name('operator.tumbler');
+Route::get('/operator/heat-setting', HeatSettingForm::class)->name('operator.heatsetting');
+Route::get('/operator/relax-dryer', RelaxDryerForm::class)->name('operator.relaxdryer');
+Route::get('/operator/fleece', FleeceForm::class)->name('operator.fleece');
+Route::get('/operator/pengujian', PengujianForm::class)->name('operator.pengujian');
+Route::get('/operator/qe', QEForm::class)->name('operator.qe');
+
 // --- REDIRECTION LOGIC ---
 Route::get('/', function () {
     if (auth()->check()) {
@@ -28,7 +55,11 @@ Route::get('/', function () {
 
 // --- AUTHENTICATED ROUTES ---
 Route::middleware('auth')->group(function () {
-    
+
+    Route::get('/marketing/orders', OrderList::class)->name('marketing.orders.index');
+    Route::get('/marketing/orders/create', OrderForm::class)->name('marketing.orders.create');
+    Route::get('/marketing/orders/{id}/edit', EditOrder::class)->name('marketing.orders.edit');
+
     Route::get('/api/monitoring/realtime-stats', [DashboardController::class, 'getRealTimeStats'])
     ->name('api.monitoring.stats');
     
@@ -85,6 +116,15 @@ Route::middleware('auth')->group(function () {
 });
 
 // --- MARKETING SECTION (Role Restricted) ---
+Route::middleware(['auth', 'role:marketing'])->group(function () {
+    Route::get('/marketing/dashboard', MarketingDashboard::class)->name('marketing.dashboard');
+});
+
+Route::middleware(['auth', 'role:operator'])->group(function () {
+    Route::get('/operator/logbook', Logbook::class)->name('operator.logbook');
+    Route::get('/operator/knitting', KnittingForm::class)->name('operator.knitting');
+});
+
 Route::middleware(['auth', 'marketing'])->group(function () {
     Route::get('/marketing/home', [DashboardController::class, 'monitoring'])->name('marketing.home');
     Route::get('/marketing/orders', [DashboardController::class, 'marketingOrderList'])->name('marketing.orders.index');
