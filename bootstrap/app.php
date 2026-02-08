@@ -16,7 +16,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.division' => \App\Http\Middleware\CheckDivision::class,
         ]);
         $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
             \App\Http\Middleware\UserActivity::class,
             // \App\Http\Middleware\CheckDivision::class,
