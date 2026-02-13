@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->timestamp('last_seen')->nullable(); // Kolom untuk memantau status online
-        });
+        if (!Schema::hasColumn('users', 'last_seen')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->timestamp('last_seen')->nullable();
+            });
+        }
     }
 
     /**

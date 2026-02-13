@@ -61,6 +61,7 @@ class StenterForm extends Component
 
     public function render()
     {
-        return view('livewire.operator.stenter-form');
+        return view('livewire.operator.stenter-form')
+        ->layout('layouts.app');
     }
 }

@@ -61,6 +61,7 @@ class HeatSettingForm extends Component
 
     public function render()
     {
-        return view('livewire.operator.heat-setting-form');
+        return view('livewire.operator.heat-setting-form')
+        ->layout('layouts.app');
     }
 }

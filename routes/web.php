@@ -6,6 +6,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\SystemHealthController;
+use Livewire\Volt\Volt;
+
+
 
 // Livewire Components
 use App\Livewire\Marketing\{MarketingDashboard, OrderList, OrderForm, EditOrder};
@@ -65,7 +68,8 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:marketing'])->prefix('marketing')->group(function () {
-    Route::get('/dashboard', MarketingDashboard::class)->name('marketing.dashboard');
+    Route::get('/dashboard', \App\Livewire\Marketing\MarketingDashboard::class)
+    ->name('dashboard');
     Route::get('/orders', OrderList::class)->name('marketing.orders.index');
     Route::get('/orders/create', OrderForm::class)->name('marketing.orders.create');
     Route::get('/orders/{id}/edit', EditOrder::class)->name('marketing.orders.edit');
@@ -110,5 +114,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/backup-db', [BackupController::class, 'download'])->name('admin.backup');
     Route::get('/system-health', [SystemHealthController::class, 'index'])->name('admin.health');
 });
+
+
+// Route::get('/admin/users', UserManagement::class)
+//     ->middleware(['auth', 'role:super_admin'])
+//     ->name('admin.users');
 
 require __DIR__.'/auth.php';

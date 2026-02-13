@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-layouts.app>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Dashboard') }}
@@ -18,7 +18,7 @@
                         @if(auth()->user()->role === 'marketing')
                             <div class="p-6 bg-blue-50 border border-blue-200 rounded-lg">
                                 <h4 class="font-bold text-blue-700">Marketing Menu</h4>
-                                <a href="{{ route('marketing.orders') }}" class="mt-2 inline-block text-sm text-blue-600 underline">Lihat Order List</a>
+                                <a href="{{ route('marketing.orders.index') }}" class="mt-2 inline-block text-sm text-blue-600 underline">Lihat Order List</a>
                             </div>
                         @endif
 
@@ -33,4 +33,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-layouts.app>

@@ -1,52 +1,69 @@
 <?php
-
 namespace App\Exports;
 
-use App\Models\MarketingOrder;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class MarketingOrdersExport implements FromCollection, WithHeadings, WithStyles, ShouldAutoSize
+class MarketingOrdersExport implements FromCollection, WithMapping, WithHeadings, WithStyles, ShouldAutoSize
 {
-    /**
-    * Mengambil data yang akan diexport
-    */
-    public function collection()
-    {
-        return MarketingOrder::select([
-            'sap_no', 'art_no', 'tanggal', 'pelanggan', 'mkt', 
-            'material', 'target_lebar', 'target_gramasi', 'warna', 
-            'roll_target', 'kg_target', 'status'
-        ])->get();
+    protected $orders;
+    protected $labelPeriode;
+
+    // Tambahkan parameter kedua $labelPeriode
+    public function __construct($orders, $labelPeriode) {
+        $this->orders = $orders;
+        $this->labelPeriode = $labelPeriode;
     }
 
-    /**
-    * Membuat Header Kolom
-    */
-    public function headings(): array
-    {
+    public function collection() {
+        return $this->orders;
+    }
+
+    public function headings(): array {
         return [
-            'SAP NO', 'ART NO', 'TANGGAL ORDER', 'NAMA PELANGGAN', 'SALES (MKT)',
-            'MATERIAL', 'TARGET LEBAR (CM)', 'TARGET GSM', 'WARNA',
-            'TARGET ROLL', 'TARGET KG', 'STATUS PRODUKSI'
+            ['DUNIATEX GROUP - FULL MARKETING DATA REPORT'],
+            ['Periode: ' . $this->labelPeriode], // Keterangan dinamis di sini
+            ['Tanggal Cetak: ' . now()->format('d/m/Y H:i')],
+            [''],
+            ['SAP NO', 'ART NO', 'TANGGAL', 'PELANGGAN', 'MKT', 'KEPERLUAN', 'KONSTRUKSI GREIGE', 'MATERIAL', 'BENANG', 'KELOMPOK KAIN', 'TARGET LEBAR', 'BELAH/BULAT', 'TARGET GRAMASI', 'WARNA', 'HANDFEEL', 'TREATMENT KHUSUS', 'ROLL', 'KG', 'KETERANGAN']
         ];
     }
 
-    /**
-    * Styling Header (Warna Merah Duniatex & Font Putih)
-    */
-    public function styles(Worksheet $sheet)
-    {
+    public function map($order): array {
         return [
-            1 => [
+            $order->sap_no,
+            $order->art_no,
+            $order->tanggal,
+            $order->pelanggan,
+            $order->mkt,
+            $order->keperluan,
+            $order->konstruksi_greig,
+            $order->material,
+            $order->benang,
+            $order->kelompok_kain,
+            $order->target_lebar,
+            $order->belah_bulat,
+            $order->target_gramasi,
+            $order->warna,
+            $order->handfeel,
+            $order->treatment_khusus,
+            $order->roll_target,
+            $order->kg_target,
+            $order->keterangan_artikel,
+        ];
+    }
+
+    public function styles(Worksheet $sheet) {
+        return [
+            1 => ['font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => 'FF0000']]],
+            2 => ['font' => ['bold' => true, 'italic' => true]],
+            5 => [
                 'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => 'ED1C24']
-                ]
+                'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '111827']]
             ],
         ];
     }

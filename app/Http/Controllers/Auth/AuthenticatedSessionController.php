@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -39,7 +40,7 @@ class AuthenticatedSessionController extends Controller
         // Logika Pengalihan Berdasarkan Role
         // Jika Marketing, langsung diarahkan ke Monitoring
         if ($user->role === 'marketing') {
-            return redirect()->intended(route('monitoring.dashboard'));
+            return redirect()->intended(route('dashboard'));
         }
 
         // Jika Operator

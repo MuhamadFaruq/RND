@@ -56,6 +56,7 @@ class QEForm extends Component
 
     public function render()
     {
-        return view('livewire.operator.qe-form');
+        return view('livewire.operator.qe-form')
+        ->layout('layouts.app');
     }
 }

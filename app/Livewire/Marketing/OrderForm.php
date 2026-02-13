@@ -47,19 +47,19 @@ class OrderForm extends Component
         MarketingOrder::create([
             'sap_no' => $this->sap_no,
             'art_no' => $this->art_no,
-            'pelanggan' => $this->pelanggan,
             'tanggal' => $this->tanggal,
+            'pelanggan' => $this->pelanggan,
             'mkt' => $this->mkt,
             'keperluan' => $this->keperluan,
             'material' => $this->material,
             'benang' => $this->benang,
-            'konstruksi_greige' => $this->konstruksi_greige,
+            'konstruksi_greige' => $this->konstruksi_greige, 
             'kelompok_kain' => $this->kelompok_kain,
-            'belah_bulat' => $this->belah_bulat,
-            'handfeel' => $this->handfeel,
             'target_lebar' => $this->target_lebar,
+            'belah_bulat' => $this->belah_bulat,
             'target_gramasi' => $this->target_gramasi,
             'warna' => $this->warna,
+            'handfeel' => $this->handfeel,
             'treatment_khusus' => $this->treatment_khusus,
             'roll_target' => $this->roll_target,
             'kg_target' => $this->kg_target,
@@ -73,6 +73,6 @@ class OrderForm extends Component
 
     public function render()
     {
-        return view('livewire.marketing.order-form');
+        return view('components.marketing.order-form');
     }
 }

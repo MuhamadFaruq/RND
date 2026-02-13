@@ -15,13 +15,23 @@ class ProductionController extends Controller
      * Store a production log into production_activities.
      */
     // Dashboard: Ringkasan singkat untuk semua user
-public function index()
+
+    public function index()
 {
-    return Inertia::render('Dashboard', [
+    // Ambil data aktivitas produksi dari database
+    $activities = \App\Models\ProductionActivity::with('marketingOrder')
+        ->where('operator_id', auth()->id())
+        ->latest()
+        ->paginate(10);
+
+    // Kirim variabel $activities ke file blade
+    return view('components.operator.logbook', [
+        'activities' => $activities,
         'totalOrders' => \App\Models\MarketingOrder::count(),
         'activeOperators' => \App\Models\User::where('role', 'operator')->count(),
     ]);
 }
+
 
 // Monitoring: Tampilan Command Center yang Anda miliki saat ini
 public function monitoringIndex()

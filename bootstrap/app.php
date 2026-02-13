@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Tambahkan pendaftaran alias middleware di sini
         $middleware->alias([
+            'role' => \App\Http\Middleware\CheckRole::class, // Tambahkan baris ini
             'marketing' => \App\Http\Middleware\EnsureUserIsMarketing::class,
         ]);
     })

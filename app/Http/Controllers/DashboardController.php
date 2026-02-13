@@ -41,27 +41,27 @@ class DashboardController extends Controller
      * Monitoring Dashboard (Tampilan Admin/Monitoring)
      * Digunakan untuk melihat summary order
      */
-    public function monitoring(Request $request): View
+    public function monitoring()
     {
-        $totalOrdersCount = MarketingOrder::count();
-        $inProgress = MarketingOrder::whereNotIn('status', ['completed', 'pending'])->count();
-        $completed = MarketingOrder::where('status', 'completed')->count();
-        $overdueCount = MarketingOrder::where('status', '!=', 'completed')
-            ->whereNotNull('tanggal')
-            ->where('tanggal', '<', now()->subDays(3))
-            ->count();
+        // Hitung data statistik
+        $totalOrder = \App\Models\MarketingOrder::count();
+        
+        // Pastikan baris ini ada (untuk menghitung status pending)
+        $pendingOrder = \App\Models\MarketingOrder::where('status', 'pending')->count();
+        
+        $activeOrder = \App\Models\MarketingOrder::whereNotIn('status', ['completed', 'pending'])->count();
+        $completedOrder = \App\Models\MarketingOrder::where('status', 'completed')->count();
+        
+        // Ambil data untuk tabel terbaru
+        $recentOrders = \App\Models\MarketingOrder::latest()->take(10)->get();
 
-        // Get Orders for Table Summary
-        $orders = MarketingOrder::latest()->take(50)->get();
-
-        return view('admin.monitoring-dashboard', [
-            'orders' => $orders,
-            'stats' => [
-                'total_pesanan' => $totalOrdersCount,
-                'order_aktif' => $inProgress,
-                'order_overdue' => $overdueCount,
-                'order_selesai' => $completed,
-            ]
+        // Kirim SEMUA variabel ke view
+        return view('components.marketing.marketing-dashboard', [
+            'totalOrder'     => $totalOrder,
+            'pendingOrder'   => $pendingOrder, // Ini yang tadi menyebabkan error
+            'activeOrder'    => $activeOrder,
+            'completedOrder' => $completedOrder,
+            'recentOrders'   => $recentOrders,
         ]);
     }
 

@@ -55,6 +55,7 @@ class PengujianForm extends Component
 
     public function render()
     {
-        return view('livewire.operator.pengujian-form');
+        return view('livewire.operator.pengujian-form')
+        ->layout('layouts.app');
     }
 }

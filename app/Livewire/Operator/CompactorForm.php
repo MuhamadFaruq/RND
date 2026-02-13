@@ -61,6 +61,7 @@ class CompactorForm extends Component
 
     public function render()
     {
-        return view('livewire.operator.compactor-form');
+        return view('livewire.operator.compactor-form')
+        ->layout('layouts.app');
     }
 }

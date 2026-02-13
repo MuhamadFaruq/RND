@@ -43,8 +43,7 @@ class Logbook extends Component
             ->latest()
             ->paginate(10);
 
-        return view('livewire.operator.logbook', [
-            'activities' => $activities
-        ]);
+        return view('components.operator.logbook')
+            ->layout('layouts.app');
     }
 }

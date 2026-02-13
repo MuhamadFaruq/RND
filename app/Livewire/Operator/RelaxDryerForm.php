@@ -58,6 +58,7 @@ class RelaxDryerForm extends Component
 
     public function render()
     {
-        return view('livewire.operator.relax-dryer-form');
+        return view('livewire.operator.relax-dryer-form')
+        ->layout('layouts.app');
     }
 }

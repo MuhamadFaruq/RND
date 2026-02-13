@@ -43,8 +43,9 @@ class KnittingForm extends Component
 
         ProductionActivity::create([
             'marketing_order_id' => $this->order_id,
-            'user_id' => Auth::id(),
-            'division_id' => Auth::user()->division_id, // Divisi Rajut/Knitting
+            // UBAH INI: Dari 'user_id' menjadi 'operator_id'
+            'operator_id' => Auth::id(), 
+            'division_id' => Auth::user()->division_id,
             'no_mesin' => $this->no_mesin,
             'shift' => $this->shift,
             'gramasi_actual' => $this->gramasi_actual,
@@ -58,9 +59,11 @@ class KnittingForm extends Component
         session()->flash('message', 'Data produksi rajut berhasil disimpan!');
         return redirect()->route('operator.logbook');
     }
-
+    
     public function render()
     {
-        return view('livewire.operator.knitting-form');
+        // Sesuaikan view dengan file blade yang ada di screenshot Anda
+        return view('components.operator.knitting-form')
+            ->layout('layouts.app'); // WAJIB pakai 'layouts.' karena file ada di folder layouts
     }
 }

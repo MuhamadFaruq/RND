@@ -59,6 +59,7 @@ class TumblerForm extends Component
 
     public function render()
     {
-        return view('livewire.operator.tumbler-form');
+        return view('livewire.operator.tumbler-form')
+        ->layout('layouts.app');
     }
 }

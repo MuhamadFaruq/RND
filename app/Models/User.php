@@ -49,4 +49,16 @@ class User extends Authenticatable
     public function isOperator() {
         return $this->role === 'operator';
     }
+
+    public function isMarketing() {
+        return $this->role === 'marketing';
+    }
+    
+    public function division()
+    {
+        // Pastikan foreign key di tabel users adalah 'division_id'
+        return $this->belongsTo(Division::class, 'division_id');
+    }
+
+    
 }

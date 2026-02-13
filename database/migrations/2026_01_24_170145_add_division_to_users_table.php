@@ -9,11 +9,13 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('division_id')->nullable()->constrained('divisions');
-        });
+        if (!Schema::hasColumn('users', 'division_id')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->foreignId('division_id')->nullable()->constrained('divisions');
+            });
+        }
     }
 
     public function down() // Tambahkan baris di bawah ini jika belum ada

@@ -32,7 +32,7 @@ class UserManagement extends Component
             ->latest()
             ->paginate(10);
 
-        return view('livewire.admin.user-management', [
+        return view('components.admin.user-management', [
             'users' => $users,
             'divisions' => Division::all()
         ])->layout('layouts.app');

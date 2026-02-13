@@ -57,6 +57,7 @@ class DyeingForm extends Component
 
     public function render()
     {
-        return view('livewire.operator.dyeing-form');
+        return view('livewire.operator.dyeing-form')
+        ->layout('layouts.app');
     }
 }

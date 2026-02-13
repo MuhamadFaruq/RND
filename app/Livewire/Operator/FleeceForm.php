@@ -56,6 +56,7 @@ class FleeceForm extends Component
 
     public function render()
     {
-        return view('livewire.operator.fleece-form');
+        return view('livewire.operator.fleece-form')
+        ->layout('layouts.app');
     }
 }
