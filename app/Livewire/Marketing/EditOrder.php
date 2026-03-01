@@ -100,6 +100,6 @@ class EditOrder extends Component
 
     public function render()
     {
-        return view('components.marketing.order-form')->layout('layouts.app');
+        return view('livewire.marketing.order-form')->layout('layouts.app');
     }
 }

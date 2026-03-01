@@ -1,18 +1,31 @@
 <?php
-
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use App\Models\Division;
+use App\Models\MarketingOrder; // Tambahkan import ini agar lebih rapi
 use Livewire\WithPagination;
+use Illuminate\Support\Str;
 
 class DivisionManagement extends Component
 {
     use WithPagination;
 
+    protected $paginationTheme = 'tailwind';
+
     public $name, $description, $divisionId;
     public $search = '';
     public $isModalOpen = false;
+
+    // Properti Modal Hapus - SEKARANG AMAN
+    public $showDeleteModal = false;
+    public $selectedDivisionId;
+    public $selectedDivisionName;
+
+    protected $rules = [
+        'name' => 'required|min:2',
+        'description' => 'nullable|string',
+    ];
 
     public function render()
     {
@@ -23,6 +36,33 @@ class DivisionManagement extends Component
         return view('livewire.admin.division-management', [
             'divisions' => $divisions
         ])->layout('layouts.app');
+    }
+
+    public function confirmDelete($id, $name)
+    {
+        $this->selectedDivisionId = $id;
+        $this->selectedDivisionName = $name;
+        $this->showDeleteModal = true;
+    }
+
+    public function delete($id)
+    {
+        $div = Division::find($id);
+        if ($div) {
+            $name = $div->name;
+            
+            // Proteksi jika masih ada order aktif
+            $isUsed = MarketingOrder::where('status', strtolower($name))->exists();
+            if ($isUsed) {
+                $this->dispatch('show-error-toast', message: "Gagal! Unit {$name} masih digunakan.");
+                $this->showDeleteModal = false;
+                return;
+            }
+
+            $div->delete();
+            $this->showDeleteModal = false;
+            session()->flash('message', "Unit {$name} berhasil dihapus.");
+        }
     }
 
     public function openModal()
@@ -41,6 +81,7 @@ class DivisionManagement extends Component
         $this->name = '';
         $this->description = '';
         $this->divisionId = null;
+        $this->resetValidation(); // Tambahkan ini agar pesan error merah hilang saat buka modal baru
     }
 
     public function edit($id)
@@ -54,22 +95,18 @@ class DivisionManagement extends Component
 
     public function save()
     {
-        $this->validate([
-            'name' => 'required|string|max:255|unique:divisions,name,' . $this->divisionId,
-        ]);
+        $this->validate();
+        
+        Division::updateOrCreate(
+            ['id' => $this->divisionId], 
+            [
+                'name' => strtoupper($this->name),
+                'description' => $this->description,
+                'slug' => Str::slug($this->name), 
+            ]
+        );
 
-        Division::updateOrCreate(['id' => $this->divisionId], [
-            'name' => $this->name,
-            'description' => $this->description,
-        ]);
-
-        session()->flash('message', $this->divisionId ? 'Divisi berhasil diperbarui.' : 'Divisi baru berhasil ditambahkan.');
+        session()->flash('message', $this->divisionId ? 'Divisi diperbarui!' : 'Divisi ditambahkan!');
         $this->closeModal();
-    }
-
-    public function delete($id)
-    {
-        Division::find($id)->delete();
-        session()->flash('message', 'Divisi berhasil dihapus.');
     }
 }

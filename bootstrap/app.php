@@ -11,21 +11,20 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Daftarkan alias agar 'check.division' bisa dikenali di routes/web.php
+        // Gabungkan SEMUA alias di sini agar tidak saling menimpa
         $middleware->alias([
             'check.division' => \App\Http\Middleware\CheckDivision::class,
+            'role'           => \App\Http\Middleware\CheckRole::class,
+            'marketing'      => \App\Http\Middleware\EnsureUserIsMarketing::class,
+            'no-back'        => \App\Http\Middleware\PreventBackHistory::class, // Pastikan ini ada
         ]);
+
         $middleware->web(append: [
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
             \App\Http\Middleware\UserActivity::class,
-            // \App\Http\Middleware\CheckDivision::class,
         ]);
-
-        // Tambahkan pendaftaran alias middleware di sini
-        $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class, // Tambahkan baris ini
-            'marketing' => \App\Http\Middleware\EnsureUserIsMarketing::class,
-        ]);
+        
+        // HAPUS pemanggilan $middleware->alias kedua yang ada di bawahnya
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

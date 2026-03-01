@@ -14,6 +14,15 @@ class User extends Authenticatable
      * Masukkan semua kolom yang Anda miliki di database (DBeaver) 
      * agar bisa disimpan secara otomatis oleh Controller.
      */
+
+    public function hasRole($roles)
+    {
+        if (is_array($roles)) {
+            return in_array($this->role, $roles);
+        }
+
+        return $this->role === $roles;
+    }
     protected $fillable = [
         'name',
         'email',

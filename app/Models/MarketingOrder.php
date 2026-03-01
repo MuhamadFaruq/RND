@@ -9,26 +9,25 @@ class MarketingOrder extends Model
 {
     use HasFactory;
 
+    // Tambahkan 'mkt', 'material', 'benang', 'roll_target', 'kg_target', 'keterangan_artikel'
+    // Dan hapus yang tidak dipakai (seperti sales_name, qty_order, dll)
     protected $fillable = [
-        'sap_no', 'art_no', 'tanggal', 'pelanggan', 'mkt', 'keperluan', 
-        'konstruksi_greige', 'material', 'benang', 'kelompok_kain', 
-        'target_lebar', 'belah_bulat', 'target_gramasi', 'warna', 
-        'handfeel', 'treatment_khusus', 'roll_target', 'kg_target', 
-        'keterangan_artikel', 'status'
+        'sap_no', 'art_no', 'tanggal', 'pelanggan', 'mkt', 
+        'warna', 'kg_target', 'roll_target', 'benang', 'material',
+        'keterangan_artikel', 'status', 'keperluan', 'konstruksi_greige', 
+        'kelompok_kain', 'target_lebar', 'target_gramasi', 
+        'handfeel', 'treatment_khusus', 'belah_bulat'
     ];
 
-    protected $guarded = [];
+    // Cukup gunakan ini saja jika ingin praktis (opsional):
+    // protected $guarded = [];
 
     protected $casts = [
         'tanggal' => 'date',
     ];
 
-    /**
-     * Related production activities logged for this marketing order.
-     */
     public function productionActivities()
     {
         return $this->hasMany(ProductionActivity::class);
     }
 }
-

@@ -8,6 +8,8 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
         './resources/js/**/*.jsx',
+        "./resources/**/*.js",
+        "./resources/**/*.vue",
     ],
 
     theme: {
@@ -17,6 +19,10 @@ export default {
             },
         },
     },
-
+    safelist: [
+        {
+        pattern: /(bg|text|border)-(blue|amber|cyan|indigo|violet|orange|rose|emerald|green)-(100|400|500|600)/,
+        },
+    ],
     plugins: [forms],
 };

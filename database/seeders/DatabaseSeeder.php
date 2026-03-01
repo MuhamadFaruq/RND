@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Super Admin Duniatex',
             'email' => 'superadmin@duniatex.com',
             'password' => Hash::make('superadmin123'), 
-            'role' => 'superadmin', 
+            'role' => 'super-admin', 
         ]);
     }
 }

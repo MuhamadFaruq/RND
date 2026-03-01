@@ -28,7 +28,17 @@ class ProductionActivity extends Model
      */
     public function operator()
     {
-        return $this->belongsTo(User::class, 'operator_id');
+        // Ubah 'user_id' menjadi 'operator_id' agar sesuai dengan database Anda
+        return $this->belongsTo(User::class, 'operator_id'); 
+    }
+
+    // Tambahkan ini di dalam class ProductionActivity Anda
+    /**
+     * Relasi balik ke Division berdasarkan nama.
+     */
+    public function division()
+    {
+        return $this->belongsTo(Division::class, 'division_name', 'name');
     }
 }
 

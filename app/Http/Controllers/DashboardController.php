@@ -21,19 +21,38 @@ class DashboardController extends Controller
     /**
      * Dashboard Utama (Halaman Index setelah Login)
      */
-    public function index(): View
+    public function index(): \Illuminate\Http\RedirectResponse|\Illuminate\View\View
     {
-        $totalSap = MarketingOrder::count();
-        $todayLogs = ProductionActivity::whereDate('created_at', today())->count();
-        $totalUsers = User::count();
+        $user = auth()->user();
 
-        $stats = [
-            ['label' => 'Total SAP Terdaftar', 'value' => $totalSap, 'icon' => '📋', 'color' => 'text-blue-600'],
-            ['label' => 'Aktivitas Hari Ini', 'value' => $todayLogs, 'icon' => '⚡', 'color' => 'text-red-600'],
-            ['label' => 'User Terdaftar', 'value' => $totalUsers, 'icon' => '👥', 'color' => 'text-green-600'],
+        // 1. Daftar role yang masuk kategori Operator
+        $operatorRoles = [
+            'knitting', 'dyeing', 'relax-dryer', 'finishing', 
+            'stenter', 'tumbler', 'fleece', 'pengujian', 'qe'
         ];
 
-        // Return ke resources/views/dashboard.blade.php
+        // 2. Jika user adalah salah satu dari operator di atas
+        if (in_array($user->role, $operatorRoles)) {
+            return redirect()->route('operator.logbook');
+        }
+
+        // 3. Jika user adalah Marketing
+        if ($user->role === 'marketing') {
+            return redirect()->route('marketing.dashboard');
+        }
+
+        if (in_array($user->role, ['super-admin', 'admin'])) {
+            // Jika file visual Anda ada di: resources/views/livewire/admin/dashboard.blade.php
+            return view('livewire.admin.dashboard'); 
+        }
+
+        // 4. Default untuk Admin (Menampilkan statistik umum)
+        $stats = [
+            ['label' => 'Total SAP Terdaftar', 'value' => MarketingOrder::count(), 'icon' => '📋', 'color' => 'text-blue-600'],
+            ['label' => 'Aktivitas Hari Ini', 'value' => ProductionActivity::whereDate('created_at', today())->count(), 'icon' => '⚡', 'color' => 'text-red-600'],
+            ['label' => 'User Terdaftar', 'value' => User::count(), 'icon' => '👥', 'color' => 'text-green-600'],
+        ];
+
         return view('dashboard', compact('stats'));
     }
 
@@ -41,27 +60,41 @@ class DashboardController extends Controller
      * Monitoring Dashboard (Tampilan Admin/Monitoring)
      * Digunakan untuk melihat summary order
      */
-    public function monitoring()
-    {
-        // Hitung data statistik
-        $totalOrder = \App\Models\MarketingOrder::count();
-        
-        // Pastikan baris ini ada (untuk menghitung status pending)
-        $pendingOrder = \App\Models\MarketingOrder::where('status', 'pending')->count();
-        
-        $activeOrder = \App\Models\MarketingOrder::whereNotIn('status', ['completed', 'pending'])->count();
-        $completedOrder = \App\Models\MarketingOrder::where('status', 'completed')->count();
-        
-        // Ambil data untuk tabel terbaru
-        $recentOrders = \App\Models\MarketingOrder::latest()->take(10)->get();
+    // app/Http/Controllers/DashboardController.php
 
-        // Kirim SEMUA variabel ke view
-        return view('components.marketing.marketing-dashboard', [
+// app/Http/Controllers/DashboardController.php
+
+public function monitoring()
+    {
+        // 1. Data Statistik Utama
+        $totalOrder = \App\Models\MarketingOrder::count();
+        $knittingOrder = \App\Models\MarketingOrder::where('status', 'knitting')->count();
+        $activeOrder = \App\Models\MarketingOrder::whereIn('status', [
+            'dyeing', 'relax-dryer', 'finishing', 
+            'stenter', 'tumbler', 'fleece', 'pengujian', 'qe'
+        ])->count();
+        $completedOrder = \App\Models\MarketingOrder::where('status', 'completed')->count();
+
+        // 2. Data untuk Progress Table (Tabel 10 SAP Terakhir)
+        $recentOrders = \App\Models\MarketingOrder::latest()
+            ->take(10)
+            ->get();
+
+        // 3. Logika "Machine Workload" (Persentase beban kerja per divisi)
+        // Anda bisa menyesuaikan angka pembaginya sesuai dengan kapasitas asli pabrik Anda
+        $machineStats = [
+            'knitting' => min(($knittingOrder / 20) * 100, 100), // Asumsi kapasitas antrean 20
+            'dyeing'   => min(($activeOrder / 15) * 100, 100),  // Asumsi kapasitas proses 15
+            'finishing'=> 82, // Nilai statis atau bisa diambil dari query aktivitas finishing
+        ];
+
+        return view('livewire.marketing.marketing-dashboard', [
             'totalOrder'     => $totalOrder,
-            'pendingOrder'   => $pendingOrder, // Ini yang tadi menyebabkan error
+            'knittingOrder'   => $knittingOrder,
             'activeOrder'    => $activeOrder,
             'completedOrder' => $completedOrder,
             'recentOrders'   => $recentOrders,
+            'machineStats'   => $machineStats, // Pastikan variabel ini dikirim agar tidak error
         ]);
     }
 

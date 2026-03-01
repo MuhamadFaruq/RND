@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('marketing_order_id')->constrained('marketing_orders')->cascadeOnDelete();
             $table->string('division_name');
             $table->foreignId('operator_id')->constrained('users')->cascadeOnDelete();
-            $table->enum('status', ['pending', 'knitting', 'dyeing', 'finishing', 'qc', 'completed'])->default('pending');
+            $table->enum('status', ['knitting', 'dyeing', 'finishing', 'qc', 'completed'])->default('knitting');
             $table->json('technical_data')->nullable();
             $table->timestamps();
         });

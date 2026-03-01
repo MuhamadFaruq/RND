@@ -23,16 +23,22 @@ return new class extends Migration
             $table->string('material');
             $table->string('benang');
             $table->string('kelompok_kain');
-            $table->unsignedInteger('target_lebar');
+            $table->string('target_lebar'); // UBAH KE STRING
             $table->string('belah_bulat');
-            $table->unsignedInteger('target_gramasi');
+            $table->string('target_gramasi'); // UBAH KE STRING
             $table->string('warna');
             $table->string('handfeel');
             $table->string('treatment_khusus')->nullable();
             $table->unsignedInteger('roll_target');
             $table->unsignedInteger('kg_target');
             $table->text('keterangan_artikel')->nullable();
-            $table->enum('status', ['pending', 'knitting', 'dyeing', 'finishing', 'qc', 'completed'])->default('pending');
+            
+            // UPDATE STATUS AGAR SESUAI ESTAFET 9 DIVISI
+            $table->enum('status', [
+                'knitting', 'dyeing', 'relax-dryer', 'finishing', 
+                'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished'
+            ])->default('knitting'); 
+            
             $table->timestamps();
         });
     }

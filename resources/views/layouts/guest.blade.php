@@ -12,23 +12,13 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     </head>
-    <body class="font-sans text-gray-900 antialiased bg-slate-100">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-[#f8fafc]">
-            <div class="mb-6">
-                <a href="/">
-                    <img src="{{ asset('images/logo.jpg') }}" class="h-20 w-auto rounded-2xl shadow-lg border-4 border-white" alt="Duniatex Logo">
-                </a>
-            </div>
-
-            <div class="w-full sm:max-w-md mt-6 px-10 py-12 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden sm:rounded-[3rem] border border-slate-100">
-                {{ $slot }}
-            </div>
-
-            <div class="mt-8 text-center">
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    &copy; {{ date('Y') }} Duniatex Group - Production RND System
-                </p>
-            </div>
+    <body class="font-sans antialiased">
+        {{-- 
+            PENTING: Hapus class bg-slate-100 dan kotak putih di sini. 
+            Biarkan file login.blade.php yang menangani background dan card-nya.
+        --}}
+        <div class="min-h-screen border-none outline-none">
+            {{ $slot }}
         </div>
     </body>
 </html>

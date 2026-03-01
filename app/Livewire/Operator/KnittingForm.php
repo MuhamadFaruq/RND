@@ -3,67 +3,166 @@
 namespace App\Livewire\Operator;
 
 use Livewire\Component;
-use App\Models\MarketingOrder;
 use App\Models\ProductionActivity;
+use App\Models\MarketingOrder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class KnittingForm extends Component
 {
-    // Data Identitas (Auto-fill berdasarkan SAP)
-    public $sap_no, $order_id, $pelanggan, $art_no, $warna;
-    
-    // Data Produksi Knitting
-    public $no_mesin, $shift, $gramasi_actual, $lebar_actual;
-    public $jumlah_roll, $berat_kg, $keterangan;
+    // Deklarasikan semua properti
+    public $operator_name,$sap_no, $tanggal, $no_mesin, $type_mesin, $gauge_inch, $jml_feeder, $jml_jarum, $konstruksi_greige;
+    public $lebar, $gramasi, $kg, $roll;
+    public $benang_1, $benang_2, $benang_3, $benang_4;
+    public $yl_1, $yl_2, $yl_3, $yl_4;
+    public $note, $produksi_per_day;
 
-    public function updatedSapNo($value)
+    public $order_detail = null;
+
+    public function mount($orderId = null, $sap = null)
     {
-        // Cari data order marketing secara otomatis saat SAP diisi
-        $order = MarketingOrder::where('sap_no', $value)->first();
+        $this->tanggal = now()->format('Y-m-d');
         
-        if ($order) {
-            $this->order_id = $order->id;
-            $this->pelanggan = $order->pelanggan;
-            $this->art_no = $order->art_no;
-            $this->warna = $order->warna;
-        } else {
-            $this->reset(['order_id', 'pelanggan', 'art_no', 'warna']);
+        // LOGIKA EDIT: Jika ada orderId, ambil data dari production_activities
+        if ($orderId) {
+            $activity = ProductionActivity::where('marketing_order_id', $orderId)
+                ->where('division_name', 'knitting')
+                ->latest()
+                ->first();
+
+            if ($activity) {
+                $this->sap_no = $activity->marketingOrder->sap_no ?? '';
+                $this->kg     = $activity->kg;
+                $this->roll   = $activity->roll;
+                
+                $tech = $activity->technical_data;
+                
+                // Mengisi properti dari technical_data JSON
+                $this->operator_name    = $tech['nama_input'] ?? ''; 
+                if (!$this->operator_name) {
+                    $this->operator_name = $activity->operator_name ?? auth()->user()->name;
+                }
+                $this->no_mesin         = $tech['no_mesin'] ?? '';
+                $this->type_mesin       = $tech['type_mesin'] ?? '';
+                $this->gauge_inch       = $tech['gauge_inch'] ?? '';
+                $this->jml_feeder       = $tech['jml_feeder'] ?? 0;
+                $this->jml_jarum        = $tech['jml_jarum'] ?? 0;
+                $this->lebar            = $tech['lebar'] ?? 0;
+                $this->gramasi          = $tech['gramasi'] ?? 0;
+                $this->note             = $tech['note'] ?? '';
+                $this->produksi_per_day = $tech['produksi_per_day'] ?? 0;
+                
+                for ($i = 1; $i <= 4; $i++) {
+                    $this->{'benang_' . $i} = $tech['benang_' . $i] ?? '';
+                    $this->{'yl_' . $i}     = $tech['yl_' . $i] ?? 0;
+                }
+
+                // Panggil detail artikel (Pelanggan, Warna, dll)
+                $this->updatedSapNo($this->sap_no, true); // Tambahkan parameter true untuk bypass status check
+                return;
+            }
+        }
+
+        // LOGIKA INPUT BARU: Ambil SAP dari Route atau Query String
+        $targetSap = $sap ?? request()->query('sap');
+        if ($targetSap) {
+            $this->sap_no = $targetSap;
+            $this->updatedSapNo($targetSap);
         }
     }
 
-    public function submit()
+    public function updatedSapNo($value, $isEdit = false)
+    {
+        $query = MarketingOrder::where('sap_no', $value);
+        
+        // Jika bukan sedang edit, hanya boleh ambil yang statusnya masih 'knitting'
+        if (!$isEdit) {
+            $query->where('status', 'knitting');
+        }
+
+        $order = $query->first();
+
+        if ($order) {
+            $this->order_detail = [
+                'id'        => $order->id,
+                'art_no'    => $order->art_no,
+                'pelanggan' => $order->pelanggan,
+                'warna'     => $order->warna,
+            ];
+
+            // LOGIKA PENTING:
+            // Jika sedang INPUT BARU (bukan edit), ambil lebar/gramasi dari target marketing.
+            // Jika sedang EDIT, biarkan nilai lebar/gramasi tetap menggunakan hasil input operator yang sudah di-load di mount().
+            if (!$isEdit) {
+                $this->lebar = $order->target_lebar;
+                $this->gramasi = $order->target_gramasi;
+            }
+            
+        } else {
+            $this->order_detail = null;
+        }
+    }
+
+    public function save()
     {
         $this->validate([
-            'sap_no' => 'required',
+            'sap_no'   => 'required|exists:marketing_orders,sap_no',
             'no_mesin' => 'required',
-            'shift' => 'required',
-            'jumlah_roll' => 'required|numeric',
-            'berat_kg' => 'required|numeric',
+            'kg'       => 'required|numeric',
+            'roll'     => 'required|numeric',
         ]);
 
-        ProductionActivity::create([
-            'marketing_order_id' => $this->order_id,
-            // UBAH INI: Dari 'user_id' menjadi 'operator_id'
-            'operator_id' => Auth::id(), 
-            'division_id' => Auth::user()->division_id,
-            'no_mesin' => $this->no_mesin,
-            'shift' => $this->shift,
-            'gramasi_actual' => $this->gramasi_actual,
-            'lebar_actual' => $this->lebar_actual,
-            'jumlah_roll' => $this->jumlah_roll,
-            'berat_kg' => $this->berat_kg,
-            'keterangan' => $this->keterangan,
-            'type' => 'knitting'
-        ]);
+        $marketingOrder = MarketingOrder::where('sap_no', $this->sap_no)->first();
 
-        session()->flash('message', 'Data produksi rajut berhasil disimpan!');
+        DB::transaction(function () use ($marketingOrder) {
+            ProductionActivity::updateOrCreate(
+                [
+                    'marketing_order_id' => $marketingOrder->id,
+                    'division_name'      => 'knitting',
+                ],
+                [
+                    'operator_id'        => auth()->id(),
+                    'status'             => 'completed',
+                    'kg'                 => $this->kg,
+                    'roll'               => $this->roll,
+                    'technical_data'     => [
+                        'tanggal'          => $this->tanggal,
+                        'no_mesin'         => $this->no_mesin,
+                        'type_mesin'       => $this->type_mesin,
+                        'gauge_inch'       => $this->gauge_inch,
+                        'jml_feeder'       => $this->jml_feeder,
+                        'jml_jarum'        => $this->jml_jarum,
+                        'lebar'            => $this->lebar,
+                        'gramasi'          => $this->gramasi,
+                        'benang_1'         => $this->benang_1,
+                        'benang_2'         => $this->benang_2,
+                        'benang_3'         => $this->benang_3,
+                        'benang_4'         => $this->benang_4,
+                        'yl_1'             => $this->yl_1,
+                        'yl_2'             => $this->yl_2,
+                        'yl_3'             => $this->yl_3,
+                        'yl_4'             => $this->yl_4,
+                        'note'             => $this->note,
+                        'produksi_per_day' => $this->produksi_per_day,
+                        'nama_input'       => $this->operator_name,
+                    ],
+                ]
+            );
+
+            $marketingOrder->update(['status' => 'dyeing']);
+        });
+
+        session()->flash('message', 'Data berhasil diperbarui!');
         return redirect()->route('operator.logbook');
     }
     
     public function render()
     {
-        // Sesuaikan view dengan file blade yang ada di screenshot Anda
-        return view('components.operator.knitting-form')
-            ->layout('layouts.app'); // WAJIB pakai 'layouts.' karena file ada di folder layouts
+        return view('livewire.operator.knitting-form', [
+            // Filter: Hanya ambil order yang masih 'knitting' (baru dari marketing)
+            'orders' => \App\Models\MarketingOrder::where('status', 'knitting')
+                        ->latest()
+                        ->paginate(10)
+        ]);
     }
 }

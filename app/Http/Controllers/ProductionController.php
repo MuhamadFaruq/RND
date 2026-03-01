@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MarketingOrder;
 use App\Models\ProductionActivity;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -16,18 +17,54 @@ class ProductionController extends Controller
      */
     // Dashboard: Ringkasan singkat untuk semua user
 
-    public function index()
+   public function index()
 {
-    // Ambil data aktivitas produksi dari database
-    $activities = \App\Models\ProductionActivity::with('marketingOrder')
-        ->where('operator_id', auth()->id())
-        ->latest()
-        ->paginate(10);
+    /** @var \App\Models\User $user */
+    $user = auth()->user();
+    $operatorId = $user->id; 
 
-    // Kirim variabel $activities ke file blade
-    return view('components.operator.logbook', [
-        'activities' => $activities,
-        'totalOrders' => \App\Models\MarketingOrder::count(),
+    try {
+        // 1. Ambil Antrean Kerja (Work Queue)
+        // Mengambil order yang statusnya 'knitting' untuk diproses operator
+        $workQueue = \App\Models\MarketingOrder::where('status', 'knitting')
+            ->latest()
+            ->take(5) // Mengambil 5 antrean terbaru
+            ->get();
+
+        // 2. Ambil data hari ini khusus operator yang login
+        $activitiesToday = ProductionActivity::where('operator_id', $operatorId)
+            ->whereDate('created_at', today())
+            ->get();
+
+        // 3. Hitung total dari JSON technical_data
+        $totalKgToday = $activitiesToday->sum(function ($activity) {
+            return $activity->technical_data['kg'] ?? 0;
+        });
+
+        $totalRollToday = $activitiesToday->sum(function ($activity) {
+            return $activity->technical_data['roll'] ?? 0;
+        });
+            
+        // 4. Ambil data untuk tabel logbook (Pagination)
+        $activities = ProductionActivity::with('marketingOrder')
+            ->where('operator_id', $operatorId)
+            ->latest()
+            ->paginate(10);
+            
+    } catch (\Exception $e) {
+        $workQueue = collect([]); // Jika error, buat koleksi kosong agar view tidak crash
+        $totalKgToday = 0;
+        $totalRollToday = 0;
+        $activities = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
+    }
+
+    // 5. Kirim semua variabel ke view (Pastikan workQueue ada di sini)
+    return view('livewire.operator.logbook', [
+        'workQueue'       => $workQueue, // Ini yang tadi menyebabkan error
+        'totalKgToday'    => $totalKgToday,
+        'totalRollToday'  => $totalRollToday,
+        'activities'      => $activities,
+        'totalOrders'     => \App\Models\MarketingOrder::count(),
         'activeOperators' => \App\Models\User::where('role', 'operator')->count(),
     ]);
 }
@@ -39,7 +76,7 @@ public function monitoringIndex()
     $stats = [
         'order_aktif'   => \App\Models\MarketingOrder::where('status', '!=', 'completed')->count(),
         'total_pesanan' => \App\Models\MarketingOrder::count(),
-        'order_overdue' => \App\Models\MarketingOrder::where('status', 'pending')->count(),
+        'order_overdue' => \App\Models\MarketingOrder::where('status', 'knitting')->count(),
         'order_selesai' => \App\Models\MarketingOrder::where('status', 'completed')->count(),
     ];
 
@@ -85,7 +122,7 @@ public function monitoringIndex()
             $validated = $request->validate([
                 'sap_no' => ['required', 'integer', 'exists:marketing_orders,sap_no'],
                 'division_name' => ['required', 'string', 'max:255'],
-                'status' => ['nullable', 'in:pending,knitting,dyeing,finishing,qc,completed'],
+                'status' => ['nullable', 'in:knitting,dyeing,finishing,qc,completed'],
                 'technical_data' => ['nullable', 'array'],
             ]);
 
@@ -142,7 +179,7 @@ public function monitoringIndex()
             'status' => 'nullable'
         ]);
 
-        $validated['status'] = 'pending';
+        $validated['status'] = 'knitting';
         MarketingOrder::create($validated);
 
         return redirect()->route('marketing.orders.index')->with('success', 'Order Dibuat!');
@@ -178,7 +215,7 @@ public function monitoringIndex()
         if (Str::contains($d, ['dye', 'scr', 'warna'])) return 'dyeing';
         if (preg_match('/(relax|compact|stenter|heat|finish|tumbler|fleece)/', $d)) return 'finishing';
         if (Str::contains($d, ['qc', 'qe', 'uji'])) return 'qc';
-        return 'pending';
+        return 'knitting'; // Default jika tidak terdeteksi
     }
 
     private function inferNextMarketingOrderStatus(string $divisionName): ?string

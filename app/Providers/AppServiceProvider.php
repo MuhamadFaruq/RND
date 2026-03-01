@@ -17,12 +17,13 @@ class AppServiceProvider extends ServiceProvider
     {
         //
     }
-
+    public const HOME = '/operator/logbook';
     /**
      * Bootstrap any application services.
      */
     public function boot() : void
     {
+        \Carbon\Carbon::setLocale('id');
         // Cukup gunakan ini untuk bypass Super Admin
         \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
             // Ubah pengecekan role
