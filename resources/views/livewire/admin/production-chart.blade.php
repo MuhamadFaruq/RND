@@ -3,6 +3,7 @@ use Livewire\Volt\Component;
 use App\Models\ProductionActivity;
 use App\Models\Setting;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 new class extends Component
 {
@@ -13,6 +14,40 @@ new class extends Component
     public $selectedDivision = 'all';
     public $chartData = [];
     public $selectedDate;
+    
+    public function exportPDF() {
+        $this->loadData();
+
+        $targetDate = \Carbon\Carbon::parse($this->selectedDate);
+
+        $activities = ProductionActivity::with('marketingOrder')
+            ->when($this->selectedDivision !== 'all', fn($q) => $q->where('division_name', $this->selectedDivision))
+            ->whereDate('created_at', $targetDate)
+            ->latest()
+            ->get();
+
+        // Validasi data sebelum generate
+        if ($activities->isEmpty()) {
+            $this->dispatch('notify', message: 'Tidak ada data untuk diekspor pada tanggal ini.', type: 'error');
+            return;
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.production-report', [
+            'period' => $this->period,
+            'selectedDivision' => $this->selectedDivision,
+            'trends' => $this->trends,
+            'hourlyActivity' => $this->hourlyActivity,
+            'divisionLeadTimes' => $this->divisionLeadTimes,
+            'activities' => $activities,
+            'generated_at' => now()->format('d M Y H:i'),
+            'admin_name' => auth()->user()->name ?? 'Admin'
+        ])->setPaper('a4', 'landscape');
+
+        return response()->streamDownload(
+            fn() => print($pdf->output()), 
+            "Report_" . strtoupper($this->selectedDivision) . "_" . $targetDate->format('Ymd') . ".pdf"
+        );
+    }
 
     public function mount($selectedDate = null) { 
         // Mengisi properti class dari parameter yang dikirim parent
@@ -29,9 +64,12 @@ new class extends Component
         $this->loadData();
     }
 
+    public function updatedSelectedDate() {
+        $this->loadData();
+    }
+
     public function with()
     {
-        $this->loadData();
         $maxCapacity = Setting::where('key', 'max_capacity')->value('value') ?? 1000;
         $targetDate = Carbon::parse($this->selectedDate);
 
@@ -72,6 +110,7 @@ new class extends Component
         foreach($divs as $d) {
             $this->divisionLeadTimes[$d] = $this->calculateAvgLeadTime($d);
         }
+        $this->dispatch('chart-updated');
 
         // 2. PERBAIKAN: Heatmap sekarang mengikuti $targetDate (bukan hari ini saja)
         $this->hourlyActivity = ProductionActivity::selectRaw('HOUR(created_at) as hour, SUM(kg) as total_kg')
@@ -116,29 +155,6 @@ new class extends Component
 
         return round(($totalHours ?? 0) / 24, 1);
     }
-
-    public function exportPDF() {
-        $this->loadData();
-        $activities = ProductionActivity::with('marketingOrder')
-            ->when($this->selectedDivision !== 'all', fn($q) => $q->where('division_name', $this->selectedDivision))
-            ->where('created_at', '>=', now()->subDays($this->period == 'weekly' ? 7 : 30))
-            ->latest()
-            ->get();
-
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.production-report', [
-            'period' => $this->period,
-            'selectedDivision' => $this->selectedDivision,
-            'trends' => $this->trends,
-            'hourlyActivity' => $this->hourlyActivity,
-            'divisionLeadTimes' => $this->divisionLeadTimes,
-            'activities' => $activities,
-            'generated_at' => now()->format('d M Y H:i'),
-            'admin_name' => auth()->user()->name
-        ])->setPaper('a4', 'landscape');
-
-        return response()->streamDownload(fn() => print($pdf->output()), 
-            "Report_" . strtoupper($this->selectedDivision) . "_" . now()->format('Ymd') . ".pdf");
-    }
 }
 ?>
 
@@ -149,72 +165,86 @@ new class extends Component
 
 @script
 <script>
-    const initChart = () => {
+    const renderChart = () => {
         const ctx = document.getElementById('productionChart');
         const container = document.getElementById('chartContainer');
+        
         if (!ctx || !container) return;
 
-        // Ambil data terbaru dari atribut data container
-        const chartData = JSON.parse(container.dataset.chart);
-        const maxVal = parseFloat(container.dataset.max);
+        setTimeout(() => {
+            const chartData = JSON.parse(container.getAttribute('data-chart'));
+            const maxVal = parseFloat(container.getAttribute('data-max'));
 
-        // PERBAIKAN: Gunakan window. untuk memastikan instance chart lama benar-benar dihancurkan
-        if (window.productionChart instanceof Chart) {
-            window.productionChart.destroy();
-        }
+            if (window.productionChart instanceof Chart) {
+                window.productionChart.destroy();
+            }
 
-        // Simpan instance ke window.productionChart
-        window.productionChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: Array.from({length: 24}, (_, i) => `${i}:00`),
-                datasets: [{
-                    data: chartData,
-                    borderColor: '#ef4444',
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                    fill: true, tension: 0.4, borderWidth: 4
-                }]
-            },
-            options: {
-                responsive: true, 
-                maintainAspectRatio: false,
-                animation: { duration: 500 }, // Tambahkan animasi halus saat ganti tanggal
-                plugins: { 
-                    legend: { display: false },
-                    annotation: { annotations: { line1: {
-                        type: 'line', yMin: maxVal, yMax: maxVal,
-                        borderColor: 'rgba(255, 255, 255, 0.2)', borderDash: [6, 6],
-                        label: { 
-                            display: true, 
-                            content: 'TARGET: ' + maxVal + ' KG', 
-                            backgroundColor: '#ef4444',
-                            font: { size: 10, weight: 'bold' }
-                        }
-                    }}}
+            window.productionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                    datasets: [{
+                        label: 'Produksi (KG)',
+                        data: chartData,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 4,
+                        pointStyle: 'circle',
+                        pointRadius: 3,
+                    }]
                 },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        suggestedMax: maxVal + 100,
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                        ticks: { color: '#64748b', font: { size: 10, weight: 'bold' } }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        // 1. MATIKAN LEGENDA OTOMATIS (Lingkaran bawah akan hilang)
+                        legend: {
+                            display: false 
+                        }
                     },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#64748b', font: { size: 9, weight: 'bold' } }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            suggestedMax: Math.max(...chartData) > 0 ? Math.max(...chartData) + 10 : 100,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#64748b' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748b' }
+                        }
                     }
                 }
-            }
-        });
+            });
+        }, 50);
     };
 
-    // Inisialisasi awal
-    initChart();
+    // 2. FUNGSI TOGGLE UNTUK IKON MATA ATAS
+    window.toggleProductionLine = () => {
+        if (!window.productionChart) return;
 
-    // Pastikan dipanggil setiap kali Livewire memperbarui komponen
-    Livewire.hook('morph.updated', () => {
-        initChart();
-    });
+        const isVisible = window.productionChart.isDatasetVisible(0);
+        const eyeIcon = document.getElementById('eye-icon-svg');
+        const btnText = document.getElementById('btn-text');
+
+        if (isVisible) {
+            window.productionChart.hide(0);
+            if(eyeIcon) eyeIcon.style.opacity = '0.3'; // Redupkan ikon saat hidden
+            if(btnText) btnText.style.color = '#475569';
+        } else {
+            window.productionChart.show(0);
+            if(eyeIcon) eyeIcon.style.opacity = '1'; // Terangkan kembali
+            if(btnText) btnText.style.color = '#94a3b8';
+        }
+    };
+
+    renderChart();
+
+    $wire.on('chart-updated', () => { renderChart(); });
+
+    Livewire.hook('morph.updated', ({ el, component }) => { renderChart(); });
 </script>
 @endscript
 
@@ -222,16 +252,11 @@ new class extends Component
     {{-- 1. HEADER & CONTROLS --}}
     <div class="flex justify-between items-center mb-10">
         <div>
-            <h3 class="text-sm font-black uppercase italic text-red-500 tracking-tighter">📈 Production Analytics Hub</h3>
+            <h3 class="text-sm font-black uppercase italic text-red-500 tracking-tighter">Production Analytics Hub</h3>
             <p class="text-[9px] text-slate-500 font-bold uppercase mt-1 italic">Real-time Performance Metrics</p>
         </div>
         
         <div class="flex items-center gap-4">
-            <div class="flex bg-slate-950 p-1 rounded-2xl border border-slate-800 shadow-inner">
-                <button wire:click="setPeriod('weekly')" class="px-5 py-2 rounded-xl text-[9px] font-black transition-all {{ $period == 'weekly' ? 'bg-red-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300' }}">MINGGUAN</button>
-                <button wire:click="setPeriod('monthly')" class="px-5 py-2 rounded-xl text-[9px] font-black transition-all {{ $period == 'monthly' ? 'bg-white text-red-600 shadow' : 'text-slate-500 hover:text-slate-300' }}">BULANAN</button>
-            </div>
-
             <select wire:model.live="selectedDivision" class="bg-slate-950 border-slate-800 text-slate-300 rounded-2xl px-4 py-2.5 text-[9px] font-black uppercase italic focus:ring-2 focus:ring-red-500 outline-none">
                 <option value="all">SEMUA DIVISI</option>
                 <option value="knitting">KNITTING</option>
@@ -242,11 +267,11 @@ new class extends Component
                 <option value="tumbler">TUMBLER DRY</option>
                 <option value="fleece">FLEECE</option>
                 <option value="pengujian">PENGUJIAN (QC & LAB)</option>
-                <option value="qe">🔍 QE / QC</option>
+                <option value="qe">QE / QC</option>
             </select>
 
             <button wire:click="exportPDF" class="bg-red-600 text-white px-5 py-2.5 rounded-2xl text-[9px] font-black uppercase italic hover:bg-black transition-all shadow-lg">
-                📄 EXPORT PDF
+                EXPORT PDF
             </button>
         </div>
     </div>
@@ -259,6 +284,20 @@ new class extends Component
     </div>
 
     {{-- Canvas tempat grafik muncul --}}
+    <div class="flex justify-end mb-2">
+        <div onclick="window.toggleProductionLine()" 
+            class="flex items-center gap-2 bg-slate-800/40 px-3 py-1 rounded-full border border-slate-700/50 shadow-sm cursor-pointer hover:bg-slate-700/50 transition-all">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" id="eye-icon-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="transition-opacity duration-300">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+            
+            <span id="btn-text" class="text-[9px] font-black text-slate-400 uppercase italic transition-colors duration-300">
+                Produksi (KG)
+            </span>
+        </div>
+    </div>
+
     <div class="mb-12 h-64 relative bg-slate-950/50 rounded-3xl p-6 border border-slate-800 shadow-inner">
         <canvas id="productionChart"></canvas>
     </div>
@@ -267,9 +306,8 @@ new class extends Component
     <div class="mt-10 border-t border-slate-800 pt-8 mb-10 relative">
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-[10px] font-black uppercase italic text-slate-400 tracking-widest">
-                🕒 Hourly Activity Heatmap ({{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('d F Y') }})
+                Hourly Activity Heatmap ({{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('d F Y') }})
             </h3>
-            <span class="text-[8px] text-slate-600 font-bold uppercase italic">Intensitas Warna = Volume Input</span>
         </div>
 
         @php 
@@ -321,7 +359,7 @@ new class extends Component
 
     {{-- 4. TREND PRODUCTION GRAPH --}}
     <div class="h-64 w-full bg-slate-950 rounded-[2rem] p-8 relative border border-slate-800 shadow-inner group">
-        <h3 class="text-[10px] font-black uppercase italic text-slate-400 tracking-widest mb-4">📈 Production Trend ({{ strtoupper($period) }})</h3>
+        <h3 class="text-[10px] font-black uppercase italic text-slate-400 tracking-widest mb-4">Production Trend ({{ strtoupper($period) }})</h3>
         
         @php
             $maxValTrend = collect($trends)->max('total') ?: 1000; // Berikan minimal target kapasitas (misal 1000) agar skala lebih proporsional

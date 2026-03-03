@@ -247,7 +247,7 @@ new class extends Component
     {{-- Di monitoring.blade.php --}}
     <livewire:admin.production-chart 
         :selectedDate="$filterDate" 
-        :wire:key="'chart-update-'.$filterDate" 
+        :wire:key="'prod-chart-v2-' . $filterDate" 
     />
 </div>
 
