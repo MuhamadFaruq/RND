@@ -259,7 +259,7 @@ new class extends Component
     public function with()
     {
         $user = Auth::user();
-        $targetShift = 500;
+        $targetShift = \App\Models\Setting::where('key', 'target_minimal')->first()->value ?? 400;
 
         // 1. Hitung Pencapaian
         $totalKgToday = ProductionActivity::where('operator_id', $user->id)
@@ -342,7 +342,7 @@ new class extends Component
 ?>
 
 <div>
-    <div class="py-8 bg-slate-50 min-h-screen font-sans tracking-tighter italic text-left">
+    <div class="py-8 bg-transparent min-h-screen font-sans tracking-tighter italic text-left">
     <div class="max-w-6xl mx-auto px-4">
         <div class="min-h-[400px]">
 
@@ -352,7 +352,7 @@ new class extends Component
                     {{-- HEADER --}}
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
                         <div class="text-left">
-                            <h2 class="text-3xl font-black uppercase tracking-tighter text-slate-800 leading-none italic">
+                            <h2 class="text-3xl font-black uppercase tracking-tighter mkt-text leading-none italic">
                                 @if(auth()->user()->role === 'knitting') 
                                     Knitting
                                 @elseif(auth()->user()->role === 'dyeing') 
@@ -378,15 +378,15 @@ new class extends Component
                             </h2>
                             <div class="mt-2 flex items-center gap-2">
                                 <div class="bg-slate-900 text-white px-3 py-1 rounded-lg shadow-lg">
-                                    <p id="real-time-clock" class="text-xs font-black tracking-widest leading-none">00:00:00</p>
+                                    <p class="real-time-clock text-xs font-black tracking-widest leading-none">00:00:00</p>
                                 </div>
-                                <p id="real-time-date" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic"></p>
+                                <p class="real-time-date text-[10px] font-bold mkt-text-muted uppercase tracking-widest italic"></p>
                             </div>
                         </div>
                         
-                        <div class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                        <div class="mkt-surface px-6 py-3 rounded-2xl shadow-sm border mkt-border flex items-center gap-4">
                             <div class="text-right italic">
-                                <p class="text-[9px] font-black text-slate-400 uppercase leading-none">Status Mesin</p>
+                                <p class="text-[9px] font-black mkt-text-muted uppercase leading-none">Status Mesin</p>
                                 <p class="text-xs font-black text-green-500 uppercase mt-1">Optimal Performance</p>
                             </div>
                             <div class="relative flex">
@@ -400,28 +400,35 @@ new class extends Component
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="md:col-span-2 bg-slate-900 p-8 rounded-[2.5rem] shadow-xl text-white relative overflow-hidden">
                             <div class="relative z-10 text-left">
-                                <p class="text-[10px] font-black text-slate-400 uppercase mb-1 italic">Pencapaian Target Shift</p>
+                                <p class="text-[10px] font-black mkt-text-muted uppercase mb-1 italic">Pencapaian Target Shift</p>
                                 <div class="flex justify-between items-end mb-4">
                                     <h4 class="text-6xl font-black leading-none italic">{{ number_format($progress, 1) }}%</h4>
                                     <div class="text-right leading-none">
-                                        <p class="text-[10px] text-slate-400 uppercase mb-1">Target: {{ $targetShift }} KG</p>
+                                        <p class="text-[10px] mkt-text-muted uppercase mb-1">Target: {{ $targetShift }} KG</p>
                                         <p class="text-xl font-black text-red-500 italic">{{ number_format($totalKgToday, 1) }} / {{ $targetShift }}</p>
                                     </div>
                                 </div>
                                 <div class="w-full bg-slate-800 h-4 rounded-full overflow-hidden border border-white/5">
-                                    <div class="bg-red-600 h-full rounded-full transition-all duration-700" style="width: {{ $progress }}%"></div>
+                                    @php
+                                        $barColor = match(true) {
+                                            $progress < 50 => 'bg-red-600',
+                                            $progress < 100 => 'bg-amber-500',
+                                            default => 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]'
+                                        };
+                                    @endphp
+                                    <div class="{{ $barColor }} h-full rounded-full transition-all duration-700" style="width: {{ $progress }}%"></div>
                                 </div>
                             </div>
                             <div class="absolute -right-10 -bottom-10 opacity-5 text-[12rem] font-black italic">UNIT</div>
                         </div>
 
                         <div class="space-y-4">
-                            <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm text-left">
-                                <p class="text-[9px] font-black text-slate-400 uppercase italic">Antrean Masuk</p>
+                            <div class="mkt-surface p-6 rounded-[2rem] border mkt-border shadow-sm text-left">
+                                <p class="text-[9px] font-black mkt-text-muted uppercase italic">Antrean Masuk</p>
                                 <h4 class="text-4xl font-black text-blue-600 italic">{{ $totalKnitting }}</h4>
                             </div>
-                            <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm text-left">
-                                <p class="text-[9px] font-black text-slate-400 uppercase italic">Total Selesai</p>
+                            <div class="mkt-surface p-6 rounded-[2rem] border mkt-border shadow-sm text-left">
+                                <p class="text-[9px] font-black mkt-text-muted uppercase italic">Total Selesai</p>
                                 <h4 class="text-4xl font-black text-green-600 italic">{{ $totalDone }}</h4>
                             </div>
                         </div>
@@ -440,36 +447,36 @@ new class extends Component
                             <h4 class="text-white font-black uppercase text-sm italic">Emergency Call</h4>
                         </div>
 
-                        <div class="md:col-span-2 bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 italic text-left">
+                        <div class="md:col-span-2 mkt-surface p-6 rounded-[2.5rem] shadow-sm border mkt-border italic text-left">
                             <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-black uppercase text-slate-800 italic">Buat <span class="text-blue-600">Pesan Handover</span></h3>
+                                <h3 class="text-lg font-black uppercase mkt-text italic">Buat <span class="text-blue-600">Pesan Handover</span></h3>
                                 <button wire:click="saveNote" class="bg-blue-600 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-black">Simpan</button>
                             </div>
-                            <textarea wire:model="messageText" placeholder="Tulis kendala mesin..." class="w-full bg-slate-50 border-none rounded-2xl p-4 text-xs font-bold italic h-24 resize-none"></textarea>
+                            <textarea wire:model="messageText" placeholder="Tulis kendala mesin..." class="w-full mkt-surface border-none rounded-2xl p-4 text-xs font-bold italic h-24 resize-none"></textarea>
                         </div>
                     </div>
 
                     {{-- PESAN TERBARU --}}
-                    <div class="bg-white p-8 rounded-[3rem] shadow-sm border border-slate-100 italic text-left">
+                    <div class="mkt-surface p-8 rounded-[3rem] shadow-sm border mkt-border italic text-left">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-black uppercase italic text-slate-800 leading-none">Pesan <span class="text-red-600">Terbaru</span></h3>
+                            <h3 class="text-xl font-black uppercase italic mkt-text leading-none">Pesan <span class="text-red-600">Terbaru</span></h3>
                             <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">{{ $unreadNotes->count() }} Baru</span>
                         </div>
                         <div class="space-y-3">
                             @forelse($unreadNotes as $note)
-                                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border-l-4 border-red-500 hover:bg-slate-100 transition-all group">
+                                <div class="flex justify-between items-center p-4 mkt-surface rounded-2xl border-l-4 border-red-500 hover:mkt-input transition-all group">
                                     <div class="flex-1">
-                                        <p class="text-[9px] font-black text-slate-400 uppercase mb-1">
+                                        <p class="text-[9px] font-black mkt-text-muted uppercase mb-1">
                                             {{ $note->user->name }} • {{ $note->created_at->format('H:i') }}
                                         </p>
-                                        <p class="text-xs font-bold text-slate-700 italic">"{{ $note->message }}"</p>
+                                        <p class="text-xs font-bold mkt-text italic">"{{ $note->message }}"</p>
                                     </div>
-                                    <button wire:click="markAsRead({{ $note->id }})" class="opacity-0 group-hover:opacity-100 bg-white p-2 rounded-lg shadow-sm text-[9px] font-black text-green-600 uppercase transition-all">
+                                    <button wire:click="markAsRead({{ $note->id }})" class="opacity-0 group-hover:opacity-100 mkt-surface p-2 rounded-lg shadow-sm text-[9px] font-black text-green-600 uppercase transition-all">
                                         Selesai/Baca
                                     </button>
                                 </div>
                             @empty
-                                <p class="text-center py-10 text-slate-300 font-black uppercase text-xs italic">Tidak ada pesan baru</p>
+                                <p class="text-center py-10 mkt-text-muted font-black uppercase text-xs italic">Tidak ada pesan baru</p>
                             @endforelse
                         </div>
                     </div>
@@ -483,10 +490,10 @@ new class extends Component
                     @if(!$isProcessing)
                         <div class="mb-8 flex justify-between items-end">
                             <div>
-                                <h2 class="text-3xl font-black uppercase tracking-tighter text-slate-800 leading-none">
+                                <h2 class="text-3xl font-black uppercase tracking-tighter mkt-text leading-none">
                                     DUNIATEX <span class="text-blue-600">Execution</span>
                                 </h2>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">
+                                <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-widest mt-2">
                                     Divisi: {{ auth()->user()->role }}
                                 </p>
                             </div>
@@ -497,16 +504,16 @@ new class extends Component
                                 @forelse($workQueue as $job)
                                     @include('livewire.operator.partials.relax-dryer-table', ['job' => $job])
                                 @empty
-                                    <div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 italic">
-                                        <p class="text-slate-300 font-black uppercase text-xs">Tidak ada antrean relax dryer</p>
+                                    <div class="text-center py-20 mkt-surface rounded-[3rem] border-2 border-dashed mkt-border italic">
+                                        <p class="mkt-text-muted font-black uppercase text-xs">Tidak ada antrean relax dryer</p>
                                     </div>
                                 @endforelse
                             @elseif(auth()->user()->role === 'knitting')
                             @forelse($workQueue as $job)
                                 @include('livewire.operator.partials.knitting-table', ['job' => $job])
                             @empty
-                                <div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 italic">
-                                    <p class="text-slate-300 font-black uppercase text-xs">Tidak ada antrean knitting</p>
+                                <div class="text-center py-20 mkt-surface rounded-[3rem] border-2 border-dashed mkt-border italic">
+                                    <p class="mkt-text-muted font-black uppercase text-xs">Tidak ada antrean knitting</p>
                                 </div>
                             @endforelse
 
@@ -517,8 +524,8 @@ new class extends Component
                                 @forelse($workQueue as $job)
                                     @include('livewire.operator.partials.finishing-table', ['job' => $job])
                                 @empty
-                                    <div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 italic">
-                                        <p class="text-slate-300 font-black uppercase text-xs">Tidak ada antrean finishing</p>
+                                    <div class="text-center py-20 mkt-surface rounded-[3rem] border-2 border-dashed mkt-border italic">
+                                        <p class="mkt-text-muted font-black uppercase text-xs">Tidak ada antrean finishing</p>
                                     </div>
                                 @endforelse
 
@@ -526,40 +533,40 @@ new class extends Component
                                 @forelse($workQueue as $job)
                                     @include('livewire.operator.partials.stenter-table', ['job' => $job])
                                 @empty
-                                    <div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 italic">
-                                        <p class="text-slate-300 font-black uppercase text-xs">Tidak ada antrean stenter</p>
+                                    <div class="text-center py-20 mkt-surface rounded-[3rem] border-2 border-dashed mkt-border italic">
+                                        <p class="mkt-text-muted font-black uppercase text-xs">Tidak ada antrean stenter</p>
                                     </div>
                                 @endforelse
                             @elseif(auth()->user()->role === 'tumbler')
                                 @forelse($workQueue as $job)
                                     @include('livewire.operator.partials.tumbler-table', ['job' => $job])
                                 @empty
-                                    <div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 italic">
-                                        <p class="text-slate-300 font-black uppercase text-xs">Tidak ada antrean tumbler</p>
+                                    <div class="text-center py-20 mkt-surface rounded-[3rem] border-2 border-dashed mkt-border italic">
+                                        <p class="mkt-text-muted font-black uppercase text-xs">Tidak ada antrean tumbler</p>
                                     </div>
                                 @endforelse
                             @elseif(auth()->user()->role === 'fleece')
                                 @forelse($workQueue as $job)
                                     @include('livewire.operator.partials.fleece-table', ['job' => $job])
                                 @empty
-                                    <div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 italic">
-                                        <p class="text-slate-300 font-black uppercase text-xs">Tidak ada antrean fleece</p>
+                                    <div class="text-center py-20 mkt-surface rounded-[3rem] border-2 border-dashed mkt-border italic">
+                                        <p class="mkt-text-muted font-black uppercase text-xs">Tidak ada antrean fleece</p>
                                     </div>
                                 @endforelse
                             @elseif(auth()->user()->role === 'pengujian')
                                 @forelse($workQueue as $job)
                                     @include('livewire.operator.partials.pengujian-table', ['job' => $job])
                                 @empty
-                                    <div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 italic">
-                                        <p class="text-slate-300 font-black uppercase text-xs">Tidak ada antrean pengujian</p>
+                                    <div class="text-center py-20 mkt-surface rounded-[3rem] border-2 border-dashed mkt-border italic">
+                                        <p class="mkt-text-muted font-black uppercase text-xs">Tidak ada antrean pengujian</p>
                                     </div>
                                 @endforelse
                             @elseif(auth()->user()->role === 'qe')
                                 @forelse($workQueue as $job)
                                     @include('livewire.operator.partials.qe-table', ['job' => $job])
                                 @empty
-                                    <div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 italic">
-                                        <p class="text-slate-300 font-black uppercase text-xs">Tidak ada antrean qe</p>
+                                    <div class="text-center py-20 mkt-surface rounded-[3rem] border-2 border-dashed mkt-border italic">
+                                        <p class="mkt-text-muted font-black uppercase text-xs">Tidak ada antrean qe</p>
                                     </div>
                                 @endforelse
                             @endif
@@ -597,7 +604,7 @@ new class extends Component
                             
                             {{-- Tombol Batal --}}
                             <div class="mt-8 text-center">
-                                <button wire:click="cancelProcess" class="text-[10px] font-black uppercase text-slate-400 hover:text-red-600 transition-all flex items-center justify-center gap-2 mx-auto">
+                                <button wire:click="cancelProcess" class="text-[10px] font-black uppercase mkt-text-muted hover:text-red-600 transition-all flex items-center justify-center gap-2 mx-auto">
                                     ✕ Batalkan dan Kembali ke Antrean
                                 </button>
                             </div>
@@ -610,13 +617,13 @@ new class extends Component
             @elseif($currentMenu === 'history')
                 <div class="animate-in slide-in-from-bottom-4 duration-500 text-left italic font-black uppercase tracking-tighter">
                     <div class="mb-8 flex justify-between items-end">
-                        <h2 class="text-3xl text-slate-800 leading-none italic">Production <span class="text-red-600">Logs</span></h2>
-                        <input wire:model.live="search" type="text" placeholder="CARI SAP..." class="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs outline-none focus:ring-2 focus:ring-red-600/20 italic">
+                        <h2 class="text-3xl mkt-text leading-none italic">Production <span class="text-red-600">Logs</span></h2>
+                        <input wire:model.live="search" type="text" placeholder="CARI SAP..." class="px-6 py-3 mkt-surface border mkt-border rounded-2xl text-xs outline-none focus:ring-2 focus:ring-red-600/20 italic">
                     </div>
                     
                     <div class="space-y-4">
                         @foreach($activities as $item)
-                            <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 flex justify-between items-center group italic">
+                            <div class="mkt-surface p-6 rounded-[2.5rem] shadow-sm border mkt-border flex justify-between items-center group italic">
                                 <div class="text-left flex items-center gap-4">
                                     <div class="text-2xl">
                                         @if($item->division_name === 'knitting') 🧶
@@ -627,17 +634,17 @@ new class extends Component
                                     
                                     <div>
                                         <span class="text-xs text-blue-600 italic">#{{ $item->marketingOrder->sap_no ?? 'N/A' }}</span>
-                                        <h4 class="text-lg text-slate-800 leading-none italic">{{ $item->marketingOrder->art_no ?? 'UNKNOWN' }}</h4>
+                                        <h4 class="text-lg mkt-text leading-none italic">{{ $item->marketingOrder->art_no ?? 'UNKNOWN' }}</h4>
                                         {{-- Info Operator --}}
-                                        <p class="text-[8px] text-slate-400 mt-1 uppercase">
+                                        <p class="text-[8px] mkt-text-muted mt-1 uppercase">
                                             PIC: {{ $item->technical_data['nama_input'] ?? 'OPERATOR' }}
                                         </p>
                                     </div>
                                 </div>
                                 
-                                <div class="flex gap-4 border-l border-slate-100 pl-10 items-center">
+                                <div class="flex gap-4 border-l mkt-border pl-10 items-center">
                                     <div class="text-right mr-4">
-                                        <p class="text-[9px] text-slate-400 mb-1 italic">Output</p>
+                                        <p class="text-[9px] mkt-text-muted mb-1 italic">Output</p>
                                         <p class="text-xl text-red-600 leading-none italic">
                                             {{ number_format($item->kg ?? 0, 1) }} KG
                                         </p>
@@ -647,7 +654,7 @@ new class extends Component
                                     <div class="flex gap-2">
                                         {{-- Tombol Detail --}}
                                         <button wire:click="showOrderDetail({{ $item->marketing_order_id }})" 
-                                                class="w-10 h-10 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center">
+                                                class="w-10 h-10 mkt-input text-slate-600 rounded-xl hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center">
                                             🔍
                                         </button>
 
@@ -680,10 +687,10 @@ new class extends Component
                 <div class="animate-in slide-in-from-bottom-4 duration-500 text-left italic">
                     <div class="mb-8 flex justify-between items-end">
                         <div>
-                            <h2 class="text-3xl font-black uppercase tracking-tighter text-slate-800 leading-none">
+                            <h2 class="text-3xl font-black uppercase tracking-tighter mkt-text leading-none">
                                 Message <span class="text-blue-600">Archive</span>
                             </h2>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Seluruh riwayat pesan dan handover</p>
+                            <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-widest mt-2">Seluruh riwayat pesan dan handover</p>
                         </div>
                         <button wire:click="setMenu('dashboard')" class="bg-slate-900 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase italic shadow-lg">
                             ⬅ Kembali ke Dashboard
@@ -692,17 +699,17 @@ new class extends Component
 
                     <div class="space-y-4">
                         @forelse($allNotes as $note)
-                            <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 flex justify-between items-center group {{ $note->is_read ? 'opacity-60' : 'border-l-4 border-l-red-500' }}">
+                            <div class="mkt-surface p-6 rounded-[2.5rem] shadow-sm border mkt-border flex justify-between items-center group {{ $note->is_read ? 'opacity-60' : 'border-l-4 border-l-red-500' }}">
                                 <div class="flex-1">
                                     <div class="flex items-center gap-3 mb-2">
-                                        <span class="text-[9px] font-black px-3 py-1 {{ $note->is_read ? 'bg-slate-100 text-slate-400' : 'bg-red-600 text-white' }} rounded-full uppercase">
+                                        <span class="text-[9px] font-black px-3 py-1 {{ $note->is_read ? 'mkt-input mkt-text-muted' : 'bg-red-600 text-white' }} rounded-full uppercase">
                                             {{ $note->is_read ? 'SUDAH DIBACA' : 'BARU' }}
                                         </span>
-                                        <p class="text-[10px] font-black text-slate-400 uppercase">
+                                        <p class="text-[10px] font-black mkt-text-muted uppercase">
                                             {{ $note->user->name }} • {{ $note->created_at->format('d M Y | H:i') }} WIB
                                         </p>
                                     </div>
-                                    <p class="text-sm font-bold text-slate-700">"{{ $note->message }}"</p>
+                                    <p class="text-sm font-bold mkt-text">"{{ $note->message }}"</p>
                                 </div>
 
                                 @if(!$note->is_read)
@@ -712,8 +719,8 @@ new class extends Component
                                 @endif
                             </div>
                         @empty
-                            <div class="py-20 text-center bg-white rounded-[3rem] border-2 border-dashed border-slate-100">
-                                <p class="text-slate-300 font-black uppercase text-xs">Arsip Kosong</p>
+                            <div class="py-20 text-center mkt-surface rounded-[3rem] border-2 border-dashed mkt-border">
+                                <p class="mkt-text-muted font-black uppercase text-xs">Arsip Kosong</p>
                             </div>
                         @endforelse
 
@@ -730,7 +737,7 @@ new class extends Component
     {{-- MODAL DETAIL & INPUT ORDER --}}
 @if($showModal && $selectedOrder)
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-    <div class="bg-white rounded-[3rem] w-full max-w-4xl my-auto overflow-hidden shadow-2xl border-4 border-slate-900 animate-in zoom-in duration-300">
+    <div class="mkt-surface rounded-[3rem] w-full max-w-4xl my-auto overflow-hidden shadow-2xl border-4 border-slate-900 animate-in zoom-in duration-300">
         
         {{-- Header Modal dengan Info SAP --}}
         <div class="bg-slate-900 p-8 flex justify-between items-center italic">
@@ -739,57 +746,57 @@ new class extends Component
                     @if($showInputForm) INPUT HASIL PRODUKSI @else DETAIL ORDER MARKETING @endif 
                     <span class="text-red-600">#{{ $selectedOrder->sap_no }}</span>
                 </h3>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Internal Tracking ID: {{ $selectedOrder->id }}</p>
+                <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-widest mt-2">Internal Tracking ID: {{ $selectedOrder->id }}</p>
             </div>
-            <button wire:click="closeModal" class="bg-white/10 hover:bg-red-600 p-3 rounded-2xl text-white transition-all">&times;</button>
+            <button wire:click="closeModal" class="mkt-surface/10 hover:bg-red-600 p-3 rounded-2xl text-white transition-all">&times;</button>
         </div>
 
-        <div class="p-8 bg-slate-50/30">
+        <div class="p-8 mkt-surface/30">
             @if(!$showInputForm)
                 {{-- TAMPILAN 1: DETAIL LENGKAP UNTUK EKSEKUSI OPERATOR --}}
                 <div class="space-y-8">
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm italic">
+                        <div class="mkt-surface p-6 rounded-[2rem] border mkt-border shadow-sm italic">
                             <h3 class="text-red-600 font-black mb-4 border-b pb-2 uppercase text-xs flex items-center">
                                 <span class="w-2 h-4 bg-red-600 mr-2 rounded-full"></span>I. Identity & Sales
                             </h3>
                             <div class="space-y-3 font-bold text-xs">
-                                <div class="flex justify-between border-b border-slate-50 pb-1">
-                                    <span class="text-slate-400 uppercase">Pelanggan</span>
-                                    <span class="text-slate-800 uppercase">{{ $selectedOrder->pelanggan }}</span>
+                                <div class="flex justify-between border-b mkt-border pb-1">
+                                    <span class="mkt-text-muted uppercase">Pelanggan</span>
+                                    <span class="mkt-text uppercase">{{ $selectedOrder->pelanggan }}</span>
                                 </div>
-                                <div class="flex justify-between border-b border-slate-50 pb-1">
-                                    <span class="text-slate-400 uppercase">Artikel No</span>
-                                    <span class="text-slate-800 uppercase">{{ $selectedOrder->art_no }}</span>
+                                <div class="flex justify-between border-b mkt-border pb-1">
+                                    <span class="mkt-text-muted uppercase">Artikel No</span>
+                                    <span class="mkt-text uppercase">{{ $selectedOrder->art_no }}</span>
                                 </div>
-                                <div class="flex justify-between border-b border-slate-50 pb-1">
-                                    <span class="text-slate-400 uppercase">Tanggal Order</span>
-                                    <span class="text-slate-800">{{ $selectedOrder->tanggal ? \Carbon\Carbon::parse($selectedOrder->tanggal)->format('d/m/Y') : '-' }}</span>
+                                <div class="flex justify-between border-b mkt-border pb-1">
+                                    <span class="mkt-text-muted uppercase">Tanggal Order</span>
+                                    <span class="mkt-text">{{ $selectedOrder->tanggal ? \Carbon\Carbon::parse($selectedOrder->tanggal)->format('d/m/Y') : '-' }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-slate-400 uppercase">Sales (Mkt)</span>
-                                    <span class="text-slate-800 italic uppercase">{{ $selectedOrder->mkt ?? 'N/A' }}</span>
+                                    <span class="mkt-text-muted uppercase">Sales (Mkt)</span>
+                                    <span class="mkt-text italic uppercase">{{ $selectedOrder->mkt ?? 'N/A' }}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm italic">
+                        <div class="mkt-surface p-6 rounded-[2rem] border mkt-border shadow-sm italic">
                             <h3 class="text-slate-900 font-black mb-4 border-b pb-2 uppercase text-xs flex items-center">
                                 <span class="w-2 h-4 bg-slate-900 mr-2 rounded-full"></span>II. Technical Specs
                             </h3>
                             <div class="space-y-3 font-bold text-xs">
-                                <div class="flex justify-between border-b border-slate-50 pb-1">
-                                    <span class="text-slate-400 uppercase">Material</span>
-                                    <span class="text-slate-800 uppercase">{{ $selectedOrder->material }}</span>
+                                <div class="flex justify-between border-b mkt-border pb-1">
+                                    <span class="mkt-text-muted uppercase">Material</span>
+                                    <span class="mkt-text uppercase">{{ $selectedOrder->material }}</span>
                                 </div>
-                                <div class="flex justify-between border-b border-slate-50 pb-1">
-                                    <span class="text-slate-400 uppercase">Benang</span>
-                                    <span class="text-slate-800 uppercase">{{ $selectedOrder->benang }}</span>
+                                <div class="flex justify-between border-b mkt-border pb-1">
+                                    <span class="mkt-text-muted uppercase">Benang</span>
+                                    <span class="mkt-text uppercase">{{ $selectedOrder->benang }}</span>
                                 </div>
-                                <div class="flex justify-between border-b border-slate-50 pb-1">
-                                    <span class="text-slate-400 uppercase">Konstruksi Greige</span>
-                                    <span class="text-slate-800 italic uppercase">{{ $selectedOrder->konstruksi_greig }}</span>
+                                <div class="flex justify-between border-b mkt-border pb-1">
+                                    <span class="mkt-text-muted uppercase">Konstruksi Greige</span>
+                                    <span class="mkt-text italic uppercase">{{ $selectedOrder->konstruksi_greig }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-red-600 uppercase">Warna Finishing</span>
@@ -803,19 +810,19 @@ new class extends Component
                         <h3 class="text-red-500 font-black mb-6 uppercase italic tracking-tighter text-center underline underline-offset-8">Production Specification Matrix</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center font-bold">
                             <div class="border-r border-white/10 italic">
-                                <p class="text-[9px] text-slate-400 uppercase mb-1">Kelompok Kain</p>
+                                <p class="text-[9px] mkt-text-muted uppercase mb-1">Kelompok Kain</p>
                                 <p class="text-lg uppercase">{{ $selectedOrder->kelompok_kain }}</p>
                             </div>
                             <div class="border-r border-white/10 italic">
-                                <p class="text-[9px] text-slate-400 uppercase mb-1">Lebar / Gramasi</p>
+                                <p class="text-[9px] mkt-text-muted uppercase mb-1">Lebar / Gramasi</p>
                                 <p class="text-lg">{{ $selectedOrder->target_lebar ?? '0' }}" / {{ $selectedOrder->target_gramasi ?? '0' }}</p>
                             </div>
                             <div class="border-r border-white/10 italic">
-                                <p class="text-[9px] text-slate-400 uppercase mb-1">Belah / Bulat</p>
+                                <p class="text-[9px] mkt-text-muted uppercase mb-1">Belah / Bulat</p>
                                 <p class="text-lg uppercase">{{ $selectedOrder->belah_bulat }}</p>
                             </div>
                             <div class="italic">
-                                <p class="text-[9px] text-slate-400 uppercase mb-1">Handfeel</p>
+                                <p class="text-[9px] mkt-text-muted uppercase mb-1">Handfeel</p>
                                 <p class="text-lg uppercase">{{ $selectedOrder->handfeel }}</p>
                             </div>
                         </div>
@@ -832,15 +839,15 @@ new class extends Component
                         </div>
                     </div>
 
-                    <div class="bg-white p-8 rounded-[3rem] border-l-[12px] border-red-600 shadow-sm space-y-4 text-left italic">
+                    <div class="mkt-surface p-8 rounded-[3rem] border-l-[12px] border-red-600 shadow-sm space-y-4 text-left italic">
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Special Treatment & Instructions:</p>
-                            <p class="text-lg font-black text-slate-800 uppercase underline decoration-red-600/30 underline-offset-4">{{ $selectedOrder->treatment_khusus ?? '-' }}</p>
+                            <p class="text-[10px] font-black mkt-text-muted uppercase mb-2 tracking-widest">Special Treatment & Instructions:</p>
+                            <p class="text-lg font-black mkt-text uppercase underline decoration-red-600/30 underline-offset-4">{{ $selectedOrder->treatment_khusus ?? '-' }}</p>
                         </div>
-                        <hr class="border-slate-100">
+                        <hr class="mkt-border">
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Internal Marketing Notes:</p>
-                            <p class="text-xs font-bold text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-2xl italic">"{{ $selectedOrder->keterangan_artikel ?? 'No additional internal notes provided.' }}"</p>
+                            <p class="text-[10px] font-black mkt-text-muted uppercase mb-2 tracking-widest">Internal Marketing Notes:</p>
+                            <p class="text-xs font-bold text-slate-600 leading-relaxed mkt-surface p-4 rounded-2xl italic">"{{ $selectedOrder->keterangan_artikel ?? 'No additional internal notes provided.' }}"</p>
                         </div>
                     </div>
 
@@ -876,16 +883,16 @@ new class extends Component
                         </div>
 
                         <div>
-                            <label class="text-[10px] text-slate-400 uppercase ml-2">Total Berat (KG)</label>
+                            <label class="text-[10px] mkt-text-muted uppercase ml-2">Total Berat (KG)</label>
                             <input type="number" step="0.1" wire:model="qty_kg" 
-                                class="w-full bg-slate-100 border-none rounded-2xl p-4 text-xl font-black text-red-600 {{ $errors->has('qty_kg') ? 'ring-2 ring-red-500' : '' }}">
+                                class="w-full mkt-input border-none rounded-2xl p-4 text-xl font-black text-red-600 {{ $errors->has('qty_kg') ? 'ring-2 ring-red-500' : '' }}">
                             @error('qty_kg') <p class="text-[9px] text-red-500 mt-1 ml-2 font-bold uppercase italic">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="text-[10px] text-slate-400 uppercase ml-2">Jumlah Roll</label>
+                            <label class="text-[10px] mkt-text-muted uppercase ml-2">Jumlah Roll</label>
                             <input type="number" wire:model="qty_roll" required
-                                class="w-full bg-slate-100 border-none rounded-2xl p-4 text-xl font-black text-slate-800 focus:ring-4 focus:ring-slate-100 italic" placeholder="0">
+                                class="w-full mkt-input border-none rounded-2xl p-4 text-xl font-black mkt-text focus:ring-4 focus:ring-slate-100 italic" placeholder="0">
                         </div>
                     </div>
 

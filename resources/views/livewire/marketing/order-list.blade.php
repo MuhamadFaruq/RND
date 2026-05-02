@@ -1,33 +1,13 @@
-<?php
-// Tambahkan fungsi ini di class Livewire Anda (order-list.blade.php)
-public $activitiesLogs = [];
-
-public function loadTrackingLogs($sap)
-    {
-        // Mengambil semua aktivitas produksi untuk SAP ini, urut berdasarkan waktu
-        $this->activitiesLogs = \App\Models\ProductionActivity::with('operator')
-            ->whereHas('marketingOrder', fn($q) => $q->where('sap_no', $sap))
-            ->get()
-            ->groupBy('division_name');
-    }
-public function updatedOpenDetail($value)
-    {
-        if($value && isset($this->selected['sap_no'])) {
-            $this->loadTrackingLogs($this->selected['sap_no']);
-        }
-    }
-?>
-<div x-data="{ openDetail: false, selected: {} }" class="animate-in fade-in duration-500 italic tracking-tighter">
-    <script src="https://cdn.tailwindcss.com"></script>
+<div x-data="{ openDetail: @entangle('showDetail'), selected: @entangle('selectedOrder') }" class="animate-in fade-in duration-500 italic tracking-tighter mkt-bg min-h-screen">
 
     <div class="max-w-[1600px] mx-auto">
         
         {{-- SECTION 1: COMPACT HEADER --}}
         {{-- Menghilangkan judul besar "Command Center" karena sudah ada di Navbar/Dashboard --}}
-        <div class="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-5 rounded-[2.5rem] border border-slate-100 shadow-sm">
+        <div class="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 mkt-surface mkt-border p-5 rounded-[2.5rem] border shadow-sm">
             <div class="flex items-center gap-3">
                 <div class="w-2 h-8 bg-red-600 rounded-full"></div>
-                <h3 class="font-black uppercase text-slate-800 italic">Order Pipeline <span class="text-red-600">Control</span></h3>
+                <h3 class="font-black uppercase mkt-text italic">Order Pipeline <span class="text-red-600">Control</span></h3>
             </div>
 
             <div class="flex flex-wrap gap-3 items-center">
@@ -97,8 +77,8 @@ public function updatedOpenDetail($value)
 
             {{-- Ganti bagian select status dengan ini --}}
             <div class="flex items-center gap-2 w-full md:w-auto">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:block">Status:</span>
-                <select wire:model.live="statusFilter" class="w-full md:w-40 py-2 px-4 bg-slate-50 border-none rounded-xl text-xs font-black uppercase tracking-tighter text-slate-600 outline-none cursor-pointer hover:bg-slate-100 transition-colors italic">
+                <span class="text-[10px] font-black mkt-text-muted uppercase tracking-widest hidden md:block">Status:</span>
+                <select wire:model.live="statusFilter" class="w-full md:w-40 py-2 px-4 mkt-input border-none rounded-xl text-xs font-black uppercase tracking-tighter text-slate-600 outline-none cursor-pointer hover:opacity-80 transition-colors italic">
                     <option value="">Semua Status</option>
                     <option value="knitting">Knitting</option>
                     <option value="dyeing">Dyeing</option>
@@ -115,25 +95,25 @@ public function updatedOpenDetail($value)
         </div>
 
         {{-- SECTION 4: TABLE --}}
-        <div class="bg-white rounded-[2.5rem] shadow-sm overflow-hidden border border-slate-100">
-            <div class="p-8 border-b border-slate-50 bg-white">
-                <h3 class="font-black uppercase text-slate-800 tracking-tighter italic text-lg">Master Data <span class="text-red-600">Marketing Order</span></h3>
+        <div class="mkt-surface rounded-[2.5rem] shadow-sm overflow-hidden mkt-border border">
+            <div class="p-8 border-b mkt-border mkt-surface">
+                <h3 class="font-black uppercase mkt-text tracking-tighter italic text-lg">Master Data <span class="text-red-600">Marketing Order</span></h3>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
-                    <thead class="bg-slate-50/50">
+                    <thead class="mkt-surface-alt">
                         <tr>
-                            <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">SAP NO</th>
-                            <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Tanggal Order</th>
-                            <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Pelanggan</th>
-                            <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Artikel No</th>
-                            <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Sales (MKT)</th>
-                            <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Keperluan</th>
-                            <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest text-center">Status</th>
-                            <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest text-right">Aksi</th>
+                            <th class="p-6 text-[10px] font-black uppercase mkt-text-muted tracking-widest">SAP NO</th>
+                            <th class="p-6 text-[10px] font-black uppercase mkt-text-muted tracking-widest">Tanggal Order</th>
+                            <th class="p-6 text-[10px] font-black uppercase mkt-text-muted tracking-widest">Pelanggan</th>
+                            <th class="p-6 text-[10px] font-black uppercase mkt-text-muted tracking-widest">Artikel No</th>
+                            <th class="p-6 text-[10px] font-black uppercase mkt-text-muted tracking-widest">Sales (MKT)</th>
+                            <th class="p-6 text-[10px] font-black uppercase mkt-text-muted tracking-widest">Keperluan</th>
+                            <th class="p-6 text-[10px] font-black uppercase mkt-text-muted tracking-widest text-center">Status</th>
+                            <th class="p-6 text-[10px] font-black uppercase mkt-text-muted tracking-widest text-right">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-50 uppercase text-sm font-bold text-slate-700">
+                    <tbody class="divide-y mkt-border uppercase text-sm font-bold mkt-text">
                         @forelse($orders as $order)
                             <tr class="hover:bg-slate-50 transition group relative {{ $order->status == 'knitting' && $order->created_at->diffInDays(now()) >= 2 ? 'bg-red-50/50' : '' }}">
                                 
@@ -154,17 +134,17 @@ public function updatedOpenDetail($value)
                                 
                                 <td class="p-6">
                                     <div class="flex flex-col">
-                                        <span class="text-slate-800">{{ \Carbon\Carbon::parse($order->tanggal)->format('d/m/Y') }}</span>
+                                        <span class="mkt-text">{{ \Carbon\Carbon::parse($order->tanggal)->format('d/m/Y') }}</span>
                                         <span class="text-[9px] {{ $order->created_at->diffInDays(now()) >= 2 && $order->status == 'knitting' ? 'text-red-500 font-black' : 'text-slate-400' }} italic font-medium lowercase leading-none mt-1">
                                             Input: {{ $order->created_at->diffForHumans() }}
                                         </span>
                                     </div>
                                 </td>
 
-                                <td class="p-6 tracking-tight">{{ $order->pelanggan }}</td>
-                                <td class="p-6 text-slate-500 uppercase">{{ $order->art_no }}</td>
-                                <td class="p-6 text-slate-500">{{ $order->mkt }}</td>
-                                <td class="p-6 italic text-[10px] text-slate-400">{{ $order->keperluan }}</td>
+                                <td class="p-6 tracking-tight mkt-text">{{ $order->pelanggan }}</td>
+                                <td class="p-6 mkt-text-muted uppercase">{{ $order->art_no }}</td>
+                                <td class="p-6 mkt-text-muted">{{ $order->mkt }}</td>
+                                <td class="p-6 italic text-[10px] mkt-text-muted">{{ $order->keperluan }}</td>
 
                                 {{-- Logika baru: Tidak ada lagi label khusus 'knitting' --}}
                                 <td class="p-6 text-center whitespace-nowrap">
@@ -192,9 +172,10 @@ public function updatedOpenDetail($value)
                                 </td>
 
                                 <td class="p-6 text-right">
-                                    <button @click="selected = {{ json_encode($order) }}; openDetail = true" 
+                                    <button wire:click="openDetail({{ $order->id }})" 
                                         class="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black hover:bg-red-600 transition shadow-md group-hover:scale-105 transform">
-                                        DETAIL
+                                        <span wire:loading.remove wire:target="openDetail({{ $order->id }})">DETAIL</span>
+                                        <span wire:loading wire:target="openDetail({{ $order->id }})">...</span>
                                     </button>
                                 </td>
                             </tr>
@@ -202,7 +183,7 @@ public function updatedOpenDetail($value)
                         @endforelse
                     </tbody>
                 </table>
-                <div class="p-6 bg-slate-50/50 border-t border-slate-50">
+                <div class="p-6 mkt-surface-alt border-t mkt-border">
                     {{ $orders->links() }}
                 </div>
             </div>
@@ -222,7 +203,7 @@ public function updatedOpenDetail($value)
              x-transition:leave="ease-in duration-200"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
-             @click="openDetail = false"></div>
+             @click="$wire.closeDetail()"></div>
 
         <div class="fixed inset-y-0 right-0 pl-10 max-w-full flex">
             <div x-show="openDetail" 
@@ -241,12 +222,12 @@ public function updatedOpenDetail($value)
                                 Industrial Order <span class="text-red-500 text-3xl italic">Detail</span>
                             </h2>
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">
-                                Internal Tracking ID: <span x-text="selected.sap_no" class="text-white font-black"></span>
+                                Internal Tracking ID: <span x-text="selected?.sap_no" class="text-white font-black"></span>
                             </p>
                             
                             <div class="mt-4 flex flex-col border-l-2 border-red-500 pl-3">
                                 <span class="text-red-500 text-sm font-black italic uppercase">
-                                    Order Date: <span x-text="selected.tanggal ? new Date(selected.tanggal).toLocaleDateString('id-ID') : '-'"></span>
+                                    Order Date: <span x-text="selected?.tanggal ? new Date(selected.tanggal).toLocaleDateString('id-ID') : '-'"></span>
                                 </span>
                             </div>
                         </div>
@@ -260,17 +241,17 @@ public function updatedOpenDetail($value)
                                 Print Label
                             </button>
       
-                            <a :href="'/marketing/orders/' + selected.id + '/edit'" 
+                            <a :href="'/marketing/orders/' + (selected ? selected.id : '') + '/edit'" 
                                 class="no-print px-6 py-2.5 bg-white text-slate-900 rounded-xl text-[10px] font-black hover:bg-red-600 hover:text-white transition shadow-sm uppercase italic">
                                 📝 Edit Data
                             </a>
-                            <button @click="if(confirm('Yakin hapus data SAP ' + selected.sap_no + '?')) { $wire.deleteOrder(selected.id); openDetail = false; }" 
+                            <button @click="if(confirm('Yakin hapus data SAP ' + (selected?.sap_no ?? '') + '?')) { $wire.deleteOrder(selected.id); }" 
                                 class="no-print px-6 py-2.5 bg-red-600/10 text-red-500 border border-red-500/50 rounded-xl text-[10px] font-black hover:bg-red-600 hover:text-white transition uppercase italic">
                                 🗑️ Delete
                             </button>
                         </div>
 
-                        <button @click="openDetail = false" class="bg-white/10 hover:bg-red-600 p-3 rounded-2xl transition group">
+                        <button wire:click="closeDetail" class="bg-white/10 hover:bg-red-600 p-3 rounded-2xl transition group">
                             <svg class="no-print h-6 w-6 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
@@ -283,19 +264,19 @@ public function updatedOpenDetail($value)
                                 <div class="space-y-4">
                                     <div class="flex justify-between border-b border-slate-50 pb-1 font-bold">
                                         <p class="text-[10px] text-slate-400 uppercase tracking-widest">Pelanggan</p>
-                                        <p class="text-slate-800 uppercase" x-text="selected.pelanggan"></p>
+                                        <p class="text-slate-800 uppercase" x-text="selected?.pelanggan"></p>
                                     </div>
                                     <div class="flex justify-between border-b border-slate-50 pb-1 font-bold">
                                         <p class="text-[10px] text-slate-400 uppercase tracking-widest">Artikel No</p>
-                                        <p class="text-slate-800 uppercase" x-text="selected.art_no"></p>
+                                        <p class="text-slate-800 uppercase" x-text="selected?.art_no"></p>
                                     </div>
                                     <div class="flex justify-between border-b border-slate-50 pb-1 font-bold">
                                         <p class="text-[10px] text-slate-400 uppercase tracking-widest">MKT Representative</p>
-                                        <p class="text-slate-800 italic" x-text="selected.mkt"></p>
+                                        <p class="text-slate-800 italic" x-text="selected?.mkt"></p>
                                     </div>
                                     <div class="flex justify-between font-bold">
                                         <p class="text-[10px] text-slate-400 uppercase tracking-widest">Keperluan</p>
-                                        <p class="text-slate-800" x-text="selected.keperluan"></p>
+                                        <p class="text-slate-800" x-text="selected?.keperluan"></p>
                                     </div>
                                 </div>
                             </div>
@@ -307,19 +288,19 @@ public function updatedOpenDetail($value)
                                 <div class="space-y-4 font-bold">
                                     <div class="flex justify-between border-b border-slate-50 pb-1">
                                         <p class="text-[10px] text-slate-400 uppercase tracking-widest">Material</p>
-                                        <p class="text-slate-800 uppercase" x-text="selected.material"></p>
+                                        <p class="text-slate-800 uppercase" x-text="selected?.material"></p>
                                     </div>
                                     <div class="flex justify-between border-b border-slate-50 pb-1">
                                         <p class="text-[10px] text-slate-400 uppercase tracking-widest">Benang</p>
-                                        <p class="text-slate-800 uppercase" x-text="selected.benang"></p>
+                                        <p class="text-slate-800 uppercase" x-text="selected?.benang"></p>
                                     </div>
                                     <div class="flex justify-between border-b border-slate-50 pb-1">
                                         <p class="text-[10px] text-slate-400 uppercase tracking-widest">Konstruksi Greige</p>
-                                        <p class="text-slate-800" x-text="selected.konstruksi_greig"></p>
+                                        <p class="text-slate-800" x-text="selected?.konstruksi_greige"></p>
                                     </div>
                                     <div class="flex justify-between">
                                         <p class="text-[10px] text-slate-400 uppercase tracking-widest text-red-600">Finishing Warna</p>
-                                        <p class="text-red-600 uppercase italic" x-text="selected.warna"></p>
+                                        <p class="text-red-600 uppercase italic" x-text="selected?.warna"></p>
                                     </div>
                                 </div>
                             </div>
@@ -330,19 +311,19 @@ public function updatedOpenDetail($value)
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center font-bold">
                                 <div class="border-r border-white/10">
                                     <p class="text-[9px] text-slate-400 uppercase mb-1">Kelompok Kain</p>
-                                    <p class="text-lg" x-text="selected.kelompok_kain"></p>
+                                    <p class="text-lg" x-text="selected?.kelompok_kain"></p>
                                 </div>
                                 <div class="border-r border-white/10">
                                     <p class="text-[9px] text-slate-400 uppercase mb-1">Lebar / Gramasi</p>
-                                    <p class="text-lg"><span x-text="selected.target_lebar"></span>" / <span x-text="selected.target_gramasi"></span></p>
+                                    <p class="text-lg"><span x-text="selected?.target_lebar"></span>" / <span x-text="selected?.target_gramasi"></span></p>
                                 </div>
                                 <div class="border-r border-white/10">
                                     <p class="text-[9px] text-slate-400 uppercase mb-1">Belah / Bulat</p>
-                                    <p class="text-lg uppercase" x-text="selected.belah_bulat"></p>
+                                    <p class="text-lg uppercase" x-text="selected?.belah_bulat"></p>
                                 </div>
                                 <div>
                                     <p class="text-[9px] text-slate-400 uppercase mb-1">Handfeel</p>
-                                    <p class="text-lg uppercase" x-text="selected.handfeel"></p>
+                                    <p class="text-lg uppercase" x-text="selected?.handfeel"></p>
                                 </div>
                             </div>
                         </div>
@@ -350,20 +331,20 @@ public function updatedOpenDetail($value)
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-black italic">
                             <div class="bg-blue-600 text-white p-8 rounded-[2.5rem] shadow-lg shadow-blue-100 flex justify-between items-center">
                                 <p class="text-xs uppercase tracking-[0.2em]">Total Roll Target</p>
-                                <h4 class="text-4xl underline decoration-4 underline-offset-8" x-text="selected.roll_target"></h4>
+                                <h4 class="text-4xl underline decoration-4 underline-offset-8" x-text="selected?.roll_target"></h4>
                             </div>
                             <div class="bg-emerald-600 text-white p-8 rounded-[2.5rem] shadow-lg shadow-emerald-100 flex justify-between items-center">
                                 <p class="text-xs uppercase tracking-[0.2em]">Total Net Weight (KG)</p>
-                                <h4 class="text-4xl underline decoration-4 underline-offset-8" x-text="selected.kg_target"></h4>
+                                <h4 class="text-4xl underline decoration-4 underline-offset-8" x-text="selected?.kg_target"></h4>
                             </div>
                         </div>
 
                         <div class="bg-white p-8 rounded-[3rem] border-l-[12px] border-red-600 shadow-sm">
                             <p class="text-[10px] font-black text-slate-400 uppercase mb-2 italic tracking-widest">Special Treatment & Instructions:</p>
-                            <p class="text-lg font-black text-slate-800 uppercase mb-4 underline decoration-red-600/30 underline-offset-4" x-text="selected.treatment_khusus || '-'"></p>
+                            <p class="text-lg font-black text-slate-800 uppercase mb-4 underline decoration-red-600/30 underline-offset-4" x-text="selected?.treatment_khusus || '-'"></p>
                             <hr class="border-slate-100 my-4">
                             <p class="text-[10px] font-black text-slate-400 uppercase mb-2 italic tracking-widest">Internal Marketing Notes:</p>
-                            <p class="text-xs font-bold text-slate-600 leading-relaxed italic bg-slate-50 p-4 rounded-2xl" x-text="selected.keterangan_artikel || 'No additional internal notes provided.'"></p>
+                            <p class="text-xs font-bold text-slate-600 leading-relaxed italic bg-slate-50 p-4 rounded-2xl" x-text="selected?.keterangan_artikel || 'No additional internal notes provided.'"></p>
                         </div>
                         <div class="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
                             <h3 class="text-slate-900 font-black mb-8 uppercase italic tracking-tighter text-sm flex items-center">
@@ -376,16 +357,16 @@ public function updatedOpenDetail($value)
 
                                 {{-- Garis Progress Merah Dinamis --}}
                                 <div class="absolute left-4 top-0 w-0.5 bg-red-600 transition-all duration-700"
-                                    :style="selected.status === 'knitting' ? 'height: 10%' : 
-                                            (selected.status === 'dyeing' ? 'height: 20%' : 
-                                            (selected.status === 'relax-dryer' ? 'height: 30%' : 
-                                            (selected.status === 'finishing' ? 'height: 40%' : 
-                                            (selected.status === 'stenter' ? 'height: 50%' : 
-                                            (selected.status === 'tumbler' ? 'height: 60%' : 
-                                            (selected.status === 'fleece' ? 'height: 70%' : 
-                                            (selected.status === 'pengujian' ? 'height: 80%' : 
-                                            (selected.status === 'qe' ? 'height: 90%' : 
-                                            (selected.status === 'finished' ? 'height: 100%' : 'height: 5%')))))))))"
+                                    :style="selected?.status === 'knitting' ? 'height: 10%' : 
+                                            (selected?.status === 'dyeing' ? 'height: 20%' : 
+                                            (selected?.status === 'relax-dryer' ? 'height: 30%' : 
+                                            (selected?.status === 'finishing' ? 'height: 40%' : 
+                                            (selected?.status === 'stenter' ? 'height: 50%' : 
+                                            (selected?.status === 'tumbler' ? 'height: 60%' : 
+                                            (selected?.status === 'fleece' ? 'height: 70%' : 
+                                            (selected?.status === 'pengujian' ? 'height: 80%' : 
+                                            (selected?.status === 'qe' ? 'height: 90%' : 
+                                            (selected?.status === 'finished' ? 'height: 100%' : 'height: 5%')))))))))"
                                 ></div>
 
                                 <div class="space-y-6 relative">
@@ -400,140 +381,58 @@ public function updatedOpenDetail($value)
                                         </div>
                                     </div>
 
-                                    {{-- 02: KNITTING --}}
-                                    <div class="flex items-start gap-6">
+                                    @php
+                                        $milestones = [
+                                            ['id' => '02', 'status' => 'knitting', 'label' => 'Knitting Process', 'desc' => 'RAJUT UNIT DDT 2', 'after' => ['dyeing', 'relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '03', 'status' => 'dyeing', 'label' => 'SCR / Dyeing', 'desc' => 'PROSES WARNA & PENCUCIAN', 'after' => ['relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '04', 'status' => 'relax-dryer', 'label' => 'Relax Dryer', 'desc' => 'PENGERINGAN TANPA TEGANGAN', 'after' => ['finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '05', 'status' => 'finishing', 'label' => 'Chemical Finishing', 'desc' => 'PELEMBUT & OBAT FINISH', 'after' => ['stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '06', 'status' => 'stenter', 'label' => 'Stenter Process', 'desc' => 'SETTING LEBAR & GRAMASI', 'after' => ['tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '07', 'status' => 'tumbler', 'label' => 'Tumbler Dry', 'desc' => 'PROSES BULKING KAIN', 'after' => ['fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '08', 'status' => 'fleece', 'label' => 'Fleece / Brushing', 'desc' => 'GARUK BULU (UNIT FLEECE)', 'after' => ['pengujian', 'qe', 'finished']],
+                                            ['id' => '09', 'status' => 'pengujian', 'label' => 'QC & Lab Testing', 'desc' => 'PENGUJIAN FISIK KAIN', 'after' => ['qe', 'finished']],
+                                            ['id' => '10', 'status' => 'qe', 'label' => 'QE Approval', 'desc' => 'FINAL INSPECTION & RELEASE', 'after' => ['finished']],
+                                        ];
+                                    @endphp
+
+                                    @foreach($milestones as $m)
                                         @php 
-                                            // Cek apakah ada record aktivitas untuk divisi ini
-                                            $log = $activitiesLogs['knitting'][0] ?? null; 
+                                            $log = $activitiesLogs[$m['status']][0] ?? null; 
+                                            $isDone = in_array($order->status, $m['after']); // Fallback logic
                                         @endphp
+                                        <div class="flex items-start gap-6">
+                                            <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-500"
+                                                :class="[ @foreach($m['after'] as $a)'{{$a}}',@endforeach ].includes(selected?.status) ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'">
+                                                <span class="text-[10px] font-black" x-text="[ @foreach($m['after'] as $a)'{{$a}}',@endforeach ].includes(selected?.status) ? '✓' : '{{ $m['id'] }}'"></span>
+                                            </div>
 
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-500"
-                                            :class="selected.status !== 'knitting' ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'">
-                                            <span class="text-[10px] font-black" x-text="selected.status !== 'knitting' ? '✓' : '02'"></span>
-                                        </div>
+                                            <div class="flex-1">
+                                                <div class="flex justify-between items-start">
+                                                    <p class="text-xs font-black uppercase italic" :class="selected?.status === '{{ $m['status'] }}' ? 'text-red-600 animate-pulse' : ''">
+                                                        {{ $m['label'] }}
+                                                    </p>
+                                                    @if($log)
+                                                        <span class="text-[8px] font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-full">
+                                                            DONE: {{ \Carbon\Carbon::parse($log['created_at'])->format('d/m H:i') }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                
+                                                <p class="text-[9px] font-bold text-slate-400 uppercase">{{ $m['desc'] }}</p>
 
-                                        <div class="flex-1">
-                                            <div class="flex justify-between items-start">
-                                                <p class="text-xs font-black uppercase italic" :class="selected.status === 'knitting' ? 'text-red-600 animate-pulse' : ''">
-                                                    Knitting Process
-                                                </p>
-                                                {{-- Tampilkan Waktu Jika Selesai --}}
                                                 @if($log)
-                                                    <span class="text-[8px] font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-full">
-                                                        DONE: {{ $log->created_at->format('d/m H:i') }}
-                                                    </span>
+                                                    <div class="mt-1 flex items-center gap-2">
+                                                        <span class="text-[8px] text-slate-500 italic">Operator:</span>
+                                                        <span class="text-[8px] font-black text-slate-700 uppercase">{{ $log['operator']['name'] ?? 'System' }}</span>
+                                                        @if(isset($log['kg']) && $log['kg'] > 0)
+                                                            <span class="text-[8px] text-slate-300">|</span>
+                                                            <span class="text-[8px] font-bold text-blue-600">{{ $log['kg'] }} KG</span>
+                                                        @endif
+                                                    </div>
                                                 @endif
                                             </div>
-                                            
-                                            <p class="text-[9px] font-bold text-slate-400 uppercase">RAJUT UNIT DDT 2</p>
-
-                                            {{-- Info Operator --}}
-                                            @if($log)
-                                                <div class="mt-1 flex items-center gap-2">
-                                                    <span class="text-[8px] text-slate-500 italic">Operator:</span>
-                                                    <span class="text-[8px] font-black text-slate-700 uppercase">{{ $log->operator->name ?? 'System' }}</span>
-                                                    <span class="text-[8px] text-slate-300">|</span>
-                                                    <span class="text-[8px] font-bold text-blue-600">{{ $log->kg }} KG</span>
-                                                </div>
-                                            @endif
                                         </div>
-                                    </div>
-
-                                    {{-- 03: SCR / DYEING --}}
-                                    <div class="flex items-start gap-6">
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-500"
-                                            :class="['relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished'].includes(selected.status) ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'">
-                                            <span class="text-[10px] font-black" x-text="['relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished'].includes(selected.status) ? '✓' : '03'"></span>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-black uppercase italic" :class="selected.status === 'dyeing' ? 'text-red-600 animate-pulse' : ''">SCR / Dyeing</p>
-                                            <p class="text-[9px] font-bold text-slate-400">PROSES WARNA & PENCUCIAN</p>
-                                        </div>
-                                    </div>
-
-                                    {{-- 04: RELAX DRYER --}}
-                                    <div class="flex items-start gap-6">
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-500"
-                                            :class="['finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished'].includes(selected.status) ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'">
-                                            <span class="text-[10px] font-black" x-text="['finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished'].includes(selected.status) ? '✓' : '04'"></span>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-black uppercase italic" :class="selected.status === 'relax-dryer' ? 'text-red-600 animate-pulse' : ''">Relax Dryer</p>
-                                            <p class="text-[9px] font-bold text-slate-400">PENGERINGAN TANPA TEGANGAN</p>
-                                        </div>
-                                    </div>
-
-                                    {{-- 05: FINISHING --}}
-                                    <div class="flex items-start gap-6">
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-500"
-                                            :class="['stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished'].includes(selected.status) ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'">
-                                            <span class="text-[10px] font-black" x-text="['stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished'].includes(selected.status) ? '✓' : '05'"></span>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-black uppercase italic" :class="selected.status === 'finishing' ? 'text-red-600 animate-pulse' : ''">Chemical Finishing</p>
-                                            <p class="text-[9px] font-bold text-slate-400">PELEMBUT & OBAT FINISH</p>
-                                        </div>
-                                    </div>
-
-                                    {{-- 06: STENTER --}}
-                                    <div class="flex items-start gap-6">
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-500"
-                                            :class="['tumbler', 'fleece', 'pengujian', 'qe', 'finished'].includes(selected.status) ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'">
-                                            <span class="text-[10px] font-black" x-text="['tumbler', 'fleece', 'pengujian', 'qe', 'finished'].includes(selected.status) ? '✓' : '06'"></span>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-black uppercase italic" :class="selected.status === 'stenter' ? 'text-red-600 animate-pulse' : ''">Stenter Process</p>
-                                            <p class="text-[9px] font-bold text-slate-400">SETTING LEBAR & GRAMASI</p>
-                                        </div>
-                                    </div>
-
-                                    {{-- 07: TUMBLER DRY --}}
-                                    <div class="flex items-start gap-6">
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-500"
-                                            :class="['fleece', 'pengujian', 'qe', 'finished'].includes(selected.status) ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'">
-                                            <span class="text-[10px] font-black" x-text="['fleece', 'pengujian', 'qe', 'finished'].includes(selected.status) ? '✓' : '07'"></span>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-black uppercase italic" :class="selected.status === 'tumbler' ? 'text-red-600 animate-pulse' : ''">Tumbler Dry</p>
-                                            <p class="text-[9px] font-bold text-slate-400">PROSES BULKING KAIN</p>
-                                        </div>
-                                    </div>
-
-                                    {{-- 08: FLEECE / BRUSHING --}}
-                                    <div class="flex items-start gap-6">
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-500"
-                                            :class="['pengujian', 'qe', 'finished'].includes(selected.status) ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'">
-                                            <span class="text-[10px] font-black" x-text="['pengujian', 'qe', 'finished'].includes(selected.status) ? '✓' : '08'"></span>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-black uppercase italic" :class="selected.status === 'fleece' ? 'text-red-600 animate-pulse' : ''">Fleece / Brushing</p>
-                                            <p class="text-[9px] font-bold text-slate-400">GARUK BULU (UNIT FLEECE)</p>
-                                        </div>
-                                    </div>
-
-                                    {{-- 09: PENGUJIAN (QC & LAB) --}}
-                                    <div class="flex items-start gap-6">
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-500"
-                                            :class="['qe', 'finished'].includes(selected.status) ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'">
-                                            <span class="text-[10px] font-black" x-text="['qe', 'finished'].includes(selected.status) ? '✓' : '09'"></span>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-black uppercase italic" :class="selected.status === 'pengujian' ? 'text-red-600 animate-pulse' : ''">QC & Lab Testing</p>
-                                            <p class="text-[9px] font-bold text-slate-400">PENGUJIAN FISIK KAIN</p>
-                                        </div>
-                                    </div>
-
-                                    {{-- 10: QE FINAL APPROVAL --}}
-                                    <div class="flex items-start gap-6">
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-500 shadow-xl"
-                                            :class="selected.status === 'finished' ? 'bg-emerald-600 text-white shadow-emerald-200' : 'bg-slate-100 text-slate-400'">
-                                            <span class="text-[10px] font-black" x-text="selected.status === 'finished' ? '🏁' : '10'"></span>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-black uppercase italic" :class="selected.status === 'qe' ? 'text-red-600 animate-pulse' : ''">QE Approval</p>
-                                            <p class="text-[9px] font-bold text-slate-400">FINAL INSPECTION & RELEASE</p>
-                                        </div>
-                                    </div>
+                                    @endforeach
                                 </div>
                             </div>
                         </div>

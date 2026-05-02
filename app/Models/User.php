@@ -6,19 +6,34 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+use App\Enums\UserRole;
+
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
+
+    /**
+     * Relasi ke tabel ProductionActivity
+     */
+    public function productionActivities()
+    {
+        return $this->hasMany(\App\Models\ProductionActivity::class, 'operator_id');
+    }
 
     /**
      * Masukkan semua kolom yang Anda miliki di database (DBeaver) 
      * agar bisa disimpan secara otomatis oleh Controller.
      */
 
-    public function hasRole($roles)
+    public function hasRole(UserRole|string|array $roles): bool
     {
+        if ($roles instanceof UserRole) {
+            return $this->role === $roles->value;
+        }
+
         if (is_array($roles)) {
-            return in_array($this->role, $roles);
+            $roleValues = array_map(fn($r) => $r instanceof UserRole ? $r->value : $r, $roles);
+            return in_array($this->role, $roleValues);
         }
 
         return $this->role === $roles;
@@ -45,22 +60,26 @@ class User extends Authenticatable
     }
 
     /**
-     * Helper untuk mengecek Role
+     * Enum-based Role Helpers
      */
-    public function isSuperAdmin() {
-        return $this->role === 'superadmin';
+    public function isSuperAdmin(): bool {
+        return $this->role === UserRole::SUPER_ADMIN->value;
     }
 
-    public function isAdmin() {
-        return $this->role === 'admin';
+    public function isImpersonated(): bool {
+        return session()->has('impersonator_id');
     }
 
-    public function isOperator() {
-        return $this->role === 'operator';
+    public function isAdmin(): bool {
+        return $this->role === UserRole::ADMIN->value;
     }
 
-    public function isMarketing() {
-        return $this->role === 'marketing';
+    public function isOperator(): bool {
+        return $this->role === UserRole::OPERATOR->value;
+    }
+
+    public function isMarketing(): bool {
+        return $this->role === UserRole::MARKETING->value;
     }
     
     public function division()

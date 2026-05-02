@@ -74,17 +74,17 @@ new class extends Component
 ?>
 
 <div>
-    <div class="py-12 bg-slate-50 min-h-screen italic">
+    <div class="py-12 bg-transparent min-h-screen italic">
         <div class="max-w-4xl mx-auto px-4">
-            <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100">
+            <div class="mkt-surface rounded-[2.5rem] p-8 shadow-xl border mkt-border">
                 
-                <div class="flex bg-slate-100 p-2 rounded-2xl mb-8">
+                <div class="flex mkt-input p-2 rounded-2xl mb-8">
                     <button wire:click="$set('jenis_proses', 'compactor')" 
-                        class="flex-1 py-3 rounded-xl font-black uppercase text-[10px] transition-all {{ $jenis_proses === 'compactor' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400' }}">
+                        class="flex-1 py-3 rounded-xl font-black uppercase text-[10px] transition-all {{ $jenis_proses === 'compactor' ? 'mkt-surface shadow-sm text-emerald-600' : 'mkt-text-muted' }}">
                         Compactor (Cotton)
                     </button>
                     <button wire:click="$set('jenis_proses', 'heatsetting')" 
-                        class="flex-1 py-3 rounded-xl font-black uppercase text-[10px] transition-all {{ $jenis_proses === 'heatsetting' ? 'bg-white shadow-sm text-rose-600' : 'text-slate-400' }}">
+                        class="flex-1 py-3 rounded-xl font-black uppercase text-[10px] transition-all {{ $jenis_proses === 'heatsetting' ? 'mkt-surface shadow-sm text-rose-600' : 'mkt-text-muted' }}">
                         Heat Setting (Polyester/PE)
                     </button>
                 </div>
@@ -94,10 +94,10 @@ new class extends Component
                         {{ $jenis_proses === 'compactor' ? '🌀' : '🌡️' }}
                     </div>
                     <div>
-                        <h2 class="text-xl font-black uppercase tracking-tighter text-slate-800">
+                        <h2 class="text-xl font-black uppercase tracking-tighter mkt-text">
                             {{ $jenis_proses === 'compactor' ? 'Compactor Finishing' : 'Heat Setting Finishing' }}
                         </h2>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-widest">
                             {{ $jenis_proses === 'compactor' ? 'Finishing Bulat Cotton' : 'Finishing Bulat Poliester/PE' }}
                         </p>
                     </div>
@@ -106,27 +106,27 @@ new class extends Component
                 <form wire:submit.prevent="submit" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Operator (Text)</label>
-                            <input type="text" wire:model="operator" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold focus:border-emerald-400 focus:ring-0 transition-all">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Operator (Text)</label>
+                            <input type="text" wire:model="operator" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold focus:border-emerald-400 focus:ring-0 transition-all">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Tanggal (Date)</label>
-                            <input type="date" wire:model="tanggal" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold focus:border-emerald-400 focus:ring-0 transition-all">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Tanggal (Date)</label>
+                            <input type="date" wire:model="tanggal" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold focus:border-emerald-400 focus:ring-0 transition-all">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">No Mesin (DD)</label>
-                            <select wire:model="no_mesin" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">No Mesin (DD)</label>
+                            <select wire:model="no_mesin" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                                 <option value="">Pilih Mesin</option>
                                 <option value="FIN-01">FIN-01</option>
                                 <option value="FIN-02">FIN-02</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Rangka (DD)</label>
-                            <select wire:model="rangka" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Rangka (DD)</label>
+                            <select wire:model="rangka" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                                 <option value="">Pilih Rangka</option>
                                 <option value="R1">Rangka 1</option>
                                 <option value="R2">Rangka 2</option>
@@ -136,22 +136,22 @@ new class extends Component
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Temperatur</label>
-                            <input type="text" wire:model="temperatur" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Temperatur</label>
+                            <input type="text" wire:model="temperatur" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Speed (Int)</label>
-                            <input type="number" wire:model="speed" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold text-emerald-600">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Speed (Int)</label>
+                            <input type="number" wire:model="speed" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold text-emerald-600">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Overfeed (Int)</label>
-                            <input type="number" wire:model="overfeed" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Overfeed (Int)</label>
+                            <input type="number" wire:model="overfeed" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                         </div>
                     </div>
 
                     @if($jenis_proses === 'compactor')
                     <div class="animate-in fade-in slide-in-from-top-2 duration-300">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Felt (DD)</label>
+                        <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Felt (DD)</label>
                         <select wire:model="felt" class="w-full bg-emerald-50 border-2 border-emerald-100 rounded-xl px-4 py-3 font-bold text-emerald-700">
                             <option value="">Pilih Felt</option>
                             <option value="Tipe A">Tipe A</option>
@@ -160,28 +160,28 @@ new class extends Component
                     </div>
                     @endif
 
-                    <div class="grid grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+                    <div class="grid grid-cols-2 gap-6 pt-4 border-t mkt-border">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Delivery Speed (Int)</label>
-                            <input type="number" wire:model="delivery_speed" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Delivery Speed (Int)</label>
+                            <input type="number" wire:model="delivery_speed" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Folding Speed (Int)</label>
-                            <input type="number" wire:model="folding_speed" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Folding Speed (Int)</label>
+                            <input type="number" wire:model="folding_speed" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-900 p-6 rounded-[2rem] shadow-xl">
                         <div>
-                            <label class="block text-[9px] font-black text-slate-400 uppercase mb-2 ml-1">Hasil Lebar (Int)</label>
+                            <label class="block text-[9px] font-black mkt-text-muted uppercase mb-2 ml-1">Hasil Lebar (Int)</label>
                             <input type="number" wire:model="hasil_lebar" class="w-full bg-slate-800 border-none rounded-xl px-4 py-3 font-black text-white focus:ring-2 focus:ring-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-[9px] font-black text-slate-400 uppercase mb-2 ml-1">Hasil Gramasi (Int)</label>
+                            <label class="block text-[9px] font-black mkt-text-muted uppercase mb-2 ml-1">Hasil Gramasi (Int)</label>
                             <input type="number" wire:model="hasil_gramasi" class="w-full bg-slate-800 border-none rounded-xl px-4 py-3 font-black text-white focus:ring-2 focus:ring-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-[9px] font-black text-slate-400 uppercase mb-2 ml-1">Shrinkage V x H (Int)</label>
+                            <label class="block text-[9px] font-black mkt-text-muted uppercase mb-2 ml-1">Shrinkage V x H (Int)</label>
                             <input type="number" wire:model="shrinkage" class="w-full bg-slate-800 border-none rounded-xl px-4 py-3 font-black text-rose-500 focus:ring-2 focus:ring-rose-500">
                         </div>
                     </div>

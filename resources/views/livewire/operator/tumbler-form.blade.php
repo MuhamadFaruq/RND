@@ -70,62 +70,62 @@ new class extends Component
 ?>
 
 <div>
-    <div class="py-12 bg-slate-50 min-h-screen italic">
+    <div class="py-12 bg-transparent min-h-screen italic">
         <div class="max-w-4xl mx-auto px-4">
-            <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100">
+            <div class="mkt-surface rounded-[2.5rem] p-8 shadow-xl border mkt-border">
                 
                 <div class="flex items-center gap-4 mb-8">
                     <div class="bg-orange-500 p-3 rounded-2xl text-white shadow-lg shadow-orange-200">
                         🌀
                     </div>
                     <div>
-                        <h2 class="text-xl font-black uppercase tracking-tighter text-slate-800">Tumbler Dry</h2>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Shaker & Dimensional Improvement</p>
+                        <h2 class="text-xl font-black uppercase tracking-tighter mkt-text">Tumbler Dry</h2>
+                        <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-widest">Shaker & Dimensional Improvement</p>
                     </div>
                 </div>
 
                 <form wire:submit.prevent="submit" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Operator</label>
-                            <input type="text" wire:model="operator" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Operator</label>
+                            <input type="text" wire:model="operator" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Tanggal</label>
-                            <input type="date" wire:model="tanggal" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Tanggal</label>
+                            <input type="date" wire:model="tanggal" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-4 border-t border-slate-100">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-4 border-t mkt-border">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Temp (°C)</label>
-                            <input type="number" wire:model="temperatur" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold text-orange-600">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Temp (°C)</label>
+                            <input type="number" wire:model="temperatur" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold text-orange-600">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Steam Inject</label>
-                            <input type="number" wire:model="steam_inject" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Steam Inject</label>
+                            <input type="number" wire:model="steam_inject" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Hotwind</label>
-                            <input type="number" wire:model="hotwind" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Hotwind</label>
+                            <input type="number" wire:model="hotwind" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Coldwind</label>
-                            <input type="number" wire:model="coldwind" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Coldwind</label>
+                            <input type="number" wire:model="coldwind" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-900 p-6 rounded-[2rem] shadow-xl">
                         <div>
-                            <label class="block text-[9px] font-black text-slate-400 uppercase mb-2 ml-1">Lebar (Int)</label>
+                            <label class="block text-[9px] font-black mkt-text-muted uppercase mb-2 ml-1">Lebar (Int)</label>
                             <input type="number" wire:model="lebar" class="w-full bg-slate-800 border-none rounded-xl px-4 py-3 font-black text-white focus:ring-2 focus:ring-orange-500">
                         </div>
                         <div>
-                            <label class="block text-[9px] font-black text-slate-400 uppercase mb-2 ml-1">Gramasi (Int)</label>
+                            <label class="block text-[9px] font-black mkt-text-muted uppercase mb-2 ml-1">Gramasi (Int)</label>
                             <input type="number" wire:model="gramasi" class="w-full bg-slate-800 border-none rounded-xl px-4 py-3 font-black text-white focus:ring-2 focus:ring-orange-500">
                         </div>
                         <div>
-                            <label class="block text-[9px] font-black text-slate-400 uppercase mb-2 ml-1">Shrinkage V x H</label>
+                            <label class="block text-[9px] font-black mkt-text-muted uppercase mb-2 ml-1">Shrinkage V x H</label>
                             <input type="number" wire:model="shrinkage" class="w-full bg-slate-800 border-none rounded-xl px-4 py-3 font-black text-orange-400 focus:ring-2 focus:ring-orange-500">
                         </div>
                     </div>

@@ -197,4 +197,14 @@ public function monitoring()
             return response()->json(['error' => 'Not Found'], 404);
         }
     }
+
+    /**
+     * Check if system is in maintenance mode (Heartbeat API)
+     */
+    public function checkMaintenanceStatus()
+    {
+        return response()->json([
+            'is_maintenance' => app()->isDownForMaintenance()
+        ]);
+    }
 }

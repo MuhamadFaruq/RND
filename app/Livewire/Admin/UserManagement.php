@@ -16,8 +16,7 @@ class UserManagement extends Component
 
     // Pastikan kedua fungsi ini bisa dipicu dari frontend
     protected $listeners = [
-        'delete-confirmed' => 'delete',
-        'delete-division-confirmed' => 'deleteDivision'
+        'delete-confirmed' => 'delete'
     ];
 
     public $name, $email, $role, $division_id, $password, $userId;
@@ -122,7 +121,7 @@ class UserManagement extends Component
 
     public function delete($id)
     {
-        if (auth()->user()->role !== 'super-admin') {
+        if (!auth()->user()->isSuperAdmin()) {
             $this->dispatch('show-toast', message: 'Hanya Super-Admin yang boleh menghapus user.', type: 'error');
             return;
         }
@@ -149,39 +148,4 @@ class UserManagement extends Component
         }
     }
 
-    public function deleteDivision($id)
-    {
-        // Pastikan ID tidak null
-        if (!$id) {
-            $this->dispatch('show-toast', message: 'ID Divisi tidak ditemukan!', type: 'error');
-            return;
-        }
-
-        if (auth()->user()->role !== 'super-admin') {
-            $this->dispatch('show-toast', message: 'Akses Ditolak!', type: 'error');
-            return;
-        }
-
-        $division = \App\Models\Division::find($id);
-        
-        if ($division) {
-            $divName = $division->name;
-            $userCount = \App\Models\User::where('division_id', $id)->count();
-
-            // Eksekusi Cascade
-            \App\Models\User::where('division_id', $id)->delete();
-            $division->delete();
-
-            // Activity Log
-            \App\Models\ActivityLog::create([
-                'user_id' => auth()->id(),
-                'action' => 'DELETE_DIVISION_CASCADE',
-                'division' => 'ADMIN_SYSTEM',
-                'details' => "MENGHAPUS UNIT: {$divName} & {$userCount} personil.",
-            ]);
-
-            $this->resetPage();
-            $this->dispatch('show-success-toast', message: "Unit {$divName} dan {$userCount} personil dihapus.");
-        }
-    }
 }

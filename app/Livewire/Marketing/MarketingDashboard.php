@@ -26,6 +26,11 @@ class MarketingDashboard extends Component
     }
 
     public $search = '';
+    
+    // Properties for Detail Modal
+    public $selectedOrder;
+    public $activitiesLogs = [];
+    public $showDetail = false;
     public function updatedSearch()
     {
         $this->resetPage(); // Reset halaman ke 1 saat mengetik
@@ -50,16 +55,60 @@ class MarketingDashboard extends Component
     public function pushOperator($orderId)
     {
         $order = MarketingOrder::find($orderId);
-        // Logika 1: Tandai sebagai urgent di database
         $order->update(['is_urgent' => true]);
-
-        // Logika 2: Kirim notifikasi (Contoh: Telegram/WhatsApp)
-        // Notification::send($supervisor, new OrderUrgentNotification($order));
 
         session()->flash('success', "Operator Divisi telah diperingatkan untuk SAP #{$order->sap_no}");
         $this->dispatch('show-toast', 
             message: "Sinyal Prioritas Terkirim ke Operator untuk SAP #{$order->sap_no}!",
             type: 'success'
+        );
+    }
+
+    public function openDetail($id)
+    {
+        $order = MarketingOrder::findOrFail($id);
+        // Store as plain array — Livewire 3 cannot serialize Eloquent Model as public property
+        $this->selectedOrder = $order->toArray();
+        $this->loadTrackingLogs($order->sap_no);
+        $this->showDetail = true;
+    }
+
+    public function closeDetail()
+    {
+        $this->showDetail = false;
+        $this->selectedOrder = null;
+        $this->activitiesLogs = [];
+    }
+
+    public function loadTrackingLogs($sap)
+    {
+        $this->activitiesLogs = \App\Models\ProductionActivity::with('operator')
+            ->whereHas('marketingOrder', fn($q) => $q->where('sap_no', $sap))
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->groupBy('division_name')
+            ->toArray();
+    }
+
+    public function exportExcel()
+    {
+        $query = MarketingOrder::query();
+        $this->applyTimeFilter($query);
+        
+        if ($this->search) {
+            $query->where(function($q) {
+                $q->where('sap_no', 'like', "%{$this->search}%")
+                ->orWhere('pelanggan', 'like', "%{$this->search}%")
+                ->orWhere('art_no', 'like', "%{$this->search}%");
+            });
+        }
+
+        $orders = $query->latest()->get();
+        $labelPeriode = strtoupper($this->dateRange);
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\MarketingOrdersExport($orders, $labelPeriode), 
+            'Duniatex_Dashboard_Report_' . now()->format('Y-m-d') . '.xlsx'
         );
     }
     /**
@@ -96,11 +145,17 @@ class MarketingDashboard extends Component
             ['name' => 'QE', 'unit' => 'QE Unit', 'color' => 'green', 'icon' => '✅', 'status' => 'qe'],
         ];
 
+        $maxCapacity = \App\Models\Setting::where('key', 'max_capacity')->first()->value ?? 1000;
+
         foreach ($stages as &$stage) {
-            $stage['load'] = MarketingOrder::where('status', $stage['status'])->count();
-            // Asumsi kapasitas maksimal antrean per divisi adalah 100
-            $stage['percentage'] = min(($stage['load'] / 100) * 100, 100);
+            $stage['load_count'] = MarketingOrder::where('status', $stage['status'])->count();
+            // Load dihitung berdasarkan total KG antrean dibandingkan kapasitas mesin
+            $totalKgInQueue = MarketingOrder::where('status', $stage['status'])->sum('kg_target');
+            
+            $stage['load_kg'] = $totalKgInQueue;
+            $stage['percentage'] = $maxCapacity > 0 ? min(($totalKgInQueue / $maxCapacity) * 100, 100) : 0;
             $stage['desc'] = "Antrean di " . $stage['name'];
+            $stage['is_full'] = $stage['percentage'] >= 90;
         }
 
         return $stages;
@@ -136,6 +191,8 @@ class MarketingDashboard extends Component
                                 ->count(),
             
             'stages'         => $this->getMachineWorkload(),
+            'factoryLoad'    => collect($this->getMachineWorkload())->avg('percentage'),
+            'maxCapacity'    => \App\Models\Setting::where('key', 'max_capacity')->first()->value ?? 1000,
         ])->layout('layouts.app');
     }
 }

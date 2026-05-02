@@ -26,13 +26,20 @@ class ProductionActivity extends Model
     /**
      * The operator (user) responsible for this activity.
      */
-    public function operator()
+    public function user()
     {
         // Ubah 'user_id' menjadi 'operator_id' agar sesuai dengan database Anda
         return $this->belongsTo(User::class, 'operator_id'); 
     }
 
-    // Tambahkan ini di dalam class ProductionActivity Anda
+    /**
+     * Alias for user relation to match UI usage.
+     */
+    public function operator()
+    {
+        return $this->user();
+    }
+
     /**
      * Relasi balik ke Division berdasarkan nama.
      */

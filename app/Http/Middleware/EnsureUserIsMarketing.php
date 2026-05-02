@@ -10,8 +10,16 @@ class EnsureUserIsMarketing
 {
     public function handle(Request $request, Closure $next): Response
     {
+        // Maintenance Bypass untuk Super Admin & Impersonation
+        if (app()->isDownForMaintenance()) {
+            if (auth()->check() && (auth()->user()->isSuperAdmin() || session()->has('impersonator_id'))) {
+                return $next($request);
+            }
+            abort(503);
+        }
+
         // Cek apakah user sudah login dan memiliki role 'marketing'
-        if (auth()->check() && auth()->user()->role === 'marketing') {
+        if (auth()->check() && auth()->user()->isMarketing()) {
             return $next($request);
         }
 

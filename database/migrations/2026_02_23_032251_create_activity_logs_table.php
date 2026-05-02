@@ -15,9 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained(); // Mencatat ID user yang menghapus
             $table->string('action'); // Berisi: "DELETE_PRODUCTION_LOG"
-            $table->string('division'); // Nama divisi (knitting, dyeing, dll)
-            $table->string('sap_no'); // Nomor SAP yang dihapus
-            $table->text('details'); // Informasi KG/Roll yang hilang
+            $table->string('model')->nullable(); // Opsional: Nama model yang terkait, misal "ProductionActivity"
+            $table->string('division')->nullable(); // Nama divisi (knitting, dyeing, dll)
+            $table->string('sap_no')->nullable(); // Nomor SAP yang dihapus
+            $table->text('description')->nullable(); // Deskripsi tambahan jika diperlukan
+            $table->string('ip_address')->nullable(); // Mencatat IP address pengguna
+            $table->text('details')->nullable(); // Informasi KG/Roll yang hilang
             $table->timestamps();
         });
     }

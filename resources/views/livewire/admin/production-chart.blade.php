@@ -3,7 +3,6 @@ use Livewire\Volt\Component;
 use App\Models\ProductionActivity;
 use App\Models\Setting;
 use Carbon\Carbon;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 new class extends Component
 {
@@ -14,43 +13,8 @@ new class extends Component
     public $selectedDivision = 'all';
     public $chartData = [];
     public $selectedDate;
-    
-    public function exportPDF() {
-        $this->loadData();
-
-        $targetDate = \Carbon\Carbon::parse($this->selectedDate);
-
-        $activities = ProductionActivity::with('marketingOrder')
-            ->when($this->selectedDivision !== 'all', fn($q) => $q->where('division_name', $this->selectedDivision))
-            ->whereDate('created_at', $targetDate)
-            ->latest()
-            ->get();
-
-        // Validasi data sebelum generate
-        if ($activities->isEmpty()) {
-            $this->dispatch('notify', message: 'Tidak ada data untuk diekspor pada tanggal ini.', type: 'error');
-            return;
-        }
-
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.production-report', [
-            'period' => $this->period,
-            'selectedDivision' => $this->selectedDivision,
-            'trends' => $this->trends,
-            'hourlyActivity' => $this->hourlyActivity,
-            'divisionLeadTimes' => $this->divisionLeadTimes,
-            'activities' => $activities,
-            'generated_at' => now()->format('d M Y H:i'),
-            'admin_name' => auth()->user()->name ?? 'Admin'
-        ])->setPaper('a4', 'landscape');
-
-        return response()->streamDownload(
-            fn() => print($pdf->output()), 
-            "Report_" . strtoupper($this->selectedDivision) . "_" . $targetDate->format('Ymd') . ".pdf"
-        );
-    }
 
     public function mount($selectedDate = null) { 
-        // Mengisi properti class dari parameter yang dikirim parent
         $this->selectedDate = $selectedDate ?? now()->format('Y-m-d');
         $this->loadData();
     }
@@ -95,14 +59,12 @@ new class extends Component
             'trends'            => $this->trends,
             'divisionLeadTimes' => $this->divisionLeadTimes,
             'selectedDate'      => $this->selectedDate,
-            // TAMBAHKAN BARIS INI:
             'totalInput'        => $totalInput, 
         ];
     }
 
     public function loadData() {
         $days = $this->period == 'weekly' ? 7 : 30;
-        // Gunakan Carbon::parse agar format tanggal dari kalender terbaca dengan benar
         $targetDate = \Carbon\Carbon::parse($this->selectedDate);
 
         // 1. Lead Time tetap sama
@@ -112,7 +74,7 @@ new class extends Component
         }
         $this->dispatch('chart-updated');
 
-        // 2. PERBAIKAN: Heatmap sekarang mengikuti $targetDate (bukan hari ini saja)
+        // 2. Heatmap mengikuti $targetDate (bukan hari ini saja)
         $this->hourlyActivity = ProductionActivity::selectRaw('HOUR(created_at) as hour, SUM(kg) as total_kg')
             ->whereDate('created_at', $targetDate)
             ->when($this->selectedDivision !== 'all', fn($q) => $q->where('division_name', $this->selectedDivision))
@@ -248,7 +210,7 @@ new class extends Component
 </script>
 @endscript
 
-<div class="bg-slate-900/80 rounded-[2rem] p-8 mb-8 shadow-2xl border border-slate-800 backdrop-blur-md">
+<div class="mkt-surface rounded-[2rem] p-8 mb-8 shadow-2xl border mkt-border backdrop-blur-md">
     {{-- 1. HEADER & CONTROLS --}}
     <div class="flex justify-between items-center mb-10">
         <div>
@@ -257,7 +219,7 @@ new class extends Component
         </div>
         
         <div class="flex items-center gap-4">
-            <select wire:model.live="selectedDivision" class="bg-slate-950 border-slate-800 text-slate-300 rounded-2xl px-4 py-2.5 text-[9px] font-black uppercase italic focus:ring-2 focus:ring-red-500 outline-none">
+            <select wire:model.live="selectedDivision" class="mkt-input mkt-border mkt-text-muted rounded-2xl px-4 py-2.5 text-[9px] font-black uppercase italic focus:ring-2 focus:ring-red-500 outline-none">
                 <option value="all">SEMUA DIVISI</option>
                 <option value="knitting">KNITTING</option>
                 <option value="dyeing">SCR/DYEING</option>
@@ -269,10 +231,6 @@ new class extends Component
                 <option value="pengujian">PENGUJIAN (QC & LAB)</option>
                 <option value="qe">QE / QC</option>
             </select>
-
-            <button wire:click="exportPDF" class="bg-red-600 text-white px-5 py-2.5 rounded-2xl text-[9px] font-black uppercase italic hover:bg-black transition-all shadow-lg">
-                EXPORT PDF
-            </button>
         </div>
     </div>
 
@@ -286,7 +244,7 @@ new class extends Component
     {{-- Canvas tempat grafik muncul --}}
     <div class="flex justify-end mb-2">
         <div onclick="window.toggleProductionLine()" 
-            class="flex items-center gap-2 bg-slate-800/40 px-3 py-1 rounded-full border border-slate-700/50 shadow-sm cursor-pointer hover:bg-slate-700/50 transition-all">
+            class="flex items-center gap-2 mkt-surface-alt px-3 py-1 rounded-full border mkt-border shadow-sm cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
             
             <svg xmlns="http://www.w3.org/2000/svg" id="eye-icon-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="transition-opacity duration-300">
                 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
@@ -298,7 +256,7 @@ new class extends Component
         </div>
     </div>
 
-    <div class="mb-12 h-64 relative bg-slate-950/50 rounded-3xl p-6 border border-slate-800 shadow-inner">
+    <div class="mb-12 h-64 relative mkt-input rounded-3xl p-6 border mkt-border shadow-inner">
         <canvas id="productionChart"></canvas>
     </div>
 
@@ -315,9 +273,8 @@ new class extends Component
             $maxCount = collect($safeHourlyData)->max() ?: 1; 
         @endphp
 
-        {{-- Gunakan variabel $totalInput yang dikirim dari with() --}}
         @if(($totalInput ?? 0) == 0)
-            <div class="absolute inset-x-0 bottom-0 top-16 flex items-center justify-center bg-slate-900/60 backdrop-blur-[2px] rounded-xl z-10 border border-slate-800/50">
+            <div class="absolute inset-x-0 bottom-0 top-16 flex items-center justify-center mkt-surface opacity-90 backdrop-blur-[2px] rounded-xl z-10 border mkt-border">
                 <div class="text-center">
                     <span class="text-[10px] font-black text-red-500 uppercase tracking-widest italic animate-pulse">Waiting for production data...</span>
                     <p class="text-[8px] text-slate-500 uppercase mt-1 font-bold">Tidak ada aktivitas tercatat pada tanggal terpilih</p>
@@ -330,10 +287,10 @@ new class extends Component
                 @php 
                     $count = $safeHourlyData[$i] ?? 0;
                     $intensity = ($count / $maxCount) * 100;
-                    $colorClass = $count == 0 ? 'bg-slate-800/30' : 'bg-red-600';
+                    $colorClass = $count == 0 ? 'mkt-surface-alt' : 'bg-red-600';
                 @endphp
                 <div class="group relative">
-                    {{-- Kotak Heatmap: Tambahkan flex agar teks KG berada di tengah --}}
+                    {{-- Kotak Heatmap --}}
                     <div class="h-12 w-full rounded-lg {{ $colorClass }} transition-all border border-white/5 flex items-center justify-center overflow-hidden" 
                         style="opacity: {{ $count == 0 ? 100 : max($intensity, 45) }}%">
                         
@@ -347,7 +304,7 @@ new class extends Component
                     
                     {{-- Tooltip tetap dipertahankan untuk detail presisi --}}
                     <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block z-20">
-                        <div class="bg-slate-950 text-white text-[8px] font-black p-2 rounded-lg shadow-2xl border border-slate-800 whitespace-nowrap uppercase">
+                        <div class="mkt-surface mkt-text text-[8px] font-black p-2 rounded-lg shadow-2xl border mkt-border whitespace-nowrap uppercase">
                             JAM {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}:00 — {{ number_format($count, 2) }} KG
                         </div>
                     </div>
@@ -358,11 +315,11 @@ new class extends Component
     </div>
 
     {{-- 4. TREND PRODUCTION GRAPH --}}
-    <div class="h-64 w-full bg-slate-950 rounded-[2rem] p-8 relative border border-slate-800 shadow-inner group">
+    <div class="h-64 w-full mkt-input rounded-[2rem] p-8 relative border mkt-border shadow-inner group">
         <h3 class="text-[10px] font-black uppercase italic text-slate-400 tracking-widest mb-4">Production Trend ({{ strtoupper($period) }})</h3>
         
         @php
-            $maxValTrend = collect($trends)->max('total') ?: 1000; // Berikan minimal target kapasitas (misal 1000) agar skala lebih proporsional
+            $maxValTrend = collect($trends)->max('total') ?: 1000; 
             $points = "";
             $countTrends = count($trends);
             foreach($trends as $i => $d) {
@@ -401,7 +358,6 @@ new class extends Component
                         $cy = 100 - (($d['total'] / $maxValTrend) * 70 + 15);
                     @endphp
                     <g class="pointer-events-auto cursor-help group/point">
-                        {{-- Sensor Kursor (Lingkaran besar tak terlihat) --}}
                         <circle cx="{{ $cx }}" cy="{{ $cy }}" r="6" fill="transparent" />
                         
                         {{-- Titik Visual (Putih kecil tajam) --}}
@@ -426,7 +382,6 @@ new class extends Component
         <div class="flex justify-between absolute bottom-4 inset-x-8">
             @foreach($trends as $d)
                 <div class="flex flex-col items-center">
-                    {{-- Tambahkan ?? '' untuk mencegah error "Undefined array key" --}}
                     <span class="text-[7px] font-black text-slate-700 uppercase leading-none">
                         {{ $d['label'] ?? '' }}
                     </span>

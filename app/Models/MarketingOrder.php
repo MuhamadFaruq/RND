@@ -16,7 +16,7 @@ class MarketingOrder extends Model
         'warna', 'kg_target', 'roll_target', 'benang', 'material',
         'keterangan_artikel', 'status', 'keperluan', 'konstruksi_greige', 
         'kelompok_kain', 'target_lebar', 'target_gramasi', 
-        'handfeel', 'treatment_khusus', 'belah_bulat'
+        'handfeel', 'treatment_khusus', 'belah_bulat', 'is_urgent'
     ];
 
     // Cukup gunakan ini saja jika ingin praktis (opsional):

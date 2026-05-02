@@ -148,10 +148,10 @@ new class extends Component {
                 </h2>
                 <div class="flex items-center gap-2 mt-3">
                     <span class="h-2 w-2 rounded-full bg-red-600 animate-pulse"></span>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Formulir Input Produksi Mesin Rajut</p>
+                    <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-[0.3em]">Formulir Input Produksi Mesin Rajut</p>
                 </div>
             </div>
-            <a href="{{ route('operator.logbook') }}" class="group bg-slate-800 border border-slate-700 px-8 py-4 rounded-2xl text-[10px] font-black uppercase text-slate-300 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all shadow-xl">
+            <a href="{{ route('operator.logbook') }}" class="group bg-slate-800 border border-slate-700 px-8 py-4 rounded-2xl text-[10px] font-black uppercase mkt-text-muted hover:bg-red-600 hover:text-white hover:border-red-600 transition-all shadow-xl">
                 ← Kembali ke Logbook
             </a>
         </div>
@@ -165,14 +165,14 @@ new class extends Component {
         <form wire:submit.prevent="save" class="space-y-8">
             
             {{-- SECTION 01: SPESIFIKASI MESIN --}}
-            <div class="bg-white p-10 rounded-[3.5rem] shadow-2xl border border-slate-200 relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-bl-full -mr-10 -mt-10 opacity-50"></div>
+            <div class="mkt-surface p-10 rounded-[3.5rem] shadow-2xl border mkt-border relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 mkt-surface rounded-bl-full -mr-10 -mt-10 opacity-50"></div>
                 
                 <div class="flex items-center gap-4 mb-10 relative z-10">
                     <div class="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-red-200">01</div>
                     <div>
-                        <h3 class="text-sm font-black uppercase text-slate-800 tracking-widest">Spesifikasi Mesin</h3>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase italic">Identitas mesin dan nomor marketing order</p>
+                        <h3 class="text-sm font-black uppercase mkt-text tracking-widest">Spesifikasi Mesin</h3>
+                        <p class="text-[9px] mkt-text-muted font-bold uppercase italic">Identitas mesin dan nomor marketing order</p>
                     </div>
                 </div>
                 
@@ -182,8 +182,8 @@ new class extends Component {
                         <label class="text-[10px] font-black uppercase text-red-600 ml-2 tracking-widest">SAP NO (Marketing Order)</label>
                         <div class="relative">
                             <input wire:model.live="sap_no" type="text" readonly
-                                class="w-full bg-slate-100 border-2 border-slate-100 rounded-2xl py-5 px-6 font-black text-sm text-slate-500 cursor-not-allowed italic">
-                            <span class="absolute right-4 top-5 text-slate-300">🔒</span>
+                                class="w-full mkt-input border-2 mkt-border rounded-2xl py-5 px-6 font-black text-sm text-slate-500 cursor-not-allowed italic">
+                            <span class="absolute right-4 top-5 mkt-text-muted">🔒</span>
                         </div>
                         
                         @if($order_detail)
@@ -200,88 +200,88 @@ new class extends Component {
 
                     {{-- OPERATOR NAME --}}
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Operator Bertugas</label>
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2 tracking-widest">Operator Bertugas</label>
                         <div class="relative">
                             <span class="absolute left-6 top-5 text-red-600 font-bold">👤</span>
                             <input type="text" wire:model="operator_name" placeholder="TULIS NAMA LENGKAP..." 
-                                class="w-full pl-14 pr-6 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-black text-slate-800 focus:border-red-600 focus:bg-white transition-all outline-none uppercase italic">
+                                class="w-full pl-14 pr-6 py-5 mkt-surface border-2 mkt-border rounded-2xl text-sm font-black mkt-text focus:border-red-600 focus:mkt-surface transition-all outline-none uppercase italic">
                         </div>
                         @error('operator_name') <span class="text-[9px] text-red-600 font-black italic ml-2 uppercase">{{ $message }}</span> @enderror
                     </div>
 
                     {{-- TANGGAL --}}
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Tanggal Produksi</label>
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2 tracking-widest">Tanggal Produksi</label>
                         <input wire:model="tanggal" type="date" 
-                            class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-5 px-6 font-black text-sm text-slate-800 focus:border-red-600 transition-all outline-none">
+                            class="w-full mkt-surface border-2 mkt-border rounded-2xl py-5 px-6 font-black text-sm mkt-text focus:border-red-600 transition-all outline-none">
                     </div>
 
                     {{-- DETAIL MESIN (ROW 2) --}}
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">No Mesin (DD)</label>
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">No Mesin (DD)</label>
                         <input wire:model="no_mesin" type="text" placeholder="CONTOH: K01" 
-                            class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 font-black text-sm text-slate-800 focus:border-red-600 transition-all outline-none">
+                            class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-red-600 transition-all outline-none">
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Type Mesin (DD)</label>
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">Type Mesin (DD)</label>
                         <input wire:model="type_mesin" type="text" placeholder="PAI LUNG / DLL" 
-                            class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 font-black text-sm text-slate-800 focus:border-red-600 transition-all outline-none uppercase">
+                            class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-red-600 transition-all outline-none uppercase">
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Gauge / Inch (DD)</label>
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2 tracking-widest">Gauge / Inch (DD)</label>
                         <input wire:model="gauge_inch" 
                             type="text" 
                             placeholder="CONTOH: 28G.30"
-                            class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 font-black text-sm text-slate-800 focus:border-red-600 transition-all outline-none">
+                            class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-red-600 transition-all outline-none">
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Jml Feeder (INT)</label>
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">Jml Feeder (INT)</label>
                         <input wire:model="jml_feeder" type="number" 
-                            class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 font-black text-sm text-slate-800 focus:border-red-600 transition-all outline-none">
+                            class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-red-600 transition-all outline-none">
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Jml Jarum (INT)</label>
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">Jml Jarum (INT)</label>
                         <input wire:model="jml_jarum" type="number" 
-                            class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 font-black text-sm text-slate-800 focus:border-red-600 transition-all outline-none">
+                            class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-red-600 transition-all outline-none">
                     </div>
                 </div>
             </div>
 
             {{-- SECTION 02: HASIL PRODUKSI --}}
-            <div class="bg-white p-10 rounded-[3.5rem] shadow-2xl border border-slate-200">
+            <div class="mkt-surface p-10 rounded-[3.5rem] shadow-2xl border mkt-border">
                 <div class="flex items-center gap-4 mb-10">
                     <div class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-slate-200">02</div>
                     <div>
-                        <h3 class="text-sm font-black uppercase text-slate-800 tracking-widest">Hasil Produksi Greige</h3>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase italic">Input data fisik kain yang dihasilkan</p>
+                        <h3 class="text-sm font-black uppercase mkt-text tracking-widest">Hasil Produksi Greige</h3>
+                        <p class="text-[9px] mkt-text-muted font-bold uppercase italic">Input data fisik kain yang dihasilkan</p>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-10">
-                    <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400 block text-center">Lebar</label>
+                    <div class="mkt-surface p-6 rounded-3xl border mkt-border space-y-2">
+                        <label class="text-[10px] font-black uppercase mkt-text-muted block text-center">Lebar</label>
                         <input wire:model="lebar" type="number" step="0.01" placeholder="0.00"
-                            class="w-full bg-white border-2 border-slate-200 rounded-2xl py-4 text-center font-black text-xl text-slate-800 focus:ring-4 focus:ring-red-50">
+                            class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 text-center font-black text-xl mkt-text focus:ring-4 focus:ring-red-50">
                     </div>
-                    <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400 block text-center">Gramasi</label>
+                    <div class="mkt-surface p-6 rounded-3xl border mkt-border space-y-2">
+                        <label class="text-[10px] font-black uppercase mkt-text-muted block text-center">Gramasi</label>
                         <input wire:model="gramasi" type="number" placeholder="0"
-                            class="w-full bg-white border-2 border-slate-200 rounded-2xl py-4 text-center font-black text-xl text-slate-800 focus:ring-4 focus:ring-red-50">
+                            class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 text-center font-black text-xl mkt-text focus:ring-4 focus:ring-red-50">
                     </div>
                     <div class="bg-red-50 p-6 rounded-3xl border border-red-100 space-y-2 shadow-inner">
                         <label class="text-[10px] font-black uppercase text-red-600 block text-center tracking-widest">KG (Weight)</label>
                         <input wire:model="kg" type="text" placeholder="0"
-                            class="w-full bg-white border-2 border-red-200 rounded-2xl py-4 text-center font-black text-3xl text-red-600 focus:ring-4 focus:ring-red-100">
+                            class="w-full mkt-surface border-2 border-red-200 rounded-2xl py-4 text-center font-black text-3xl text-red-600 focus:ring-4 focus:ring-red-100">
                         @error('kg') <p class="text-[8px] text-red-600 font-black text-center mt-1 uppercase">{{ $message }}</p> @enderror
                     </div>
                     <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2 shadow-2xl">
                         <label class="text-[10px] font-black uppercase text-slate-500 block text-center tracking-widest">Roll Count</label>
                         <input wire:model="roll" type="number" placeholder="0"
-                            class="w-full bg-white/10 border-2 border-white/10 rounded-2xl py-4 text-center font-black text-3xl text-white focus:border-red-600 outline-none">
+                            class="w-full mkt-surface/10 border-2 border-white/10 rounded-2xl py-4 text-center font-black text-3xl text-white focus:border-red-600 outline-none">
                         @error('roll') <p class="text-[8px] text-red-400 font-black text-center mt-1 uppercase">{{ $message }}</p> @enderror
                     </div>
                 </div>
@@ -304,12 +304,12 @@ new class extends Component {
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
                     @foreach(range(1,4) as $i)
-                    <div class="p-8 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6 hover:bg-white/10 transition-all group backdrop-blur-sm">
+                    <div class="p-8 mkt-surface/5 rounded-[2.5rem] border border-white/5 space-y-6 hover:mkt-surface/10 transition-all group backdrop-blur-sm">
                         <div class="space-y-2">
                             <label class="text-[10px] font-black uppercase text-slate-500 group-hover:text-red-500 transition-colors tracking-widest block ml-2">Benang {{ $i }} (%)</label>
                             @php $b_field = 'benang_' . $i; @endphp
                             <input wire:model="{{ $b_field }}" type="text" placeholder="..." 
-                                class="w-full bg-slate-950/50 border-2 border-white/5 rounded-2xl py-4 px-6 font-black text-xs text-white placeholder:text-slate-800 focus:border-red-600 outline-none transition-all italic">
+                                class="w-full bg-slate-950/50 border-2 border-white/5 rounded-2xl py-4 px-6 font-black text-xs text-white placeholder:mkt-text focus:border-red-600 outline-none transition-all italic">
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] font-black uppercase text-slate-500 group-hover:text-red-500 transition-colors tracking-widest block ml-2">YL {{ $i }} (INT)</label>

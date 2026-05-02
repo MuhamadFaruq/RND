@@ -12,8 +12,16 @@ class CheckDivision
     {
         $user = auth()->user();
 
+        // Maintenance Bypass untuk Super Admin & Impersonation
+        if (app()->isDownForMaintenance()) {
+            if ($user && ($user->isSuperAdmin() || session()->has('impersonator_id'))) {
+                return $next($request);
+            }
+            abort(503);
+        }
+
         // 1. KUNCI UTAMA: Jika Superadmin, abaikan semua pengecekan divisi
-        if ($user->role === 'superadmin') {
+        if ($user->isSuperAdmin()) {
             return $next($request);
         }
 

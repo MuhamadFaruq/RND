@@ -1,6 +1,6 @@
 <x-layouts.app>
-    {{-- Container utama dengan background gelap agar konsisten dengan tema industrial --}}
-    <div class="min-h-screen bg-slate-900">
+    {{-- Container utama dengan background yang beradaptasi dengan tema --}}
+    <div class="min-h-screen mkt-bg mkt-text transition-colors duration-300">
         
         {{-- 1. DASHBOARD SUPER ADMIN / ADMIN --}}
         @if(in_array(auth()->user()->role, ['super-admin', 'admin']))

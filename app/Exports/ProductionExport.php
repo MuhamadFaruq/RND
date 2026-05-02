@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Exports;
 
 use App\Models\ProductionActivity;
@@ -16,46 +15,70 @@ class ProductionExport implements FromQuery, WithHeadings, ShouldAutoSize, WithS
     protected $end;
     protected $mode;
     protected $unit;
+    protected $operator;
+    private $rowNumber = 0; // Tambahkan properti untuk nomor urut
 
-    // Terima parameter lengkap dari Controller
-    public function __construct($start, $end, $mode, $unit)
+    public function __construct($start, $end, $mode, $unit, $operator = 'SEMUA')
     {
         $this->start = $start;
         $this->end = $end;
         $this->mode = $mode;
         $this->unit = $unit;
+        $this->operator = $operator;
     }
 
     public function query()
     {
         return ProductionActivity::query()
-            ->with(['marketingOrder'])
+            ->with(['marketingOrder', 'user']) 
             ->whereDate('created_at', '>=', $this->start)
             ->whereDate('created_at', '<=', $this->end)
-            ->when($this->unit !== 'SEMUA', function($q) {
-                $q->whereHas('marketingOrder', fn($sq) => $sq->where('kelompok_kain', $this->unit));
-            })
             ->when($this->mode === 'rajut', function($q) {
-                $q->where('division_name', 'knitting');
+                $q->where('division_name', 'KNITTING');
             })
             ->when($this->mode === 'warna', function($q) {
-                $q->whereIn('division_name', ['dyeing', 'finishing']);
+                $q->whereIn('division_name', ['DYEING', 'FINISHING', 'STENTER']);
+            })
+            ->when($this->operator !== 'SEMUA', function($q) {
+                $q->where('operator_id', $this->operator);
+            })
+            ->when($this->operator === 'SEMUA', function($q) {
+                // Filter tambahan untuk memastikan data marketing/admin tidak ikut masuk
+                $q->whereHas('user', function($u) {
+                    $u->where('name', 'NOT LIKE', '%admin%')
+                      ->where('name', 'NOT LIKE', '%marketing%');
+                });
             });
+    }
+
+    public function headings(): array
+    {
+        return [
+            'NO', // Kolom nomor urut
+            'SAP', 'ART', 'TANGGAL & JAM', 'OPERATOR', 'PELANGGAN', 'MKT', 
+            'KEPERLUAN', 'KONSTRUKSI GREIGE', 'MATERIAL', 'BENANG', 
+            'KELOMPOK KAIN', 'TARGET LEBAR', 'BELAH/BULAT', 
+            'TARGET GRAMASI', 'WARNA', 'HANDFEEL', 'TREATMENT KHUSUS', 
+            'ROLL', 'KG', 'KETERANGAN ARTIKEL'
+        ];
     }
 
     public function map($activity): array
     {
-        // Mapping data sesuai permintaan kolom Anda
+        $this->rowNumber++; // Naikkan nomor setiap baris data
+
         return [
+            $this->rowNumber, // Masukkan nomor urut
             $activity->marketingOrder->sap_no ?? '-',
             $activity->marketingOrder->art_no ?? '-',
             $activity->created_at->format('d/m/Y H:i'),
-            $activity->marketingOrder->pelanggan ?? '-', // Sesuaikan 'customer' ke 'pelanggan' jika perlu
+            $activity->user->name ?? '-', 
+            $activity->marketingOrder->pelanggan ?? '-', 
             $activity->marketingOrder->marketing_name ?? '-', 
             $activity->marketingOrder->keperluan ?? '-',
             $activity->marketingOrder->konstruksi_greige ?? '-',
             $activity->marketingOrder->material ?? '-',
-            $activity->technical_data['benang_1'] ?? '-', // Mengambil dari JSON technical_data
+            $activity->technical_data['benang_1'] ?? '-', 
             $activity->marketingOrder->kelompok_kain ?? '-',
             $activity->marketingOrder->target_lebar ?? '-',
             $activity->marketingOrder->belah_bulat ?? '-',
@@ -69,17 +92,6 @@ class ProductionExport implements FromQuery, WithHeadings, ShouldAutoSize, WithS
         ];
     }
 
-    public function headings(): array
-    {
-        return [
-            'SAP', 'ART', 'TANGGAL & JAM', 'PELANGGAN', 'MKT', 
-            'KEPERLUAN', 'KONSTRUKSI GREIGE', 'MATERIAL', 'BENANG', 
-            'KELOMPOK KAIN', 'TARGET LEBAR', 'BELAH/BULAT', 
-            'TARGET GRAMASI', 'WARNA', 'HANDFEEL', 'TREATMENT KHUSUS', 
-            'ROLL', 'KG', 'KETERANGAN ARTIKEL'
-        ];
-    }
-
     public function styles(Worksheet $sheet)
     {
         return [
@@ -89,7 +101,10 @@ class ProductionExport implements FromQuery, WithHeadings, ShouldAutoSize, WithS
                     'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                     'startColor' => ['rgb' => 'ED1C24'] // Merah Duniatex
                 ],
-                'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                ],
             ],
         ];
     }

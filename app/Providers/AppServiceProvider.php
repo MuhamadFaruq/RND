@@ -26,8 +26,8 @@ class AppServiceProvider extends ServiceProvider
         \Carbon\Carbon::setLocale('id');
         // Cukup gunakan ini untuk bypass Super Admin
         \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
-            // Ubah pengecekan role
-            return $user->role === 'superadmin' ? true : null;
+            // Gunakan value yang benar: 'super-admin'
+            return $user->role === 'super-admin' ? true : null;
         });
         Gate::define('access-superadmin', function ($user) {
             return $user->role === 'admin' || $user->role === 'superadmin'; //

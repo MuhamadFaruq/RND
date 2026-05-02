@@ -1,12 +1,12 @@
 {{-- resources/views/livewire/operator/partials/compactor-table.blade.php --}}
-<div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-in fade-in duration-500">
+<div class="mkt-surface rounded-[2.5rem] shadow-sm border mkt-border overflow-hidden animate-in fade-in duration-500">
     <table class="w-full text-left border-collapse">
         <thead>
-            <tr class="bg-slate-50 border-b border-slate-100 font-black italic">
-                <th class="px-6 py-4 text-[10px] text-slate-400 uppercase">SAP NO</th>
-                <th class="px-6 py-4 text-[10px] text-slate-400 uppercase">Produk (COMPACTOR)</th>
-                <th class="px-6 py-4 text-[10px] text-slate-400 uppercase">Status Alur</th>
-                <th class="px-6 py-4 text-[10px] text-slate-400 uppercase text-center">Aksi</th>
+            <tr class="mkt-surface border-b mkt-border font-black italic">
+                <th class="px-6 py-4 text-[10px] mkt-text-muted uppercase">SAP NO</th>
+                <th class="px-6 py-4 text-[10px] mkt-text-muted uppercase">Produk (COMPACTOR)</th>
+                <th class="px-6 py-4 text-[10px] mkt-text-muted uppercase">Status Alur</th>
+                <th class="px-6 py-4 text-[10px] mkt-text-muted uppercase text-center">Aksi</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-slate-50 italic">
@@ -16,8 +16,8 @@
                         <span class="text-xs font-black text-blue-600 uppercase">#{{ $job->sap_no }}</span>
                     </td>
                     <td class="px-6 py-5">
-                        <h4 class="text-sm font-black text-slate-800 uppercase leading-none">{{ $job->art_no }}</h4>
-                        <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase">{{ $job->warna }}</p>
+                        <h4 class="text-sm font-black mkt-text uppercase leading-none">{{ $job->art_no }}</h4>
+                        <p class="text-[10px] font-bold mkt-text-muted mt-1 uppercase">{{ $job->warna }}</p>
                     </td>
 
                     <td class="px-6 py-5 text-xs">
@@ -38,7 +38,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="py-20 text-center text-slate-300 font-black uppercase text-xs italic">
+                    <td colspan="4" class="py-20 text-center mkt-text-muted font-black uppercase text-xs italic">
                         Tidak ada antrean untuk divisi Compactor...
                     </td>
                 </tr>

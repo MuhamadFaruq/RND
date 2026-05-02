@@ -21,7 +21,7 @@ new class extends Component {
         $pct = ($limitCapacity > 0) ? ($currentWeight / $limitCapacity) * 100 : 0;
 
         return [
-            'totalUsers' => $countUsers, // Pastikan ini terpanggil di Blade
+            'totalUsers' => $countUsers, 
             'totalDivisions' => $countDivs,
             'totalLogsToday' => $countLogsToday,
             'maxCapacity' => $limitCapacity,
@@ -32,22 +32,34 @@ new class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen w-full bg-slate-950 text-white font-sans italic flex flex-col">
+<div class="min-h-screen w-full mkt-bg mkt-text font-sans italic flex flex-col transition-colors duration-300">
     <div class="p-4 md:p-8 flex-grow container mx-auto">
         
         {{-- HEADER SECTION --}}
         <div class="mb-10 border-b border-white/5 pb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
-                <h1 class="text-5xl md:text-7xl font-black italic tracking-tighter uppercase text-white leading-none">
+                <h1 class="text-5xl md:text-7xl font-black italic tracking-tighter uppercase mkt-text leading-none">
                     System <span class="text-red-600">Overview</span>
                 </h1>
-                <p class="text-slate-500 font-bold tracking-widest uppercase text-[10px] mt-3 italic">
-                    Logistik & Produksi System <span class="text-white mx-2">|</span> User: <span class="text-emerald-400">{{ auth()->user()->name }}</span>
+                <p class="mkt-text-muted font-bold tracking-widest uppercase text-[10px] mt-3 italic">
+                    Logistik & Produksi System <span class="mkt-text mx-2">|</span> User: <span class="text-emerald-500">{{ auth()->user()->name }}</span>
                 </p>
             </div>
-            <div class="bg-slate-900 px-6 py-4 rounded-3xl border border-white/5 shadow-2xl text-right">
-                <span class="text-[9px] font-black text-slate-500 uppercase block tracking-[0.3em] mb-1">Server Time</span>
-                <span class="text-3xl font-mono font-bold text-red-600">{{ now()->format('H:i') }}</span>
+            <div x-data="{ 
+                time: '',
+                updateTime() {
+                    this.time = new Date().toLocaleTimeString('id-ID', { 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        second: '2-digit',
+                        hour12: false 
+                    }).replace(/\./g, ':');
+                }
+            }" 
+            x-init="updateTime(); setInterval(() => updateTime(), 1000)"
+            class="mkt-surface px-8 py-5 rounded-[2rem] mkt-border border shadow-2xl text-right min-w-[180px]">
+                <span class="text-[9px] font-black text-slate-500 uppercase block tracking-[0.4em] mb-1 opacity-60">Server Time</span>
+                <span class="text-3xl font-mono font-bold text-red-600 tabular-nums" x-text="time"></span>
             </div>
         </div>
 
@@ -55,13 +67,13 @@ new class extends Component {
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             
             {{-- 1. OUTPUT --}}
-            <div class="bg-slate-900 p-7 rounded-[2.5rem] border border-white/5 shadow-2xl relative overflow-hidden group">
+            <div class="mkt-surface p-7 rounded-[2.5rem] mkt-border border shadow-2xl relative overflow-hidden group">
                 <p class="text-[10px] font-black text-slate-500 uppercase mb-3 italic tracking-widest">Output Hari Ini</p>
                 <div class="flex items-baseline gap-2 mb-4">
-                    <h3 class="text-4xl font-black italic tracking-tighter text-white">{{ number_format($currentOutput, 2) }}</h3>
-                    <span class="text-xs font-bold text-slate-500 uppercase italic">KG</span>
+                    <h3 class="text-4xl font-black italic tracking-tighter mkt-text">{{ number_format($currentOutput, 2) }}</h3>
+                    <span class="text-xs font-bold mkt-text-muted uppercase italic">KG</span>
                 </div>
-                <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-white/5">
+                <div class="w-full mkt-bg h-2 rounded-full overflow-hidden mkt-border border">
                     <div class="bg-red-600 h-full transition-all duration-1000" style="width: {{ $percentage }}%"></div>
                 </div>
                 <p class="text-[8px] font-bold text-slate-600 mt-3 uppercase italic tracking-widest">Max: {{ number_format($maxCapacity) }} KG</p>
@@ -69,31 +81,31 @@ new class extends Component {
             </div>
 
             {{-- 2. PERSONNEL --}}
-            <div class="bg-slate-900 p-7 rounded-[2.5rem] border border-white/5 shadow-2xl relative overflow-hidden">
+            <div class="mkt-surface p-7 rounded-[2.5rem] mkt-border border shadow-2xl relative overflow-hidden">
                 <p class="text-[10px] font-black text-slate-500 uppercase mb-3 italic tracking-widest">Total Personel</p>
                 <div class="flex items-baseline gap-2">
-                    <h3 class="text-4xl font-black italic tracking-tighter text-white">{{ $totalUsers ?? 0 }}</h3>
-                    <span class="text-xs font-bold text-slate-500 uppercase italic">User</span>
+                    <h3 class="text-4xl font-black italic tracking-tighter mkt-text">{{ $totalUsers ?? 0 }}</h3>
+                    <span class="text-xs font-bold mkt-text-muted uppercase italic">User</span>
                 </div>
                 <div class="absolute left-0 top-0 w-1.5 h-full bg-blue-600"></div>
             </div>
 
             {{-- 3. LOGS --}}
-            <div class="bg-slate-900 p-7 rounded-[2.5rem] border border-white/5 shadow-2xl relative overflow-hidden">
+            <div class="mkt-surface p-7 rounded-[2.5rem] mkt-border border shadow-2xl relative overflow-hidden">
                 <p class="text-[10px] font-black text-slate-500 uppercase mb-3 italic tracking-widest">Log Aktivitas</p>
                 <div class="flex items-baseline gap-2">
-                    <h3 class="text-4xl font-black italic tracking-tighter text-white">{{ $totalLogsToday ?? 0 }}</h3>
-                    <span class="text-xs font-bold text-slate-500 uppercase italic">Event</span>
+                    <h3 class="text-4xl font-black italic tracking-tighter mkt-text">{{ $totalLogsToday ?? 0 }}</h3>
+                    <span class="text-xs font-bold mkt-text-muted uppercase italic">Event</span>
                 </div>
                 <div class="absolute left-0 top-0 w-1.5 h-full bg-emerald-600"></div>
             </div>
 
             {{-- 4. DIVISIONS --}}
-            <div class="bg-slate-900 p-7 rounded-[2.5rem] border border-white/5 shadow-2xl relative overflow-hidden">
+            <div class="mkt-surface p-7 rounded-[2.5rem] mkt-border border shadow-2xl relative overflow-hidden">
                 <p class="text-[10px] font-black text-slate-500 uppercase mb-3 italic tracking-widest">Unit Divisi</p>
                 <div class="flex items-baseline gap-2">
-                    <h3 class="text-4xl font-black italic tracking-tighter text-white">{{ $totalDivisions ?? 0 }}</h3>
-                    <span class="text-xs font-bold text-slate-500 uppercase italic">Unit</span>
+                    <h3 class="text-4xl font-black italic tracking-tighter mkt-text">{{ $totalDivisions ?? 0 }}</h3>
+                    <span class="text-xs font-bold mkt-text-muted uppercase italic">Unit</span>
                 </div>
                 <div class="absolute left-0 top-0 w-1.5 h-full bg-amber-600"></div>
             </div>
@@ -106,28 +118,28 @@ new class extends Component {
         {{-- FOOTER / MAIN CONTENT GRID --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <a href="{{ route('admin.monitoring') }}" class="group bg-slate-900 p-10 rounded-[3rem] border border-white/5 hover:border-red-600/50 transition-all shadow-2xl">
+                <a href="{{ route('admin.monitoring') }}" class="group mkt-surface p-10 rounded-[3rem] mkt-border border hover:border-red-600/50 transition-all shadow-2xl">
                     <div class="text-5xl mb-6 group-hover:scale-110 transition-transform duration-500">📊</div>
-                    <h4 class="text-2xl font-black uppercase italic tracking-tighter mb-3 text-white">Production Monitor</h4>
-                    <p class="text-[11px] text-slate-500 font-bold leading-relaxed uppercase tracking-widest italic">Pantau real-time output mesin harian.</p>
+                    <h4 class="text-2xl font-black uppercase italic tracking-tighter mb-3 mkt-text">Production Monitor</h4>
+                    <p class="text-[11px] mkt-text-muted font-bold leading-relaxed uppercase tracking-widest italic">Pantau real-time output mesin harian.</p>
                 </a>
-                <a href="{{ route('admin.activity-logs') }}" class="group bg-slate-900 p-10 rounded-[3rem] border border-white/5 hover:border-emerald-600/50 transition-all shadow-2xl">
+                <a href="{{ route('admin.activity-logs') }}" class="group mkt-surface p-10 rounded-[3rem] mkt-border border hover:border-emerald-600/50 transition-all shadow-2xl">
                     <div class="text-5xl mb-6 group-hover:scale-110 transition-transform duration-500">🛡️</div>
-                    <h4 class="text-2xl font-black uppercase italic tracking-tighter mb-3 text-white">Security Audit</h4>
-                    <p class="text-[11px] text-slate-500 font-bold leading-relaxed uppercase tracking-widest italic">Lihat riwayat aktivitas operator sistem.</p>
+                    <h4 class="text-2xl font-black uppercase italic tracking-tighter mb-3 mkt-text">Security Audit</h4>
+                    <p class="text-[11px] mkt-text-muted font-bold leading-relaxed uppercase tracking-widest italic">Lihat riwayat aktivitas operator sistem.</p>
                 </a>
             </div>
 
             {{-- RECENT FEED --}}
-            <div class="bg-slate-900 rounded-[3rem] p-8 border border-white/5 shadow-2xl">
-                <h4 class="text-lg font-black uppercase italic tracking-tighter mb-8 text-red-600 border-b border-white/5 pb-5">Recent Feed</h4>
+            <div class="mkt-surface rounded-[3rem] p-8 mkt-border border shadow-2xl">
+                <h4 class="text-lg font-black uppercase italic tracking-tighter mb-8 text-red-600 border-b mkt-border pb-5">Recent Feed</h4>
                 <div class="space-y-7">
                     @forelse($recentActivities ?? [] as $log)
                     <div class="flex gap-5 items-start">
-                        <div class="w-1 h-10 bg-slate-800 rounded-full"></div>
+                        <div class="w-1 h-10 mkt-bg rounded-full"></div>
                         <div class="flex-grow">
-                            <p class="text-xs font-black text-white italic uppercase tracking-tighter leading-none mb-1">{{ $log->user->name ?? 'System' }}</p>
-                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-2">{{ strtoupper($log->action) }}</p>
+                            <p class="text-xs font-black mkt-text italic uppercase tracking-tighter leading-none mb-1">{{ $log->user->name ?? 'System' }}</p>
+                            <p class="text-[9px] mkt-text-muted font-bold uppercase tracking-widest mb-2">{{ strtoupper($log->action) }}</p>
                         </div>
                     </div>
                     @empty

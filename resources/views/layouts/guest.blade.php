@@ -12,12 +12,12 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased bg-black min-h-screen">
         {{-- 
             PENTING: Hapus class bg-slate-100 dan kotak putih di sini. 
             Biarkan file login.blade.php yang menangani background dan card-nya.
         --}}
-        <div class="min-h-screen border-none outline-none">
+        <div class="min-h-screen border-none outline-none flex flex-col">
             {{ $slot }}
         </div>
     </body>

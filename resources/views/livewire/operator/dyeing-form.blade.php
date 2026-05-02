@@ -66,16 +66,16 @@ new class extends Component {
     }
 }
 ?>
-<div class="py-8 bg-slate-50 min-h-screen font-sans tracking-tighter italic text-left">
+<div class="py-8 bg-transparent min-h-screen font-sans tracking-tighter italic text-left">
     <div class="max-w-4xl mx-auto px-4">
         
         {{-- HEADER FORM --}}
         <div class="mb-8 flex justify-between items-end border-b-4 border-slate-900 pb-4">
             <div>
-                <h2 class="text-4xl font-black uppercase text-slate-800 leading-none italic">
+                <h2 class="text-4xl font-black uppercase mkt-text leading-none italic">
                     SCR / <span class="text-blue-600">DYEING</span>
                 </h2>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">
+                <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-widest mt-2">
                     Production Control & Chemical Treatment
                 </p>
             </div>
@@ -88,8 +88,8 @@ new class extends Component {
 
         <form wire:submit.prevent="saveDyeing" class="space-y-6">
             {{-- SEKSI 1: CEK GREIGE --}}
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 italic">
-                <h3 class="text-lg font-black uppercase text-slate-800 mb-6 flex items-center gap-2 italic">
+            <div class="mkt-surface p-8 rounded-[2.5rem] shadow-sm border mkt-border italic">
+                <h3 class="text-lg font-black uppercase mkt-text mb-6 flex items-center gap-2 italic">
                     <span class="w-2 h-6 bg-blue-600 rounded-full"></span>
                     CEK GREIGE
                 </h3>
@@ -97,26 +97,26 @@ new class extends Component {
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {{-- LEBAR/GRAMASI --}}
                     <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 italic">Lebar / Gramasi (Inch/Gsm)</label>
+                        <label class="text-[10px] font-black mkt-text-muted uppercase ml-2 italic">Lebar / Gramasi (Inch/Gsm)</label>
                         <input type="text" wire:model="gramasi" 
-                            class="w-full bg-slate-50 border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-blue-100" 
+                            class="w-full mkt-surface border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-blue-100" 
                             placeholder="Contoh: 103/22">
                         @error('gramasi') <span class="text-red-500 text-[9px] font-bold italic ml-2">{{ $message }}</span> @enderror
                     </div>
 
                     {{-- TANGGAL --}}
                     <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 italic">Tanggal Proses</label>
+                        <label class="text-[10px] font-black mkt-text-muted uppercase ml-2 italic">Tanggal Proses</label>
                         <input type="date" wire:model="tanggal_proses" 
-                            class="w-full bg-slate-50 border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-blue-100">
+                            class="w-full mkt-surface border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-blue-100">
                         @error('tanggal_proses') <span class="text-red-500 text-[9px] font-bold italic ml-2">{{ $message }}</span> @enderror
                     </div>
 
                     {{-- JENIS MESIN --}}
                     <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 italic">Jenis Mesin</label>
+                        <label class="text-[10px] font-black mkt-text-muted uppercase ml-2 italic">Jenis Mesin</label>
                         <select wire:model="jenis_mesin" 
-                            class="w-full bg-slate-50 border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-blue-100">
+                            class="w-full mkt-surface border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-blue-100">
                             <option value="">-- Pilih Mesin --</option>
                             <option value="Jet Dyeing">Jet Dyeing</option>
                             <option value="Long Dyeing">Long Dyeing</option>
@@ -127,9 +127,9 @@ new class extends Component {
 
                     {{-- NO MESIN --}}
                     <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 italic">No. Mesin</label>
+                        <label class="text-[10px] font-black mkt-text-muted uppercase ml-2 italic">No. Mesin</label>
                         <input type="number" wire:model="no_mesin" 
-                            class="w-full bg-slate-50 border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-blue-100" 
+                            class="w-full mkt-surface border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-blue-100" 
                             placeholder="00">
                         @error('no_mesin') <span class="text-red-500 text-[9px] font-bold italic ml-2">{{ $message }}</span> @enderror
                     </div>
@@ -137,8 +137,8 @@ new class extends Component {
             </div>
 
             {{-- SEKSI 2: SPESIFIKASI WARNA --}}
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 italic">
-                <h3 class="text-lg font-black uppercase text-slate-800 mb-6 flex items-center gap-2 italic">
+            <div class="mkt-surface p-8 rounded-[2.5rem] shadow-sm border mkt-border italic">
+                <h3 class="text-lg font-black uppercase mkt-text mb-6 flex items-center gap-2 italic">
                     <span class="w-2 h-6 bg-red-600 rounded-full"></span>
                     WARNA & SYSTEM
                 </h3>
@@ -146,36 +146,36 @@ new class extends Component {
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {{-- WARNA --}}
                     <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 italic">Warna</label>
+                        <label class="text-[10px] font-black mkt-text-muted uppercase ml-2 italic">Warna</label>
                         <input type="text" wire:model="warna" 
-                            class="w-full bg-slate-50 border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-red-100" 
+                            class="w-full mkt-surface border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-red-100" 
                             placeholder="Nama Warna">
                         @error('warna') <span class="text-red-500 text-[9px] font-bold italic ml-2">{{ $message }}</span> @enderror
                     </div>
 
                     {{-- KODE WARNA --}}
                     <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 italic">Kode Warna</label>
+                        <label class="text-[10px] font-black mkt-text-muted uppercase ml-2 italic">Kode Warna</label>
                         <input type="text" wire:model="kode_warna" 
-                            class="w-full bg-slate-50 border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-red-100" 
+                            class="w-full mkt-surface border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-red-100" 
                             placeholder="Contoh: D-BK-001">
                         @error('kode_warna') <span class="text-red-500 text-[9px] font-bold italic ml-2">{{ $message }}</span> @enderror
                     </div>
 
                     {{-- DYE SYSTEM --}}
                     <div class="md:col-span-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 italic">Dye System</label>
+                        <label class="text-[10px] font-black mkt-text-muted uppercase ml-2 italic">Dye System</label>
                         <input type="text" wire:model="dye_system" 
-                            class="w-full bg-slate-50 border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-blue-100" 
+                            class="w-full mkt-surface border-none rounded-2xl p-4 text-sm font-bold italic focus:ring-4 focus:ring-blue-100" 
                             placeholder="Contoh: Disperse / Reactive">
                         @error('dye_system') <span class="text-red-500 text-[9px] font-bold italic ml-2">{{ $message }}</span> @enderror
                     </div>
 
                     {{-- TREATMENT (CHEMICAL) --}}
                     <div class="md:col-span-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 italic">Treatment (Chemical)</label>
+                        <label class="text-[10px] font-black mkt-text-muted uppercase ml-2 italic">Treatment (Chemical)</label>
                         <textarea wire:model="treatment" 
-                            class="w-full bg-slate-50 border-none rounded-2xl p-4 text-sm font-bold italic h-32 resize-none focus:ring-4 focus:ring-blue-100" 
+                            class="w-full mkt-surface border-none rounded-2xl p-4 text-sm font-bold italic h-32 resize-none focus:ring-4 focus:ring-blue-100" 
                             placeholder="Tuliskan detail penggunaan chemical..."></textarea>
                         @error('treatment') <span class="text-red-500 text-[9px] font-bold italic ml-2">{{ $message }}</span> @enderror
                     </div>

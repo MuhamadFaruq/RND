@@ -66,50 +66,50 @@ new class extends Component
 ?>
 
 <div>
-    <div class="py-12 bg-slate-50 min-h-screen italic">
+    <div class="py-12 bg-transparent min-h-screen italic">
         <div class="max-w-4xl mx-auto px-4">
-            <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100">
+            <div class="mkt-surface rounded-[2.5rem] p-8 shadow-xl border mkt-border">
                 
                 <div class="flex items-center gap-4 mb-8">
                     <div class="bg-violet-600 p-3 rounded-2xl text-white shadow-lg shadow-violet-200">
                         🛡️
                     </div>
                     <div>
-                        <h2 class="text-xl font-black uppercase tracking-tighter text-slate-800">QE (Final Description)</h2>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Quality Engineering & Final Validation</p>
+                        <h2 class="text-xl font-black uppercase tracking-tighter mkt-text">QE (Final Description)</h2>
+                        <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-widest">Quality Engineering & Final Validation</p>
                     </div>
                 </div>
 
                 <form wire:submit.prevent="submit" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Operator QE</label>
-                            <input type="text" wire:model="operator" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Operator QE</label>
+                            <input type="text" wire:model="operator" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Fabric Name</label>
-                            <input type="text" wire:model="fabric_name" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Fabric Name</label>
+                            <input type="text" wire:model="fabric_name" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-slate-100">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t mkt-border">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Lebar (Int)</label>
-                            <input type="number" wire:model="lebar" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold text-violet-600">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Lebar (Int)</label>
+                            <input type="number" wire:model="lebar" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold text-violet-600">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Gramasi (Int)</label>
-                            <input type="number" wire:model="gramasi" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold text-violet-600">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Gramasi (Int)</label>
+                            <input type="number" wire:model="gramasi" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold text-violet-600">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Shrinkage (Int)</label>
-                            <input type="number" wire:model="shrinkage" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold">
+                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Shrinkage (Int)</label>
+                            <input type="number" wire:model="shrinkage" class="w-full mkt-surface border-2 mkt-border rounded-xl px-4 py-3 font-bold">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Note (Catatan Final)</label>
-                        <textarea wire:model="note" rows="4" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3 font-bold italic" placeholder="Tuliskan keterangan akhir kain di sini..."></textarea>
+                        <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Note (Catatan Final)</label>
+                        <textarea wire:model="note" rows="4" class="w-full mkt-surface border-2 mkt-border rounded-2xl px-4 py-3 font-bold italic" placeholder="Tuliskan keterangan akhir kain di sini..."></textarea>
                     </div>
 
                     <button type="submit" class="w-full bg-violet-600 text-white py-5 rounded-2xl font-black uppercase text-xs shadow-2xl transition-all hover:bg-black group">

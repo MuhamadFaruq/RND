@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Inertia\Inertia;
+
 
 class SystemHealthController extends Controller
 {
@@ -14,7 +14,7 @@ class SystemHealthController extends Controller
         $totalSpace = disk_total_space(base_path());
         $usedSpace = $totalSpace - $freeSpace;
 
-        return Inertia::render('Admin/SystemHealth', [
+        return view('admin.system-health', [
             'storage' => [
                 'free' => round($freeSpace / (1024 * 1024 * 1024), 2), // GB
                 'used' => round($usedSpace / (1024 * 1024 * 1024), 2), // GB

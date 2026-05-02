@@ -86,6 +86,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/order-detail/{sap_no}', [DashboardController::class, 'getOrderDetailApi'])->name('api.order-detail');
         Route::get('/qrcode/{sap_no}', [DashboardController::class, 'generateQrCode'])->name('api.qrcode');
         Route::get('/label/{sap_no}', [DashboardController::class, 'generateLabel'])->name('api.label');
+        
+        // Maintenance Heartbeat (Sangat penting untuk Otomatisasi Logout)
+        Route::get('/check-maintenance', [DashboardController::class, 'checkMaintenanceStatus'])->name('api.maintenance-check');
     });
 });
 
@@ -149,7 +152,7 @@ Route::middleware(['auth', 'role:operator,knitting,dyeing,relax-dryer,finishing,
 |--------------------------------------------------------------------------
 */
 // Grup 1: Akses untuk Admin DAN Super-Admin
-Route::middleware(['auth', 'role:admin,super-admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Monitoring & Audit (Read-only untuk Admin)
     Volt::route('/activity-logs', 'admin.activity-logs')->name('admin.activity-logs');
     Volt::route('/monitoring', 'admin.monitoring')->name('admin.monitoring');
