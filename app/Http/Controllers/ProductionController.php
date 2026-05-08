@@ -74,10 +74,10 @@ class ProductionController extends Controller
 public function monitoringIndex()
 {
     $stats = [
-        'order_aktif'   => \App\Models\MarketingOrder::where('status', '!=', 'completed')->count(),
+        'order_aktif'   => \App\Models\MarketingOrder::where('status', '!=', 'finished')->count(),
         'total_pesanan' => \App\Models\MarketingOrder::count(),
         'order_overdue' => \App\Models\MarketingOrder::where('status', 'knitting')->count(),
-        'order_selesai' => \App\Models\MarketingOrder::where('status', 'completed')->count(),
+        'order_selesai' => \App\Models\MarketingOrder::where('status', 'finished')->count(),
     ];
 
     return Inertia::render('Admin/MonitoringDashboard', [
@@ -122,7 +122,7 @@ public function monitoringIndex()
             $validated = $request->validate([
                 'sap_no' => ['required', 'integer', 'exists:marketing_orders,sap_no'],
                 'division_name' => ['required', 'string', 'max:255'],
-                'status' => ['nullable', 'in:knitting,dyeing,finishing,qc,completed'],
+                'status' => ['nullable', 'in:knitting,dyeing,finishing,qc,finished'],
                 'technical_data' => ['nullable', 'array'],
             ]);
 
@@ -222,10 +222,15 @@ public function monitoringIndex()
     {
         $d = $this->normalizeDivision($divisionName);
         if (str_contains($d, 'knit')) return 'dyeing';
-        if (Str::contains($d, ['dye', 'scr'])) return 'finishing';
-        if (preg_match('/(relax|heat|compact)/', $d)) return 'finishing';
-        if (preg_match('/(stenter|tumbler|fleece)/', $d)) return 'qc';
-        if (Str::contains($d, ['qc', 'qe'])) return 'completed';
+        if (Str::contains($d, ['dye', 'scr'])) return 'relax-dryer';
+        if (str_contains($d, 'relax')) return 'compactor';
+        if (str_contains($d, 'compact')) return 'heat-setting';
+        if (str_contains($d, 'heat')) return 'stenter';
+        if (str_contains($d, 'stenter')) return 'tumbler';
+        if (str_contains($d, 'tumbler')) return 'fleece';
+        if (str_contains($d, 'fleece')) return 'pengujian';
+        if (Str::contains($d, ['uji', 'pengujian'])) return 'qe';
+        if (Str::contains($d, ['qc', 'qe'])) return 'finished';
         return null;
     }
 

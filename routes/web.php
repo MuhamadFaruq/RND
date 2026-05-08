@@ -21,12 +21,7 @@ use App\Livewire\Admin\{UserManagement, DivisionManagement};
 | Public & Redirection Routes
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    if (auth()->check()) {
-        return redirect()->route('dashboard');
-    }
-    return view('welcome');
-});
+// Removed: duplicate '/' route — the guest-middleware version below handles this.
 
 
 /*
@@ -71,7 +66,7 @@ Route::middleware('auth')->group(function () {
     // PERBAIKAN: Jika Admin Monitoring menggunakan Volt, gunakan Volt::route
     // Jika menggunakan Class, pastikan file App\Livewire\Admin\Monitoring ada.
     // Sementara saya arahkan ke Volt agar tidak error.
-    Volt::route('/admin/monitoring', 'admin.monitoring')->name('admin.monitoring');
+    // Removed: duplicate admin.monitoring — already registered in admin prefix group below.
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -165,7 +160,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/system-health', [SystemHealthController::class, 'index'])->name('admin.health');
     
     // Export Data
-    Route::get('/export-excel', [DashboardController::class, 'exportExcel'])->name('marketing.orders.export');
+    Route::get('/export-excel', [DashboardController::class, 'exportExcel'])->name('admin.orders.export');
 });
 
 // Grup 2: KHUSUS Super-Admin (Akses Penuh / CRUD)

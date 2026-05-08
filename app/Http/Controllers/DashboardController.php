@@ -66,36 +66,9 @@ class DashboardController extends Controller
 
 public function monitoring()
     {
-        // 1. Data Statistik Utama
-        $totalOrder = \App\Models\MarketingOrder::count();
-        $knittingOrder = \App\Models\MarketingOrder::where('status', 'knitting')->count();
-        $activeOrder = \App\Models\MarketingOrder::whereIn('status', [
-            'dyeing', 'relax-dryer', 'finishing', 
-            'stenter', 'tumbler', 'fleece', 'pengujian', 'qe'
-        ])->count();
-        $completedOrder = \App\Models\MarketingOrder::where('status', 'completed')->count();
-
-        // 2. Data untuk Progress Table (Tabel 10 SAP Terakhir)
-        $recentOrders = \App\Models\MarketingOrder::latest()
-            ->take(10)
-            ->get();
-
-        // 3. Logika "Machine Workload" (Persentase beban kerja per divisi)
-        // Anda bisa menyesuaikan angka pembaginya sesuai dengan kapasitas asli pabrik Anda
-        $machineStats = [
-            'knitting' => min(($knittingOrder / 20) * 100, 100), // Asumsi kapasitas antrean 20
-            'dyeing'   => min(($activeOrder / 15) * 100, 100),  // Asumsi kapasitas proses 15
-            'finishing'=> 82, // Nilai statis atau bisa diambil dari query aktivitas finishing
-        ];
-
-        return view('livewire.marketing.marketing-dashboard', [
-            'totalOrder'     => $totalOrder,
-            'knittingOrder'   => $knittingOrder,
-            'activeOrder'    => $activeOrder,
-            'completedOrder' => $completedOrder,
-            'recentOrders'   => $recentOrders,
-            'machineStats'   => $machineStats, // Pastikan variabel ini dikirim agar tidak error
-        ]);
+        // Redirect ke Livewire MarketingDashboard yang sudah menangani semua data
+        // Controller biasa tidak bisa menyuplai Livewire properties seperti stages, factoryLoad, dll.
+        return redirect()->route('marketing.dashboard');
     }
 
     /**
@@ -149,7 +122,7 @@ public function monitoring()
         $reason = $request->input('reason'); 
 
         if ($action === 'approve') {
-            $order->update(['status' => 'completed']);
+            $order->update(['status' => 'finished']);
             return back()->with('success', "Order SAP {$order->sap_no} SELESAI.");
         }
 

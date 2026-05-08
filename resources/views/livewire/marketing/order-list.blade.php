@@ -83,7 +83,8 @@
                     <option value="knitting">Knitting</option>
                     <option value="dyeing">Dyeing</option>
                     <option value="relax-dryer">Relax Dryer</option>
-                    <option value="finishing">Finishing</option>
+                    <option value="compactor">Compactor</option>
+                    <option value="heat-setting">Heat Setting</option>
                     <option value="stenter">Stenter</option>
                     <option value="tumbler">Tumbler</option>
                     <option value="fleece">Fleece</option>
@@ -245,7 +246,22 @@
                                 class="no-print px-6 py-2.5 bg-white text-slate-900 rounded-xl text-[10px] font-black hover:bg-red-600 hover:text-white transition shadow-sm uppercase italic">
                                 📝 Edit Data
                             </a>
-                            <button @click="if(confirm('Yakin hapus data SAP ' + (selected?.sap_no ?? '') + '?')) { $wire.deleteOrder(selected.id); }" 
+                            <button @click="
+                                let sap = selected?.sap_no ?? '';
+                                let status = selected?.status ?? 'knitting';
+                                let id = selected?.id;
+                                if(status === 'knitting') {
+                                    if(confirm('Yakin hapus data SAP ' + sap + '?')) {
+                                        $wire.deleteOrder(id);
+                                    }
+                                } else {
+                                    if(confirm('Yakin hapus data SAP ' + sap + '?')) {
+                                        if(confirm('PERINGATAN!\n\nOrder SAP ' + sap + ' sudah dalam proses produksi (' + status.toUpperCase() + ').\nMenghapus order ini juga akan MENGHAPUS SEMUA RIWAYAT OPERATOR secara permanen!\n\nAnda yakin ingin menghapus PAKSA?')) {
+                                            $wire.deleteOrder(id);
+                                        }
+                                    }
+                                }
+                            " 
                                 class="no-print px-6 py-2.5 bg-red-600/10 text-red-500 border border-red-500/50 rounded-xl text-[10px] font-black hover:bg-red-600 hover:text-white transition uppercase italic">
                                 🗑️ Delete
                             </button>
@@ -383,22 +399,23 @@
 
                                     @php
                                         $milestones = [
-                                            ['id' => '02', 'status' => 'knitting', 'label' => 'Knitting Process', 'desc' => 'RAJUT UNIT DDT 2', 'after' => ['dyeing', 'relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '03', 'status' => 'dyeing', 'label' => 'SCR / Dyeing', 'desc' => 'PROSES WARNA & PENCUCIAN', 'after' => ['relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '04', 'status' => 'relax-dryer', 'label' => 'Relax Dryer', 'desc' => 'PENGERINGAN TANPA TEGANGAN', 'after' => ['finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '05', 'status' => 'finishing', 'label' => 'Chemical Finishing', 'desc' => 'PELEMBUT & OBAT FINISH', 'after' => ['stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '06', 'status' => 'stenter', 'label' => 'Stenter Process', 'desc' => 'SETTING LEBAR & GRAMASI', 'after' => ['tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '07', 'status' => 'tumbler', 'label' => 'Tumbler Dry', 'desc' => 'PROSES BULKING KAIN', 'after' => ['fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '08', 'status' => 'fleece', 'label' => 'Fleece / Brushing', 'desc' => 'GARUK BULU (UNIT FLEECE)', 'after' => ['pengujian', 'qe', 'finished']],
-                                            ['id' => '09', 'status' => 'pengujian', 'label' => 'QC & Lab Testing', 'desc' => 'PENGUJIAN FISIK KAIN', 'after' => ['qe', 'finished']],
-                                            ['id' => '10', 'status' => 'qe', 'label' => 'QE Approval', 'desc' => 'FINAL INSPECTION & RELEASE', 'after' => ['finished']],
+                                            ['id' => '02', 'status' => 'knitting', 'label' => 'Knitting Process', 'desc' => 'RAJUT UNIT DDT 2', 'after' => ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '03', 'status' => 'dyeing', 'label' => 'SCR / Dyeing', 'desc' => 'PROSES WARNA & PENCUCIAN', 'after' => ['relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '04', 'status' => 'relax-dryer', 'label' => 'Relax Dryer', 'desc' => 'PENGERINGAN TANPA TEGANGAN', 'after' => ['compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '05', 'status' => 'compactor', 'label' => 'Compactor', 'desc' => 'FINISHING BULAT (COTTON)', 'after' => ['heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '06', 'status' => 'heat-setting', 'label' => 'Heat Setting', 'desc' => 'FINISHING BULAT (PE/POLYESTER)', 'after' => ['stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '07', 'status' => 'stenter', 'label' => 'Stenter Process', 'desc' => 'SETTING LEBAR & GRAMASI', 'after' => ['tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '08', 'status' => 'tumbler', 'label' => 'Tumbler Dry', 'desc' => 'PROSES BULKING KAIN', 'after' => ['fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '09', 'status' => 'fleece', 'label' => 'Fleece / Brushing', 'desc' => 'GARUK BULU (UNIT FLEECE)', 'after' => ['pengujian', 'qe', 'finished']],
+                                            ['id' => '10', 'status' => 'pengujian', 'label' => 'QC & Lab Testing', 'desc' => 'PENGUJIAN FISIK KAIN', 'after' => ['qe', 'finished']],
+                                            ['id' => '11', 'status' => 'qe', 'label' => 'QE Approval', 'desc' => 'FINAL INSPECTION & RELEASE', 'after' => ['finished']],
                                         ];
                                     @endphp
 
                                     @foreach($milestones as $m)
                                         @php 
                                             $log = $activitiesLogs[$m['status']][0] ?? null; 
-                                            $isDone = in_array($order->status, $m['after']); // Fallback logic
+                                            $isDone = in_array($selectedOrder['status'] ?? '', $m['after']); // Fallback logic
                                         @endphp
                                         <div class="flex items-start gap-6">
                                             <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-500"

@@ -34,34 +34,37 @@ new class extends Component
             'hasil_gramasi' => 'required|numeric',
         ]);
 
-        ProductionActivity::create([
-            'marketing_order_id' => $this->orderId,
-            'user_id' => Auth::id(),
-            'type' => 'finishing',
-            'no_mesin' => $this->no_mesin,
-            'shift' => $this->determineShift(),
-            'technical_data' => [
-                'sub_proses' => $this->jenis_proses,
-                'operator' => $this->operator,
-                'tanggal' => $this->tanggal,
-                'rangka' => $this->rangka,
-                'temperatur' => $this->temperatur,
-                'speed' => $this->speed,
-                'overfeed' => $this->overfeed,
-                'delivery_speed' => $this->delivery_speed,
-                'folding_speed' => $this->folding_speed,
-                'felt' => $this->jenis_proses === 'compactor' ? $this->felt : null,
-                'hasil_lebar' => $this->hasil_lebar,
-                'hasil_gramasi' => $this->hasil_gramasi,
-                'shrinkage' => $this->shrinkage,
-            ]
-        ]);
+        try {
+        try {
+            $productionService = app(ProductionService::class);
+            $productionService->processFinishing(
+                $this->orderId,
+                Auth::id(),
+                $this->jenis_proses,
+                $this->no_mesin,
+                $this->determineShift(),
+                [
+                    'sub_proses' => $this->jenis_proses,
+                    'operator' => $this->operator,
+                    'tanggal' => $this->tanggal,
+                    'rangka' => $this->rangka,
+                    'temperatur' => $this->temperatur,
+                    'speed' => $this->speed,
+                    'overfeed' => $this->overfeed,
+                    'delivery_speed' => $this->delivery_speed,
+                    'folding_speed' => $this->folding_speed,
+                    'felt' => $this->jenis_proses === 'compactor' ? $this->felt : null,
+                    'hasil_lebar' => $this->hasil_lebar,
+                    'hasil_gramasi' => $this->hasil_gramasi,
+                    'shrinkage' => $this->shrinkage,
+                ]
+            );
 
-        // Update status Marketing Order menjadi SELESAI atau ke QC
-        MarketingOrder::where('id', $this->orderId)->update(['status' => 'completed']);
-
-        session()->flash('message', 'Data Finishing (' . strtoupper($this->jenis_proses) . ') berhasil disimpan! 🚀');
-        return redirect()->route('operator.logbook');
+            session()->flash('message', 'Data Finishing (' . strtoupper($this->jenis_proses) . ') berhasil disimpan! 🚀');
+            return redirect()->route('operator.logbook');
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: 'Gagal menyimpan data Finishing: ' . $e->getMessage());
+        }
     }
 
     private function determineShift() {

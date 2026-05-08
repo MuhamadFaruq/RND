@@ -3,7 +3,7 @@ use Livewire\Component;
 new class extends Component {};
 ?>
 <div x-data="{ openDetail: false, selected: {} }" class="bg-transparent italic tracking-tighter">
-    <script src="https://cdn.tailwindcss.com"></script>
+    {{-- Tailwind sudah dikompilasi via Vite, tidak perlu CDN --}}
 
     <div class="max-w-[1600px] mx-auto">
         

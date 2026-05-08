@@ -24,7 +24,7 @@ class DyeingForm extends Component
 
     public function mount($sap)
     {
-        $this->sap = $sap;
+        $this->sap_no = $sap;
         $this->order = MarketingOrder::where('sap_no', $sap)->first();
 
         if (!$this->order) {
@@ -67,7 +67,7 @@ class DyeingForm extends Component
 
             // UPDATE STATUS: Melempar ke divisi selanjutnya (misal: STENTER)
             $this->order->update([
-                'status' => 'relax-dryer' 
+                'status' => 'relax-dryer'
             ]);
         });
 

@@ -31,14 +31,13 @@ new class extends Component
             'gramasi' => 'required|numeric',
         ]);
 
-        DB::transaction(function () {
-            ProductionActivity::create([
-                'marketing_order_id' => $this->orderId,
-                'user_id' => Auth::id(),
-                'type' => 'qe',
-                'division_name' => 'qe',
-                'shift' => $this->determineShift(),
-                'technical_data' => [
+        try {
+            $productionService = app(ProductionService::class);
+            $productionService->processQE(
+                $this->orderId,
+                Auth::id(),
+                $this->determineShift(),
+                [
                     'operator' => $this->operator,
                     'fabric_name' => $this->fabric_name,
                     'lebar' => $this->lebar,
@@ -46,14 +45,13 @@ new class extends Component
                     'shrinkage' => $this->shrinkage,
                     'note' => $this->note,
                 ]
-            ]);
+            );
 
-            // QE adalah tahap Final Description
-            MarketingOrder::where('id', $this->orderId)->update(['status' => 'completed']);
-        });
-
-        session()->flash('message', 'Data QE Final Description berhasil disimpan! ✨');
-        return redirect()->route('operator.logbook');
+            session()->flash('message', 'Data QE Final Description berhasil disimpan! ✨');
+            return redirect()->route('operator.logbook');
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: 'Gagal menyimpan data QE: ' . $e->getMessage());
+        }
     }
 
     private function determineShift() {

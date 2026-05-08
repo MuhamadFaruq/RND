@@ -68,7 +68,7 @@ new class extends Component
         $targetDate = \Carbon\Carbon::parse($this->selectedDate);
 
         // 1. Lead Time tetap sama
-        $divs = ['knitting', 'dyeing', 'relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe'];
+        $divs = ['knitting', 'dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe'];
         foreach($divs as $d) {
             $this->divisionLeadTimes[$d] = $this->calculateAvgLeadTime($d);
         }
@@ -224,7 +224,8 @@ new class extends Component
                 <option value="knitting">KNITTING</option>
                 <option value="dyeing">SCR/DYEING</option>
                 <option value="relax-dryer">RELAX DRYER</option>
-                <option value="finishing">FINISHING</option>
+                <option value="compactor">COMPACTOR</option>
+                <option value="heat-setting">HEAT SETTING</option>
                 <option value="stenter">STENTER</option>
                 <option value="tumbler">TUMBLER DRY</option>
                 <option value="fleece">FLEECE</option>

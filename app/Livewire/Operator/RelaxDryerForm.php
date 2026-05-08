@@ -97,7 +97,7 @@ class RelaxDryerForm extends Component
             ]);
 
             // Update status MO agar hilang dari list permintaan dan lanjut ke Compactor
-            MarketingOrder::where('id', $this->order_id)->update(['status' => 'COMPACTOR']);
+            MarketingOrder::where('id', $this->order_id)->update(['status' => 'compactor']);
         });
 
         session()->flash('message', 'Data Relax Dryer berhasil disimpan!');
@@ -107,7 +107,7 @@ class RelaxDryerForm extends Component
     public function render()
     {
         // Ambil data permintaan yang statusnya memang untuk Relax Dryer
-        $jobs = MarketingOrder::where('status', 'RELAX-DRYER')->get();
+        $jobs = MarketingOrder::where('status', 'relax-dryer')->get();
 
         return view('livewire.operator.relax-dryer-form', [
             'jobs' => $jobs

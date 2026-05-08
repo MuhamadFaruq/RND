@@ -29,14 +29,13 @@ new class extends Component
             'shrinkage' => 'required|numeric',
         ]);
 
-        DB::transaction(function () {
-            ProductionActivity::create([
-                'marketing_order_id' => $this->orderId,
-                'user_id' => Auth::id(),
-                'type' => 'pengujian',
-                'division_name' => 'pengujian',
-                'shift' => $this->determineShift(),
-                'technical_data' => [
+        try {
+            $productionService = app(ProductionService::class);
+            $productionService->processPengujian(
+                $this->orderId,
+                Auth::id(),
+                $this->determineShift(),
+                [
                     'operator' => $this->operator,
                     'tanggal' => $this->tanggal,
                     'lebar' => $this->lebar,
@@ -45,14 +44,13 @@ new class extends Component
                     'spirality' => $this->spirality,
                     'skewness' => $this->skewness,
                 ]
-            ]);
+            );
 
-            // Setelah Pengujian, status order bisa menjadi 'final' atau 'QC-Passed'
-            MarketingOrder::where('id', $this->orderId)->update(['status' => 'completed']);
-        });
-
-        session()->flash('message', 'Data Pengujian QC & LAB berhasil disimpan! 🏆');
-        return redirect()->route('operator.logbook');
+            session()->flash('message', 'Data Pengujian QC & LAB berhasil disimpan! 🏆');
+            return redirect()->route('operator.logbook');
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: 'Gagal menyimpan data Pengujian: ' . $e->getMessage());
+        }
     }
 
     private function determineShift() {

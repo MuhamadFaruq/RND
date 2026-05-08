@@ -1,6 +1,5 @@
 <div>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{-- Tailwind & Chart.js sudah dikompilasi via Vite, tidak perlu CDN --}}
 
 <div x-data="{ openDetail: @entangle('showDetail'), selected: @entangle('selectedOrder') }" class="min-h-screen mkt-bg pt-2 pb-8 px-6 font-inter tracking-tight">
     <div class="max-w-[1600px] mx-auto">
@@ -141,7 +140,7 @@
                     </div>
                 </div>
 
-                {{-- SALES PERFORMANCE & REPS                 {{-- SALES PERFORMANCE & REPS --}}
+                {{-- SALES PERFORMANCE & REPS --}}
                 <div class="mb-10">
                     <div class="mkt-surface p-8 rounded-[3rem] mkt-border border shadow-sm">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -448,15 +447,16 @@
 
                                     @php
                                         $milestones = [
-                                            ['id' => '02', 'status' => 'knitting', 'label' => 'Knitting Process', 'desc' => 'RAJUT UNIT DDT 2', 'after' => ['dyeing', 'relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '03', 'status' => 'dyeing', 'label' => 'SCR / Dyeing', 'desc' => 'PROSES WARNA & PENCUCIAN', 'after' => ['relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '04', 'status' => 'relax-dryer', 'label' => 'Relax Dryer', 'desc' => 'PENGERINGAN TANPA TEGANGAN', 'after' => ['finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '05', 'status' => 'finishing', 'label' => 'Chemical Finishing', 'desc' => 'PELEMBUT & OBAT FINISH', 'after' => ['stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '06', 'status' => 'stenter', 'label' => 'Stenter Process', 'desc' => 'SETTING LEBAR & GRAMASI', 'after' => ['tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '07', 'status' => 'tumbler', 'label' => 'Tumbler Dry', 'desc' => 'PROSES BULKING KAIN', 'after' => ['fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '08', 'status' => 'fleece', 'label' => 'Fleece / Brushing', 'desc' => 'GARUK BULU (UNIT FLEECE)', 'after' => ['pengujian', 'qe', 'finished']],
-                                            ['id' => '09', 'status' => 'pengujian', 'label' => 'QC & Lab Testing', 'desc' => 'PENGUJIAN FISIK KAIN', 'after' => ['qe', 'finished']],
-                                            ['id' => '10', 'status' => 'qe', 'label' => 'QE Approval', 'desc' => 'FINAL INSPECTION & RELEASE', 'after' => ['finished']],
+                                            ['id' => '02', 'status' => 'knitting', 'label' => 'Knitting Process', 'desc' => 'RAJUT UNIT DDT 2', 'after' => ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '03', 'status' => 'dyeing', 'label' => 'SCR / Dyeing', 'desc' => 'PROSES WARNA & PENCUCIAN', 'after' => ['relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '04', 'status' => 'relax-dryer', 'label' => 'Relax Dryer', 'desc' => 'PENGERINGAN TANPA TEGANGAN', 'after' => ['compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '05', 'status' => 'compactor', 'label' => 'Compactor', 'desc' => 'FINISHING BULAT (COTTON)', 'after' => ['heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '06', 'status' => 'heat-setting', 'label' => 'Heat Setting', 'desc' => 'FINISHING BULAT (PE/POLYESTER)', 'after' => ['stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '07', 'status' => 'stenter', 'label' => 'Stenter Process', 'desc' => 'SETTING LEBAR & GRAMASI', 'after' => ['tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '08', 'status' => 'tumbler', 'label' => 'Tumbler Dry', 'desc' => 'PROSES BULKING KAIN', 'after' => ['fleece', 'pengujian', 'qe', 'finished']],
+                                            ['id' => '09', 'status' => 'fleece', 'label' => 'Fleece / Brushing', 'desc' => 'GARUK BULU (UNIT FLEECE)', 'after' => ['pengujian', 'qe', 'finished']],
+                                            ['id' => '10', 'status' => 'pengujian', 'label' => 'QC & Lab Testing', 'desc' => 'PENGUJIAN FISIK KAIN', 'after' => ['qe', 'finished']],
+                                            ['id' => '11', 'status' => 'qe', 'label' => 'QE Approval', 'desc' => 'FINAL INSPECTION & RELEASE', 'after' => ['finished']],
                                         ];
                                     @endphp
 

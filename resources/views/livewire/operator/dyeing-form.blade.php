@@ -4,6 +4,7 @@ use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use App\Models\ProductionActivity;
 use App\Models\MarketingOrder;
+use App\Services\ProductionService;
 
 new class extends Component {
     public $sap_no;
@@ -39,13 +40,12 @@ new class extends Component {
             'dye_system' => 'required',
         ]);
 
-        DB::transaction(function () {
-            // 1. Simpan aktivitas produksi
-            ProductionActivity::create([
-                'operator_id' => auth()->id(),
-                'marketing_order_id' => $this->order->id,
-                'division_name' => 'dyeing',
-                'technical_data' => [
+        try {
+            $productionService = app(ProductionService::class);
+            $productionService->processDyeing(
+                $this->order->id,
+                auth()->id(),
+                [
                     'gramasi' => $this->gramasi,
                     'jenis_mesin' => $this->jenis_mesin,
                     'no_mesin' => $this->no_mesin,
@@ -53,16 +53,15 @@ new class extends Component {
                     'dye_system' => $this->dye_system,
                     'treatment' => $this->treatment,
                 ]
-            ]);
+            );
 
-            // 2. Update status ke proses selanjutnya (misal: stenter)
-            $this->order->update(['status' => 'stenter']);
-        });
-
-        session()->flash('message', 'Data SCR/DYEING berhasil disimpan! 🚀');
-        
-        // Kembali ke logbook
-        return redirect()->route('operator.logbook', ['menu' => 'orders']);
+            session()->flash('message', 'Data SCR/DYEING berhasil disimpan! 🚀');
+            
+            // Kembali ke logbook
+            return redirect()->route('operator.logbook', ['menu' => 'orders']);
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: 'Gagal menyimpan data Dyeing: ' . $e->getMessage());
+        }
     }
 }
 ?>

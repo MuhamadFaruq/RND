@@ -60,11 +60,15 @@ class OrderList extends Component
 
     public function deleteOrder($id)
     {
-        MarketingOrder::findOrFail($id)->delete();
-        if ($this->selectedOrder && ($this->selectedOrder['id'] ?? null) == $id) {
-            $this->closeDetail();
+        try {
+            MarketingOrder::findOrFail($id)->delete();
+            if ($this->selectedOrder && ($this->selectedOrder['id'] ?? null) == $id) {
+                $this->closeDetail();
+            }
+            $this->dispatch('show-toast', message: 'Order berhasil dihapus.', type: 'success');
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: 'Gagal menghapus order: ' . $e->getMessage());
         }
-        session()->flash('message', 'Order berhasil dihapus.');
     }
 
     public function openDetail($id)

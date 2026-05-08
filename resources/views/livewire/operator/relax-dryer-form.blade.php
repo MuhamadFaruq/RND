@@ -40,30 +40,29 @@ new class extends Component
             'berat_kg' => 'required|numeric',
         ]);
 
-        DB::transaction(function () {
-            ProductionActivity::create([
-                'operator_id' => auth()->id(),
-                'marketing_order_id' => $this->order->id,
-                'division_name' => 'relax-dryer',
-                'kg' => $this->berat_kg,
-                'roll' => $this->jumlah_roll,
-                'shift' => $this->shift,
-                'technical_data' => [
+        try {
+            $productionService = app(ProductionService::class);
+            $productionService->processRelaxDryer(
+                $this->order->id,
+                auth()->id(),
+                $this->berat_kg,
+                $this->jumlah_roll,
+                $this->shift,
+                [
                     'no_mesin' => $this->no_mesin,
                     'suhu_set' => $this->suhu_set,
                     'speed' => $this->speed,
                     'overfeed' => $this->overfeed,
                 ]
-            ]);
+            );
 
-            // Pindahkan status ke Compactor
-            $this->order->update(['status' => 'compactor']);
-        });
-
-        session()->flash('message', 'Data Relax Dryer berhasil disimpan!');
-        
-        // Setelah simpan, balikkan ke Logbook (Menu Orders)
-        return redirect()->route('operator.logbook', ['menu' => 'orders']);
+            session()->flash('message', 'Data Relax Dryer berhasil disimpan!');
+            
+            // Setelah simpan, balikkan ke Logbook (Menu Orders)
+            return redirect()->route('operator.logbook', ['menu' => 'orders']);
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: 'Gagal menyimpan data Relax Dryer: ' . $e->getMessage());
+        }
     }
 };
 ?>

@@ -31,14 +31,13 @@ new class extends Component
             'gramasi' => 'required|numeric',
         ]);
 
-        DB::transaction(function () {
-            ProductionActivity::create([
-                'marketing_order_id' => $this->orderId,
-                'user_id' => Auth::id(),
-                'type' => 'tumbler',
-                'division_name' => 'tumbler',
-                'shift' => $this->determineShift(),
-                'technical_data' => [
+        try {
+            $productionService = app(ProductionService::class);
+            $productionService->processTumbler(
+                $this->orderId,
+                Auth::id(),
+                $this->determineShift(),
+                [
                     'operator' => $this->operator,
                     'tanggal' => $this->tanggal,
                     'temperatur' => $this->temperatur,
@@ -49,15 +48,13 @@ new class extends Component
                     'gramasi' => $this->gramasi,
                     'shrinkage' => $this->shrinkage,
                 ]
-            ]);
+            );
 
-            // Setelah Tumbler, biasanya kembali ke Finishing atau Selesai
-            // Sesuaikan alur status Anda di sini
-            MarketingOrder::where('id', $this->orderId)->update(['status' => 'completed']);
-        });
-
-        session()->flash('message', 'Data Tumbler Dry berhasil disimpan! ✅');
-        return redirect()->route('operator.logbook');
+            session()->flash('message', 'Data Tumbler Dry berhasil disimpan! ✅');
+            return redirect()->route('operator.logbook');
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: 'Gagal menyimpan data Tumbler: ' . $e->getMessage());
+        }
     }
 
     private function determineShift() {

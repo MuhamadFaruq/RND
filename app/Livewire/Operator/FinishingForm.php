@@ -51,7 +51,7 @@ class FinishingForm extends Component
             'gramasi_actual' => $this->gramasi_target,
             'jumlah_roll' => $this->jumlah_roll,
             'berat_kg' => $this->berat_kg,
-            'keterangan' => "Speed: {$this->speed} m/min | Overfeed: {$this->overfeed}% | " . $this->keterations,
+            'keterangan' => "Speed: {$this->speed} m/min | Overfeed: {$this->overfeed}% | " . $this->keterangan,
             'type' => 'finishing',
         ]);
 

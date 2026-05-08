@@ -41,7 +41,7 @@ class MarketingOrdersExport implements FromCollection, WithMapping, WithHeadings
             $order->pelanggan,
             $order->mkt,
             $order->keperluan,
-            $order->konstruksi_greig,
+            $order->konstruksi_greige,
             $order->material,
             $order->benang,
             $order->kelompok_kain,

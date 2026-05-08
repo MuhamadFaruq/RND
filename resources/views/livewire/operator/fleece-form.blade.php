@@ -34,14 +34,14 @@ new class extends Component
             'speed' => 'required|numeric',
         ]);
 
-        DB::transaction(function () {
-            ProductionActivity::create([
-                'marketing_order_id' => $this->orderId,
-                'user_id' => Auth::id(),
-                'type' => 'fleece',
-                'division_name' => 'fleece',
-                'shift' => $this->determineShift(),
-                'technical_data' => [
+        try {
+            $isLastShearingStep = ($this->sub_proses === 'shearing');
+            $productionService = app(ProductionService::class);
+            $productionService->processFleece(
+                $this->orderId,
+                Auth::id(),
+                $this->determineShift(),
+                [
                     'sub_proses' => $this->sub_proses,
                     'operator' => $this->operator,
                     'tanggal' => $this->tanggal,
@@ -59,17 +59,15 @@ new class extends Component
                     'tension' => $this->tension,
                     'exknitting' => $this->exknitting,
                     'shear' => $this->shear,
-                ]
-            ]);
+                ],
+                $isLastShearingStep
+            );
 
-            // Jika sampai di tahap shearing, bisa dianggap selesai atau lanjut ke divisi berikutnya
-            if($this->sub_proses === 'shearing') {
-                MarketingOrder::where('id', $this->orderId)->update(['status' => 'completed']);
-            }
-        });
-
-        session()->flash('message', 'Data Fleece ' . strtoupper($this->sub_proses) . ' berhasil disimpan!');
-        return redirect()->route('operator.logbook');
+            session()->flash('message', 'Data Fleece ' . strtoupper($this->sub_proses) . ' berhasil disimpan!');
+            return redirect()->route('operator.logbook');
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: 'Gagal menyimpan data Fleece: ' . $e->getMessage());
+        }
     }
 
     private function determineShift() {

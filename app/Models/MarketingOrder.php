@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MarketingOrder extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     // Tambahkan 'mkt', 'material', 'benang', 'roll_target', 'kg_target', 'keterangan_artikel'
     // Dan hapus yang tidak dipakai (seperti sales_name, qty_order, dll)

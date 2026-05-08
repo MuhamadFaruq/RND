@@ -137,7 +137,8 @@ class MarketingDashboard extends Component
             ['name' => 'Knitting', 'unit' => 'Weaving Unit', 'color' => 'blue', 'icon' => '🧶', 'status' => 'knitting'],
             ['name' => 'Dyeing', 'unit' => 'Coloring Unit', 'color' => 'amber', 'icon' => '🧪', 'status' => 'dyeing'],
             ['name' => 'Relax Dryer', 'unit' => 'Drying Unit', 'color' => 'cyan', 'icon' => '💨', 'status' => 'relax-dryer'],
-            ['name' => 'Finishing', 'unit' => 'Finishing Unit', 'color' => 'indigo', 'icon' => '✨', 'status' => 'finishing'],
+            ['name' => 'Compactor', 'unit' => 'Compactor Unit', 'color' => 'green', 'icon' => '🌀', 'status' => 'compactor'],
+            ['name' => 'Heat Setting', 'unit' => 'Heat Setting Unit', 'color' => 'indigo', 'icon' => '🌡️', 'status' => 'heat-setting'],
             ['name' => 'Stenter', 'unit' => 'Stenter Unit', 'color' => 'violet', 'icon' => '📏', 'status' => 'stenter'],
             ['name' => 'Tumbler', 'unit' => 'Tumbler Unit', 'color' => 'orange', 'icon' => '🌀', 'status' => 'tumbler'],
             ['name' => 'Fleece', 'unit' => 'Fleece Unit', 'color' => 'rose', 'icon' => '🧥', 'status' => 'fleece'],
@@ -174,7 +175,11 @@ class MarketingDashboard extends Component
             ->orWhere('art_no', 'like', "%{$this->search}%");
         });
 
-        // 3. Kembalikan View dengan data yang sudah terfilter
+        // 3. Cache hasil getMachineWorkload agar tidak dipanggil berulang (19 query per panggilan)
+        $stages = $this->getMachineWorkload();
+        $maxCapacity = \App\Models\Setting::where('key', 'max_capacity')->first()->value ?? 1000;
+
+        // 4. Kembalikan View dengan data yang sudah terfilter
         return view('livewire.marketing.marketing-dashboard', [
             'totalOrder'     => (clone $orderQuery)->count(), 
             'allOrders'      => (clone $orderQuery)->latest()->paginate(10),
@@ -190,9 +195,9 @@ class MarketingDashboard extends Component
                                 ->where('created_at', '<=', now()->subDays(2))
                                 ->count(),
             
-            'stages'         => $this->getMachineWorkload(),
-            'factoryLoad'    => collect($this->getMachineWorkload())->avg('percentage'),
-            'maxCapacity'    => \App\Models\Setting::where('key', 'max_capacity')->first()->value ?? 1000,
+            'stages'         => $stages,
+            'factoryLoad'    => collect($stages)->avg('percentage'),
+            'maxCapacity'    => $maxCapacity,
         ])->layout('layouts.app');
     }
 }

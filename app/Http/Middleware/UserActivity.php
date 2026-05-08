@@ -11,11 +11,13 @@ class UserActivity
     public function handle(Request $request, Closure $next)
     {
         // Jika user sedang login, perbarui waktu 'last_seen' mereka
+        // Throttle: hanya update jika selisih > 1 menit untuk menghindari query berlebihan (Livewire polling)
         if (Auth::check()) {
             $user = Auth::user();
-            // Gunakan update quiet agar tidak memicu event 'updated_at'
-            $user->last_seen = now();
-            $user->save(['timestamps' => false]);
+            if (!$user->last_seen || $user->last_seen->diffInMinutes(now()) >= 1) {
+                $user->last_seen = now();
+                $user->saveQuietly();
+            }
         }
 
         return $next($request);

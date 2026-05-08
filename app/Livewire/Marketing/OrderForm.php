@@ -20,13 +20,6 @@ class OrderForm extends Component
     public $sapError = null;
 
     public function mount() {
-        $menuFromUrl = request()->query('menu');
-    
-        if (in_array($menuFromUrl, ['dashboard', 'orders', 'history', 'notes'])) {
-            $this->currentMenu = $menuFromUrl;
-        } else {
-            $this->currentMenu = 'dashboard';
-        }
         // Inisialisasi default
         $this->tanggal = now()->format('Y-m-d');
         $this->mkt = ''; // Otomatis ambil nama marketing yang login
@@ -61,31 +54,35 @@ class OrderForm extends Component
         'target_gramasi' => 'required|string',
     ]);
 
-    MarketingOrder::create([
-        'sap_no'             => $this->sap_no,
-        'art_no'             => $this->art_no,
-        'tanggal'            => $this->tanggal,
-        'pelanggan'          => $this->pelanggan,
-        'mkt'                => $this->mkt,              
-        'keperluan'          => $this->keperluan,
-        'konstruksi_greige'  => $this->konstruksi_greige,
-        'material'           => $this->material,
-        'benang'             => $this->benang,             
-        'kelompok_kain'      => $this->kelompok_kain,
-        'target_lebar'       => $this->target_lebar,
-        'belah_bulat'        => $this->belah_bulat,
-        'target_gramasi'     => $this->target_gramasi,
-        'warna'              => $this->warna,
-        'handfeel'           => $this->handfeel,
-        'treatment_khusus'   => $this->treatment_khusus,
-        'roll_target'        => $this->roll_target,       
-        'kg_target'          => $this->kg_target,          
-        'keterangan_artikel' => $this->keterangan_artikel, 
-        'status'             => 'knitting'
-    ]);
+    try {
+        MarketingOrder::create([
+            'sap_no'             => $this->sap_no,
+            'art_no'             => $this->art_no,
+            'tanggal'            => $this->tanggal,
+            'pelanggan'          => $this->pelanggan,
+            'mkt'                => $this->mkt,              
+            'keperluan'          => $this->keperluan,
+            'konstruksi_greige'  => $this->konstruksi_greige,
+            'material'           => $this->material,
+            'benang'             => $this->benang,             
+            'kelompok_kain'      => $this->kelompok_kain,
+            'target_lebar'       => $this->target_lebar,
+            'belah_bulat'        => $this->belah_bulat,
+            'target_gramasi'     => $this->target_gramasi,
+            'warna'              => $this->warna,
+            'handfeel'           => $this->handfeel,
+            'treatment_khusus'   => $this->treatment_khusus,
+            'roll_target'        => $this->roll_target,       
+            'kg_target'          => $this->kg_target,          
+            'keterangan_artikel' => $this->keterangan_artikel, 
+            'status'             => 'knitting'
+        ]);
 
-    session()->flash('message', 'Order Berhasil Dikirim!');
-    return redirect()->route('marketing.orders.index');
+        session()->flash('message', 'Order Berhasil Dikirim!');
+        return redirect()->route('marketing.orders.index');
+    } catch (\Exception $e) {
+        $this->dispatch('show-error-toast', message: 'Gagal membuat order: ' . $e->getMessage());
+    }
 }
 
     public function render()

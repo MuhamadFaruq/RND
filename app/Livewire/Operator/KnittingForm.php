@@ -5,6 +5,8 @@ namespace App\Livewire\Operator;
 use Livewire\Component;
 use App\Models\ProductionActivity;
 use App\Models\MarketingOrder;
+use App\Services\ProductionService;
+use App\Enums\OrderStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -114,53 +116,49 @@ class KnittingForm extends Component
 
         $marketingOrder = MarketingOrder::where('sap_no', $this->sap_no)->first();
 
-        DB::transaction(function () use ($marketingOrder) {
-            ProductionActivity::updateOrCreate(
+        try {
+            // Panggil ProductionService untuk memproses Knitting
+            $productionService = app(ProductionService::class);
+            $productionService->processKnitting(
+                $marketingOrder->id,
+                auth()->id(),
+                $this->kg,
+                $this->roll,
                 [
-                    'marketing_order_id' => $marketingOrder->id,
-                    'division_name'      => 'knitting',
-                ],
-                [
-                    'operator_id'        => auth()->id(),
-                    'status'             => 'completed',
-                    'kg'                 => $this->kg,
-                    'roll'               => $this->roll,
-                    'technical_data'     => [
-                        'tanggal'          => $this->tanggal,
-                        'no_mesin'         => $this->no_mesin,
-                        'type_mesin'       => $this->type_mesin,
-                        'gauge_inch'       => $this->gauge_inch,
-                        'jml_feeder'       => $this->jml_feeder,
-                        'jml_jarum'        => $this->jml_jarum,
-                        'lebar'            => $this->lebar,
-                        'gramasi'          => $this->gramasi,
-                        'benang_1'         => $this->benang_1,
-                        'benang_2'         => $this->benang_2,
-                        'benang_3'         => $this->benang_3,
-                        'benang_4'         => $this->benang_4,
-                        'yl_1'             => $this->yl_1,
-                        'yl_2'             => $this->yl_2,
-                        'yl_3'             => $this->yl_3,
-                        'yl_4'             => $this->yl_4,
-                        'note'             => $this->note,
-                        'produksi_per_day' => $this->produksi_per_day,
-                        'nama_input'       => $this->operator_name,
-                    ],
+                    'tanggal'          => $this->tanggal,
+                    'no_mesin'         => $this->no_mesin,
+                    'type_mesin'       => $this->type_mesin,
+                    'gauge_inch'       => $this->gauge_inch,
+                    'jml_feeder'       => $this->jml_feeder,
+                    'jml_jarum'        => $this->jml_jarum,
+                    'lebar'            => $this->lebar,
+                    'gramasi'          => $this->gramasi,
+                    'benang_1'         => $this->benang_1,
+                    'benang_2'         => $this->benang_2,
+                    'benang_3'         => $this->benang_3,
+                    'benang_4'         => $this->benang_4,
+                    'yl_1'             => $this->yl_1,
+                    'yl_2'             => $this->yl_2,
+                    'yl_3'             => $this->yl_3,
+                    'yl_4'             => $this->yl_4,
+                    'note'             => $this->note,
+                    'produksi_per_day' => $this->produksi_per_day,
+                    'nama_input'       => $this->operator_name,
                 ]
             );
 
-            $marketingOrder->update(['status' => 'dyeing']);
-        });
-
-        session()->flash('message', 'Data berhasil diperbarui!');
-        return redirect()->route('operator.logbook');
+            session()->flash('message', 'Data berhasil diperbarui!');
+            return redirect()->route('operator.logbook');
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: 'Gagal menyimpan data Knitting: ' . $e->getMessage());
+        }
     }
     
     public function render()
     {
         return view('livewire.operator.knitting-form', [
             // Filter: Hanya ambil order yang masih 'knitting' (baru dari marketing)
-            'orders' => \App\Models\MarketingOrder::where('status', 'knitting')
+            'orders' => \App\Models\MarketingOrder::where('status', OrderStatus::KNITTING->value)
                         ->latest()
                         ->paginate(10)
         ]);

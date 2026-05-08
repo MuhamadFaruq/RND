@@ -90,6 +90,7 @@ new class extends Component
 
     public function showOrderDetail($id) {
         $this->selectedOrder = MarketingOrder::find($id);
+        $this->selectedLog = null; // Pastikan log tidak ikut jika membuka dari Permintaan
         if ($this->selectedOrder) {
             $this->showModal = true;
         }
@@ -98,6 +99,7 @@ new class extends Component
     public function closeModal() {
         $this->showModal = false;
         $this->selectedOrder = null;
+        $this->selectedLog = null;
         $this->showInputForm = false;
     }
 
@@ -192,8 +194,15 @@ new class extends Component
     private function updateOrderStatus($role) {
         if ($role === 'knitting') $this->selectedOrder->status = 'dyeing';
         elseif ($role === 'dyeing') $this->selectedOrder->status = 'relax-dryer';
-        elseif ($role === 'relax-dryer') $this->selectedOrder->status = 'finishing';
-        elseif ($role === 'finishing') $this->selectedOrder->status = 'stenter';
+        elseif ($role === 'relax-dryer') $this->selectedOrder->status = 'compactor';
+        elseif ($role === 'finishing') {
+            // Finishing role handles both compactor and heat-setting
+            if ($this->selectedOrder->status === 'compactor') {
+                $this->selectedOrder->status = 'heat-setting';
+            } else {
+                $this->selectedOrder->status = 'stenter';
+            }
+        }
         elseif ($role === 'stenter') $this->selectedOrder->status = 'tumbler';
         elseif ($role === 'tumbler') $this->selectedOrder->status = 'fleece';
         elseif ($role === 'fleece') $this->selectedOrder->status = 'pengujian';
@@ -287,8 +296,8 @@ new class extends Component
             $orderQuery->where('status', 'relax-dryer');
         }
         elseif ($role === 'finishing') {
-            // Menangkap lemparan dari Relax Dryer
-            $orderQuery->where('status', 'finishing');
+            // Finishing role menangani Compactor & Heat Setting
+            $orderQuery->whereIn('status', ['compactor', 'heat-setting']);
         }
         elseif ($role === 'stenter') {
             // Menangkap lemparan dari Finishing
@@ -343,7 +352,7 @@ new class extends Component
 
 <div>
     <div class="py-8 bg-transparent min-h-screen font-sans tracking-tighter italic text-left">
-    <div class="max-w-6xl mx-auto px-4">
+    <div class="max-w-[1920px] w-full mx-auto px-4 md:px-8 lg:px-12">
         <div class="min-h-[400px]">
 
             {{-- 1. TAMPILAN DASHBOARD --}}
@@ -360,7 +369,7 @@ new class extends Component
                                 @elseif(auth()->user()->role === 'relax-dryer') 
                                     Relax Dryer 
                                 @elseif(auth()->user()->role === 'finishing') 
-                                    Finishing 
+                                    Compactor / Heat Setting 
                                 @elseif(auth()->user()->role === 'stenter') 
                                     Stenter
                                 @elseif(auth()->user()->role === 'tumbler') 
@@ -653,7 +662,7 @@ new class extends Component
                                     {{-- ACTION BUTTONS --}}
                                     <div class="flex gap-2">
                                         {{-- Tombol Detail --}}
-                                        <button wire:click="showOrderDetail({{ $item->marketing_order_id }})" 
+                                        <button wire:click="viewLogDetail({{ $item->id }})" 
                                                 class="w-10 h-10 mkt-input text-slate-600 rounded-xl hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center">
                                             🔍
                                         </button>
@@ -796,7 +805,7 @@ new class extends Component
                                 </div>
                                 <div class="flex justify-between border-b mkt-border pb-1">
                                     <span class="mkt-text-muted uppercase">Konstruksi Greige</span>
-                                    <span class="mkt-text italic uppercase">{{ $selectedOrder->konstruksi_greig }}</span>
+                                    <span class="mkt-text italic uppercase">{{ $selectedOrder->konstruksi_greige }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-red-600 uppercase">Warna Finishing</span>
@@ -852,24 +861,40 @@ new class extends Component
                     </div>
 
                    <div class="pt-4">
-                        @php 
-                            // 1. Tentukan route berdasarkan role user yang sedang login
-                            $role = auth()->user()->role;
-                            $targetRoute = 'operator.' . $role; 
+                        @if($selectedLog)
+                            <div class="mkt-surface p-8 rounded-[3rem] border-t-8 border-blue-600 shadow-xl mt-4">
+                                <h3 class="text-blue-600 font-black mb-6 uppercase italic tracking-tighter text-lg flex items-center">
+                                    <span class="mr-2">📝</span> Data Input Operator Tersimpan
+                                </h3>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-6 font-bold text-xs">
+                                    @foreach($selectedLog->technical_data ?? [] as $key => $value)
+                                        <div class="border-b mkt-border pb-2">
+                                            <p class="text-[9px] mkt-text-muted uppercase mb-1 tracking-widest">{{ str_replace('_', ' ', $key) }}</p>
+                                            <p class="text-base text-slate-900 uppercase italic">{{ is_array($value) ? json_encode($value) : ($value ?: '-') }}</p>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @else
+                            @php 
+                                // 1. Tentukan route berdasarkan role user yang sedang login
+                                $role = auth()->user()->role;
+                                $targetRoute = 'operator.' . $role; 
 
-                            // 2. Fallback sederhana jika role tidak terdaftar di route
-                            if (!Route::has($targetRoute)) {
-                                $targetRoute = 'operator.knitting'; 
-                            }
-                        @endphp
+                                // 2. Fallback sederhana jika role tidak terdaftar di route
+                                if (!Route::has($targetRoute)) {
+                                    $targetRoute = 'operator.knitting'; 
+                                }
+                            @endphp
 
-                        {{-- Gunakan variabel $targetRoute di dalam route() --}}
-                        <a href="{{ route($targetRoute, ['sap' => $selectedOrder->sap_no]) }}" 
-                            class="w-full bg-slate-900 text-white py-6 rounded-[2rem] font-black uppercase text-sm flex items-center justify-center gap-3 hover:bg-blue-600 transition-all shadow-xl tracking-[0.2em]">
-                            
-                            {{-- Nama tombol otomatis berubah sesuai divisi --}}
-                            ⚙️ MULAI EKSEKUSI {{ strtoupper($role) }}
-                        </a>
+                            {{-- Gunakan variabel $targetRoute di dalam route() --}}
+                            <a href="{{ route($targetRoute, ['sap' => $selectedOrder->sap_no]) }}" 
+                                class="w-full bg-slate-900 text-white py-6 rounded-[2rem] font-black uppercase text-sm flex items-center justify-center gap-3 hover:bg-blue-600 transition-all shadow-xl tracking-[0.2em]">
+                                
+                                {{-- Nama tombol otomatis berubah sesuai divisi --}}
+                                ⚙️ MULAI EKSEKUSI {{ strtoupper($role) }}
+                            </a>
+                        @endif
                     </div>
                 </div>
         

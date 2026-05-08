@@ -38,8 +38,8 @@ class Monitoring extends Component
         $stats = [
             'total' => MarketingOrder::count(),
             'knitting' => MarketingOrder::where('status', 'knitting')->count(),
-            'active' => MarketingOrder::whereIn('status', ['knitting', 'dyeing', 'finishing'])->count(),
-            'completed' => MarketingOrder::where('status', 'completed')->count(),
+            'active' => MarketingOrder::whereIn('status', ['knitting', 'dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe'])->count(),
+            'completed' => MarketingOrder::where('status', 'finished')->count(),
         ];
 
         return view('livewire.marketing.monitoring', [

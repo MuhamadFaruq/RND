@@ -41,14 +41,14 @@ new class extends Component
             'speed' => 'required|numeric',
         ]);
 
-        DB::transaction(function () {
-            ProductionActivity::create([
-                'marketing_order_id' => $this->orderId,
-                'user_id' => Auth::id(),
-                'type' => 'stenter',
-                'no_mesin' => $this->no_mesin,
-                'shift' => $this->determineShift(),
-                'technical_data' => [
+        try {
+            $isLastFinishingStep = ($this->sub_proses === 'finishing');
+            $productionService = app(ProductionService::class);
+            $productionService->processStenter(
+                $this->orderId,
+                Auth::id(),
+                $this->determineShift(),
+                [
                     'sub_proses' => $this->sub_proses,
                     'operator' => $this->operator,
                     'tanggal' => $this->tanggal,
@@ -66,17 +66,15 @@ new class extends Component
                     'hasil_lebar' => $this->hasil_lebar,
                     'hasil_gramasi' => $this->hasil_gramasi,
                     'shrinkage' => $this->shrinkage,
-                ]
-            ]);
+                ],
+                $isLastFinishingStep
+            );
 
-            // Jika tahap terakhir (finishing) selesai, ubah status order
-            if ($this->sub_proses === 'finishing') {
-                MarketingOrder::where('id', $this->orderId)->update(['status' => 'completed']);
-            }
-        });
-
-        session()->flash('message', 'Data Stenter ' . strtoupper($this->sub_proses) . ' berhasil disimpan!');
-        return redirect()->route('operator.logbook');
+            session()->flash('message', 'Data Stenter ' . strtoupper($this->sub_proses) . ' berhasil disimpan!');
+            return redirect()->route('operator.logbook');
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: 'Gagal menyimpan data Stenter: ' . $e->getMessage());
+        }
     }
 
     private function determineShift() {

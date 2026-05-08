@@ -32,7 +32,7 @@ class EditOrder extends Component
         $this->keperluan = $order->keperluan;
         $this->material = $order->material;
         $this->benang = $order->benang;
-        $this->konstruksi_greige = $order->konstruksi_greig; 
+        $this->konstruksi_greige = $order->konstruksi_greige;
         $this->kelompok_kain = $order->kelompok_kain;
         $this->belah_bulat = $order->belah_bulat;
         $this->handfeel = $order->handfeel;
@@ -72,30 +72,34 @@ class EditOrder extends Component
         if ($this->sapError) return;
 
         $order = MarketingOrder::find($this->orderId);
-        $order->update([
-            'sap_no' => $this->sap_no,
-            'art_no' => $this->art_no,
-            'tanggal' => $this->tanggal,
-            'pelanggan' => $this->pelanggan,
-            'mkt' => $this->mkt,
-            'keperluan' => $this->keperluan,
-            'material' => $this->material,
-            'benang' => $this->benang,
-            'konstruksi_greig' => $this->konstruksi_greige,
-            'kelompok_kain' => $this->kelompok_kain,
-            'belah_bulat' => $this->belah_bulat,
-            'handfeel' => $this->handfeel,
-            'target_lebar' => $this->target_lebar,
-            'target_gramasi' => $this->target_gramasi,
-            'warna' => $this->warna,
-            'treatment_khusus' => $this->treatment_khusus,
-            'roll_target' => $this->roll_target,
-            'kg_target' => $this->kg_target,
-            'keterangan_artikel' => $this->keterangan_artikel,
-        ]);
+        try {
+            $order->update([
+                'sap_no' => $this->sap_no,
+                'art_no' => $this->art_no,
+                'tanggal' => $this->tanggal,
+                'pelanggan' => $this->pelanggan,
+                'mkt' => $this->mkt,
+                'keperluan' => $this->keperluan,
+                'material' => $this->material,
+                'benang' => $this->benang,
+                'konstruksi_greige' => $this->konstruksi_greige,
+                'kelompok_kain' => $this->kelompok_kain,
+                'belah_bulat' => $this->belah_bulat,
+                'handfeel' => $this->handfeel,
+                'target_lebar' => $this->target_lebar,
+                'target_gramasi' => $this->target_gramasi,
+                'warna' => $this->warna,
+                'treatment_khusus' => $this->treatment_khusus,
+                'roll_target' => $this->roll_target,
+                'kg_target' => $this->kg_target,
+                'keterangan_artikel' => $this->keterangan_artikel,
+            ]);
 
-        session()->flash('message', 'Order SAP ' . $this->sap_no . ' Berhasil Diperbarui!');
-        return redirect()->route('marketing.orders.index');
+            session()->flash('message', 'Order SAP ' . $this->sap_no . ' Berhasil Diperbarui!');
+            return redirect()->route('marketing.orders.index');
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: 'Gagal memperbarui order: ' . $e->getMessage());
+        }
     }
 
     public function render()
