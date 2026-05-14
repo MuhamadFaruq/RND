@@ -108,10 +108,18 @@ class KnittingForm extends Component
     public function save()
     {
         $this->validate([
-            'sap_no'   => 'required|exists:marketing_orders,sap_no',
-            'no_mesin' => 'required',
-            'kg'       => 'required|numeric',
-            'roll'     => 'required|numeric',
+            'sap_no'           => 'required|exists:marketing_orders,sap_no',
+            'operator_name'    => 'required|min:3',
+            'tanggal'          => 'required|date',
+            'no_mesin'         => 'required',
+            'type_mesin'       => 'required',
+            'gauge_inch'       => 'required',
+            'jml_feeder'       => 'required|numeric',
+            'jml_jarum'        => 'required|numeric',
+            'lebar'            => 'required|numeric',
+            'gramasi'          => 'required|numeric',
+            'kg'               => 'required|numeric|min:0.1',
+            'roll'             => 'required|numeric|min:1',
         ]);
 
         $marketingOrder = MarketingOrder::where('sap_no', $this->sap_no)->first();

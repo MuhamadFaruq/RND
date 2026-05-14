@@ -1,141 +1,3 @@
-<?php
-
-use Livewire\Volt\Component;
-use App\Models\ProductionActivity;
-use App\Models\MarketingOrder;
-use Illuminate\Support\Facades\Auth;
-
-new class extends Component {
-    // Inisialisasi Properti dengan nilai default agar tidak error "Property does not exist"
-    public $sap_no = '', $tanggal = '', $operator_name = '', $no_mesin = '', $type_mesin = '';
-    public $gauge_inch = '', $jml_feeder = 0, $jml_jarum = 0;
-    public $lebar = 0, $gramasi = 0, $kg = '', $roll = 0;
-    public $benang_1 = '', $benang_2 = '', $benang_3 = '', $benang_4 = '';
-    public $yl_1 = 0, $yl_2 = 0, $yl_3 = 0, $yl_4 = 0;
-    public $note = '', $produksi_per_day = 0;
-
-    public $order_detail = null;
-    public $currentMenu = 'logbook';
-
-    public function mount($orderId = null) {
-        $this->tanggal = now()->format('Y-m-d');
-        
-        if ($orderId) {
-            // Cari aktivitas produksi berdasarkan marketing_order_id
-            $activity = ProductionActivity::with('marketingOrder')
-                ->where('marketing_order_id', $orderId)
-                ->where('division_name', 'knitting')
-                ->latest()
-                ->first();
-
-            if ($activity) {
-                // Load data dasar
-                $this->sap_no = $activity->marketingOrder->sap_no;
-                $this->kg     = $activity->kg;
-                $this->roll   = $activity->roll;
-                
-                // Ambil data teknis dari JSON technical_data
-                $tech = $activity->technical_data;
-                
-                // SESUAIKAN KEY BERIKUT DENGAN YANG ADA DI FUNGSI SAVE()
-                $this->operator_name = $tech['nama_input'] ?? ''; 
-                $this->no_mesin      = $tech['no_mesin'] ?? '';
-                $this->type_mesin    = $tech['type_mesin'] ?? '';
-                $this->gauge_inch    = $tech['gauge_inch'] ?? '';
-                $this->jml_feeder    = $tech['jml_feeder'] ?? 0;
-                $this->jml_jarum     = $tech['jml_jarum'] ?? 0;
-                $this->lebar         = $tech['lebar'] ?? 0;
-                $this->gramasi       = $tech['gramasi'] ?? 0;
-                $this->note          = $tech['note'] ?? '';
-                $this->produksi_per_day = $tech['produksi_per_day'] ?? 0;
-                
-                // Muat data benang
-                for ($i = 1; $i <= 4; $i++) {
-                    $this->{'benang_' . $i} = $tech['benang_' . $i] ?? '';
-                    $this->{'yl_' . $i}     = $tech['yl_' . $i] ?? 0;
-                }
-
-                // Panggil detail artikel (Pelanggan, Warna, dll)
-                $this->fetchOrderDetail($this->sap_no);
-            }
-        }
-    }
-
-    public function fetchOrderDetail($value) {
-        $order = MarketingOrder::where('sap_no', $value)->first();
-        if ($order) {
-            $this->order_detail = [
-                'art_no'    => $order->art_no,
-                'pelanggan' => $order->pelanggan,
-                'warna'     => $order->warna,
-            ];
-        }
-    }
-
-    public function save() {
-        $this->validate([
-            'sap_no' => 'required|exists:marketing_orders,sap_no',
-            'operator_name' => 'required|min:3',
-            'no_mesin' => 'required',
-            'kg' => 'required',
-            'roll' => 'required|numeric',
-        ]);
-
-        $order = MarketingOrder::where('sap_no', $this->sap_no)->first();
-
-        \Illuminate\Support\Facades\DB::transaction(function () use ($order) {
-            // Update atau Create data produksi
-            ProductionActivity::updateOrCreate(
-                [
-                    'marketing_order_id' => $order->id,
-                    'division_name' => 'knitting',
-                ],
-                [
-                    'operator_id' => Auth::id(),
-                    'status' => 'completed',
-                    'kg' => $this->kg,
-                    'roll' => $this->roll,
-                    'technical_data' => [
-                        'nama_input' => $this->operator_name, // Simpan manual ke nama_input
-                        'tanggal' => $this->tanggal,
-                        'no_mesin' => $this->no_mesin,
-                        'type_mesin' => $this->type_mesin,
-                        'gauge_inch' => $this->gauge_inch,
-                        'jml_feeder' => $this->jml_feeder,
-                        'jml_jarum' => $this->jml_jarum,
-                        'lebar' => $this->lebar,
-                        'gramasi' => $this->gramasi,
-                        'benang_1' => $this->benang_1,
-                        'benang_2' => $this->benang_2,
-                        'benang_3' => $this->benang_3,
-                        'benang_4' => $this->benang_4,
-                        'yl_1' => $this->yl_1,
-                        'yl_2' => $this->yl_2,
-                        'yl_3' => $this->yl_3,
-                        'yl_4' => $this->yl_4,
-                        'note' => $this->note,
-                        'produksi_per_day' => $this->produksi_per_day,
-                    ],
-                ]
-            );
-
-            $order->update(['status' => 'dyeing']);
-        });
-
-        session()->flash('message', 'Data Berhasil Diperbarui!');
-        return redirect()->route('operator.logbook');
-    }
-    
-    public function with() {
-        return [
-            'currentMenu' => $this->currentMenu,
-        ];
-    }
-
-    public function rendering($view) {
-        $view->layout('layouts.app');
-    }
-}; ?>
 
 <div class="py-12 bg-[#0f172a] min-h-screen font-sans italic tracking-tighter text-left">
     <div class="max-w-6xl mx-auto px-4">
@@ -214,6 +76,7 @@ new class extends Component {
                         <label class="text-[10px] font-black uppercase mkt-text-muted ml-2 tracking-widest">Tanggal Produksi</label>
                         <input wire:model="tanggal" type="date" 
                             class="w-full mkt-surface border-2 mkt-border rounded-2xl py-5 px-6 font-black text-sm mkt-text focus:border-red-600 transition-all outline-none">
+                        @error('tanggal') <span class="text-[9px] text-red-600 font-black italic ml-2 uppercase">{{ $message }}</span> @enderror
                     </div>
 
                     {{-- DETAIL MESIN (ROW 2) --}}
@@ -221,12 +84,14 @@ new class extends Component {
                         <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">No Mesin (DD)</label>
                         <input wire:model="no_mesin" type="text" placeholder="CONTOH: K01" 
                             class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-red-600 transition-all outline-none">
+                        @error('no_mesin') <span class="text-[9px] text-red-600 font-black italic ml-2 uppercase">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">Type Mesin (DD)</label>
                         <input wire:model="type_mesin" type="text" placeholder="PAI LUNG / DLL" 
                             class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-red-600 transition-all outline-none uppercase">
+                        @error('type_mesin') <span class="text-[9px] text-red-600 font-black italic ml-2 uppercase">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="space-y-2">
@@ -235,18 +100,21 @@ new class extends Component {
                             type="text" 
                             placeholder="CONTOH: 28G.30"
                             class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-red-600 transition-all outline-none">
+                        @error('gauge_inch') <span class="text-[9px] text-red-600 font-black italic ml-2 uppercase">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">Jml Feeder (INT)</label>
                         <input wire:model="jml_feeder" type="number" 
                             class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-red-600 transition-all outline-none">
+                        @error('jml_feeder') <span class="text-[9px] text-red-600 font-black italic ml-2 uppercase">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">Jml Jarum (INT)</label>
                         <input wire:model="jml_jarum" type="number" 
                             class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-red-600 transition-all outline-none">
+                        @error('jml_jarum') <span class="text-[9px] text-red-600 font-black italic ml-2 uppercase">{{ $message }}</span> @enderror
                     </div>
                 </div>
             </div>
@@ -266,11 +134,13 @@ new class extends Component {
                         <label class="text-[10px] font-black uppercase mkt-text-muted block text-center">Lebar</label>
                         <input wire:model="lebar" type="number" step="0.01" placeholder="0.00"
                             class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 text-center font-black text-xl mkt-text focus:ring-4 focus:ring-red-50">
+                        @error('lebar') <p class="text-[8px] text-red-600 font-black text-center mt-1 uppercase">{{ $message }}</p> @enderror
                     </div>
                     <div class="mkt-surface p-6 rounded-3xl border mkt-border space-y-2">
                         <label class="text-[10px] font-black uppercase mkt-text-muted block text-center">Gramasi</label>
                         <input wire:model="gramasi" type="number" placeholder="0"
                             class="w-full mkt-surface border-2 mkt-border rounded-2xl py-4 text-center font-black text-xl mkt-text focus:ring-4 focus:ring-red-50">
+                        @error('gramasi') <p class="text-[8px] text-red-600 font-black text-center mt-1 uppercase">{{ $message }}</p> @enderror
                     </div>
                     <div class="bg-red-50 p-6 rounded-3xl border border-red-100 space-y-2 shadow-inner">
                         <label class="text-[10px] font-black uppercase text-red-600 block text-center tracking-widest">KG (Weight)</label>
@@ -281,7 +151,7 @@ new class extends Component {
                     <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2 shadow-2xl">
                         <label class="text-[10px] font-black uppercase text-slate-500 block text-center tracking-widest">Roll Count</label>
                         <input wire:model="roll" type="number" placeholder="0"
-                            class="w-full mkt-surface/10 border-2 border-white/10 rounded-2xl py-4 text-center font-black text-3xl text-white focus:border-red-600 outline-none">
+                            class="w-full bg-white/5 border-2 border-white/10 rounded-2xl py-4 text-center font-black text-3xl text-white focus:border-red-600 outline-none">
                         @error('roll') <p class="text-[8px] text-red-400 font-black text-center mt-1 uppercase">{{ $message }}</p> @enderror
                     </div>
                 </div>
@@ -304,7 +174,7 @@ new class extends Component {
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
                     @foreach(range(1,4) as $i)
-                    <div class="p-8 mkt-surface/5 rounded-[2.5rem] border border-white/5 space-y-6 hover:mkt-surface/10 transition-all group backdrop-blur-sm">
+                    <div class="p-8 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6 hover:bg-white/10 transition-all group backdrop-blur-sm">
                         <div class="space-y-2">
                             <label class="text-[10px] font-black uppercase text-slate-500 group-hover:text-red-500 transition-colors tracking-widest block ml-2">Benang {{ $i }} (%)</label>
                             @php $b_field = 'benang_' . $i; @endphp
@@ -340,9 +210,10 @@ new class extends Component {
 
             {{-- SUBMIT --}}
             <div class="flex justify-center md:justify-end pt-10 pb-24">
-                <button type="submit" 
-                    class="group relative w-full md:w-auto overflow-hidden bg-red-600 text-white px-20 py-7 rounded-[2.5rem] font-black uppercase italic tracking-[0.3em] hover:scale-105 transition-all shadow-2xl shadow-red-900/40">
-                    <span class="relative z-10">Submit Production Log</span>
+                <button type="submit" wire:loading.attr="disabled"
+                    class="group relative w-full md:w-auto overflow-hidden bg-red-600 text-white px-20 py-7 rounded-[2.5rem] font-black uppercase italic tracking-[0.3em] hover:scale-105 transition-all shadow-2xl shadow-red-900/40 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span wire:loading.remove class="relative z-10">Submit Production Log</span>
+                    <span wire:loading class="relative z-10">Processing Log...</span>
                     <div class="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 </button>
             </div>

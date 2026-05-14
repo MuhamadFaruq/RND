@@ -757,10 +757,10 @@ new class extends Component
                 </h3>
                 <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-widest mt-2">Internal Tracking ID: {{ $selectedOrder->id }}</p>
             </div>
-            <button wire:click="closeModal" class="mkt-surface/10 hover:bg-red-600 p-3 rounded-2xl text-white transition-all">&times;</button>
+            <button wire:click="closeModal" class="bg-white/10 hover:bg-red-600 p-3 rounded-2xl text-white transition-all">&times;</button>
         </div>
 
-        <div class="p-8 mkt-surface/30">
+        <div class="p-8 bg-white/5">
             @if(!$showInputForm)
                 {{-- TAMPILAN 1: DETAIL LENGKAP UNTUK EKSEKUSI OPERATOR --}}
                 <div class="space-y-8">
