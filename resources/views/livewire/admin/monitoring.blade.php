@@ -137,7 +137,7 @@ new class extends Component
         {{-- HEADER --}}
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 border-b mkt-border pb-6 gap-6">
             <div>
-                <h1 class="text-3xl md:text-5xl font-black italic tracking-tighter uppercase text-red-600 leading-none">
+                <h1 class="text-3xl md:text-5xl font-black italic tracking-tighter uppercase text-indigo-600 leading-none">
                     Production <span class="mkt-text">Monitor</span>
                 </h1>
                 <p class="mkt-text-muted font-bold tracking-widest uppercase text-[10px] md:text-xs mt-2 italic">Duniatex Group - Realtime Data</p>
@@ -145,7 +145,7 @@ new class extends Component
             
             <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
                 <div class="mkt-surface p-2 rounded-2xl border mkt-border flex items-center gap-3 shadow-xl w-full sm:w-auto">
-                    <input type="date" wire:model.live="filterDate" class="bg-transparent border-none text-red-500 font-black uppercase text-xs md:text-sm focus:ring-0 cursor-pointer flex-1">
+                    <input type="date" wire:model.live="filterDate" class="bg-transparent border-none text-indigo-600 font-black uppercase text-xs md:text-sm focus:ring-0 cursor-pointer flex-1">
                     <select wire:model.live="selectedOperator" class="bg-transparent border-none text-blue-400 font-black uppercase text-[10px] focus:ring-0 cursor-pointer">
                         <option value="SEMUA">SEMUA OPERATOR</option>
                         @foreach($operators as $op)
@@ -167,15 +167,15 @@ new class extends Component
         {{-- QUICK SUMMARY HEADER (3 COLUMNS) --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {{-- Rajut --}}
-            <div class="mkt-surface border border-red-600/20 p-5 rounded-3xl flex justify-between items-center group hover:bg-red-950/10 transition-all">
+            <div class="mkt-surface border border-indigo-600/20 p-5 rounded-3xl flex justify-between items-center group hover:bg-indigo-950/10 transition-all">
                 <div>
-                    <p class="text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-1 italic">Accumulation: RAJUT</p>
+                    <p class="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-1 italic">Accumulation: RAJUT</p>
                     <h4 class="text-3xl font-black italic tracking-tighter mkt-text">
                         {{ number_format($summary['rajut_kg'], 2) }} <span class="text-xs mkt-text-muted uppercase">KG</span>
                     </h4>
                 </div>
                 <div class="text-right">
-                    <span class="text-2xl font-black italic text-slate-700 group-hover:text-red-600 transition-colors">
+                    <span class="text-2xl font-black italic text-slate-700 group-hover:text-indigo-600 transition-colors">
                         {{ number_format($summary['rajut_roll']) }}
                     </span>
                     <p class="text-[9px] font-bold text-slate-500 uppercase italic">Rolls</p>
@@ -222,9 +222,9 @@ new class extends Component
                 <p class="text-[10px] font-black text-slate-500 uppercase mb-3 italic tracking-widest">Total Output (KG)</p>
                 <div class="flex items-baseline gap-2">
                     <h3 class="text-4xl font-black italic tracking-tighter mkt-text">{{ number_format($todayProduction, 2) }}</h3>
-                    <span class="text-xs font-bold text-red-600 uppercase italic">Live</span>
+                    <span class="text-xs font-bold text-indigo-600 uppercase italic">Live</span>
                 </div>
-                <div class="absolute left-0 top-0 w-1.5 h-full bg-red-600 shadow-[0_0_20px_rgba(220,38,38,0.5)]"></div>
+                <div class="absolute left-0 top-0 w-1.5 h-full bg-indigo-600 shadow-[0_0_20px_rgba(79,70,229,0.5)]"></div>
             </div>
 
             {{-- Marketing Unit Card --}}
@@ -267,7 +267,7 @@ new class extends Component
                             <th class="px-8 py-6 text-right">Hasil (KG)</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700/50">
+                    <tbody class="divide-y divide-border">
                         @forelse($latestActivities as $activity)
                         <tr class="hover:mkt-surface-alt/50 transition-colors border-b mkt-border last:border-0">
                             <td class="px-8 py-7 font-mono text-emerald-500 font-bold text-sm tracking-tight">{{ $activity->created_at->format('H:i') }}</td>
@@ -283,7 +283,7 @@ new class extends Component
                                     {{ $activity->technical_data['no_mesin'] ?? '-' }}
                                 </span>
                             </td>
-                            <td class="px-8 py-7 text-right font-black text-2xl text-red-600 dark:text-red-500 tracking-tighter">{{ number_format($activity->kg, 2) }}</td>
+                            <td class="px-8 py-7 text-right font-black text-2xl text-indigo-600 dark:text-indigo-500 tracking-tighter">{{ number_format($activity->kg, 2) }}</td>
                         </tr>
                         @empty
                         <tr><td colspan="6" class="p-20 text-center mkt-text-muted font-black uppercase text-xs italic">Data Tidak Ditemukan</td></tr>

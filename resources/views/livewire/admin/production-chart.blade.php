@@ -148,8 +148,8 @@ new class extends Component
                     datasets: [{
                         label: 'Produksi (KG)',
                         data: chartData,
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
                         fill: true,
                         tension: 0.4,
                         borderWidth: 4,
@@ -214,12 +214,12 @@ new class extends Component
     {{-- 1. HEADER & CONTROLS --}}
     <div class="flex justify-between items-center mb-10">
         <div>
-            <h3 class="text-sm font-black uppercase italic text-red-500 tracking-tighter">Production Analytics Hub</h3>
+            <h3 class="text-sm font-black uppercase italic text-indigo-600 tracking-tighter">Production Analytics Hub</h3>
             <p class="text-[9px] text-slate-500 font-bold uppercase mt-1 italic">Real-time Performance Metrics</p>
         </div>
         
         <div class="flex items-center gap-4">
-            <select wire:model.live="selectedDivision" class="mkt-input mkt-border mkt-text-muted rounded-2xl px-4 py-2.5 text-[9px] font-black uppercase italic focus:ring-2 focus:ring-red-500 outline-none">
+            <select wire:model.live="selectedDivision" class="mkt-input mkt-border mkt-text-muted rounded-2xl px-4 py-2.5 text-[9px] font-black uppercase italic focus:ring-2 focus:ring-indigo-600 outline-none">
                 <option value="all">SEMUA DIVISI</option>
                 <option value="knitting">KNITTING</option>
                 <option value="dyeing">SCR/DYEING</option>
@@ -247,7 +247,7 @@ new class extends Component
         <div onclick="window.toggleProductionLine()" 
             class="flex items-center gap-2 mkt-surface-alt px-3 py-1 rounded-full border mkt-border shadow-sm cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
             
-            <svg xmlns="http://www.w3.org/2000/svg" id="eye-icon-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="transition-opacity duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" id="eye-icon-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="transition-opacity duration-300">
                 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
             </svg>
             
@@ -277,7 +277,7 @@ new class extends Component
         @if(($totalInput ?? 0) == 0)
             <div class="absolute inset-x-0 bottom-0 top-16 flex items-center justify-center mkt-surface opacity-90 backdrop-blur-[2px] rounded-xl z-10 border mkt-border">
                 <div class="text-center">
-                    <span class="text-[10px] font-black text-red-500 uppercase tracking-widest italic animate-pulse">Waiting for production data...</span>
+                    <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest italic animate-pulse">Waiting for production data...</span>
                     <p class="text-[8px] text-slate-500 uppercase mt-1 font-bold">Tidak ada aktivitas tercatat pada tanggal terpilih</p>
                 </div>
             </div>
@@ -288,7 +288,7 @@ new class extends Component
                 @php 
                     $count = $safeHourlyData[$i] ?? 0;
                     $intensity = ($count / $maxCount) * 100;
-                    $colorClass = $count == 0 ? 'mkt-surface-alt' : 'bg-red-600';
+                    $colorClass = $count == 0 ? 'mkt-surface-alt' : 'bg-indigo-600';
                 @endphp
                 <div class="group relative">
                     {{-- Kotak Heatmap --}}
@@ -337,15 +337,14 @@ new class extends Component
                 
                 <defs>
                     <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0" />
+                        <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#4f46e5;stop-opacity:0" />
                     </linearGradient>
                 </defs>
 
-                {{-- 2. Garis Utama (Sangat Ramping: stroke-width="0.8") --}}
                 <polyline 
                     fill="none" 
-                    stroke="#ef4444" 
+                    stroke="#4f46e5" 
                     stroke-width="0.8" 
                     stroke-linecap="round" 
                     stroke-linejoin="round" 
@@ -367,7 +366,7 @@ new class extends Component
                             cy="{{ $cy }}" 
                             r="0.8" 
                             fill="white" 
-                            stroke="#ef4444" 
+                            stroke="#4f46e5" 
                             stroke-width="0.3" 
                             class="transition-all duration-200 group-hover/point:r-2" 
                         />

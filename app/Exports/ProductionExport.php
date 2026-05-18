@@ -34,10 +34,13 @@ class ProductionExport implements FromQuery, WithHeadings, ShouldAutoSize, WithS
             ->whereDate('created_at', '>=', $this->start)
             ->whereDate('created_at', '<=', $this->end)
             ->when($this->mode === 'rajut', function($q) {
-                $q->where('division_name', 'KNITTING');
+                $q->where('division_name', 'knitting');
             })
             ->when($this->mode === 'warna', function($q) {
-                $q->whereIn('division_name', ['DYEING', 'FINISHING', 'STENTER']);
+                $q->whereIn('division_name', ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece']);
+            })
+            ->when($this->unit !== 'SEMUA', function($q) {
+                $q->whereHas('marketingOrder', fn($sq) => $sq->where('kelompok_kain', $this->unit));
             })
             ->when($this->operator !== 'SEMUA', function($q) {
                 $q->where('operator_id', $this->operator);
@@ -54,8 +57,8 @@ class ProductionExport implements FromQuery, WithHeadings, ShouldAutoSize, WithS
     public function headings(): array
     {
         return [
-            'NO', // Kolom nomor urut
-            'SAP', 'ART', 'TANGGAL & JAM', 'OPERATOR', 'PELANGGAN', 'MKT', 
+            'NO', 
+            'NO ARTIKEL', 'LEGACY SAP ID', 'TANGGAL & JAM', 'OPERATOR', 'PELANGGAN', 'MKT', 
             'KEPERLUAN', 'KONSTRUKSI GREIGE', 'MATERIAL', 'BENANG', 
             'KELOMPOK KAIN', 'TARGET LEBAR', 'BELAH/BULAT', 
             'TARGET GRAMASI', 'WARNA', 'HANDFEEL', 'TREATMENT KHUSUS', 
@@ -69,16 +72,16 @@ class ProductionExport implements FromQuery, WithHeadings, ShouldAutoSize, WithS
 
         return [
             $this->rowNumber, // Masukkan nomor urut
-            $activity->marketingOrder->sap_no ?? '-',
             $activity->marketingOrder->art_no ?? '-',
+            $activity->marketingOrder->sap_no ?? '-',
             $activity->created_at->format('d/m/Y H:i'),
             $activity->user->name ?? '-', 
             $activity->marketingOrder->pelanggan ?? '-', 
-            $activity->marketingOrder->marketing_name ?? '-', 
+            $activity->marketingOrder->mkt ?? '-', 
             $activity->marketingOrder->keperluan ?? '-',
             $activity->marketingOrder->konstruksi_greige ?? '-',
             $activity->marketingOrder->material ?? '-',
-            $activity->technical_data['benang_1'] ?? '-', 
+            $activity->marketingOrder->benang ?? '-', 
             $activity->marketingOrder->kelompok_kain ?? '-',
             $activity->marketingOrder->target_lebar ?? '-',
             $activity->marketingOrder->belah_bulat ?? '-',
@@ -99,7 +102,7 @@ class ProductionExport implements FromQuery, WithHeadings, ShouldAutoSize, WithS
                 'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
                 'fill' => [
                     'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => 'ED1C24'] // Merah Duniatex
+                    'startColor' => ['rgb' => '111827'] // Gunakan warna gelap premium
                 ],
                 'alignment' => [
                     'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,

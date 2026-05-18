@@ -92,14 +92,14 @@ new class extends Component {
 <div class="min-h-screen mkt-bg mkt-text p-8 transition-colors duration-300 font-sans italic">
     <div class="max-w-6xl mx-auto">
         <h1 class="text-5xl font-black italic uppercase tracking-tighter mkt-text mb-10">
-            SYSTEM <span class="text-red-600">CONFIGURATION</span>
+            SYSTEM <span class="text-indigo-600">CONFIGURATION</span>
         </h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {{-- Production Parameters --}}
             <div class="lg:col-span-2 mkt-surface border mkt-border p-10 rounded-[3rem] shadow-2xl relative overflow-hidden">
-                <h3 class="text-2xl font-black italic uppercase text-red-500 mb-8 flex items-center gap-3">
-                    <span class="w-2 h-8 bg-red-600 rounded-full"></span>
+                <h3 class="text-2xl font-black italic uppercase text-indigo-600 mb-8 flex items-center gap-3">
+                    <span class="w-2 h-8 bg-indigo-600 rounded-full"></span>
                     Production Parameters
                 </h3>
                 
@@ -108,21 +108,21 @@ new class extends Component {
                         <div>
                             <label class="block text-[10px] font-black uppercase text-slate-500 mb-3 tracking-[0.2em]">Durasi Shift (Jam)</label>
                             <input type="number" wire:model="shift_duration"
-                                class="w-full mkt-input mkt-border rounded-2xl p-5 mkt-text font-black text-xl italic focus:border-red-600 focus:ring-4 focus:ring-red-600/10 transition-all outline-none">
+                                class="w-full mkt-input mkt-border rounded-2xl p-5 mkt-text font-black text-xl italic focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-black uppercase text-slate-500 mb-3 tracking-[0.2em]">Kapasitas Mesin Maksimal (KG)</label>
                             <input type="number" wire:model="max_capacity"
-                                class="w-full mkt-input mkt-border rounded-2xl p-5 mkt-text font-black text-xl italic focus:border-red-600 focus:ring-4 focus:ring-red-600/10 transition-all outline-none">
+                                class="w-full mkt-input mkt-border rounded-2xl p-5 mkt-text font-black text-xl italic focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all outline-none">
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-[10px] font-black uppercase text-slate-500 mb-3 tracking-[0.2em]">Target Minimal per Shift (KG)</label>
                             <input type="number" wire:model="target_minimal"
-                                class="w-full mkt-input mkt-border rounded-2xl p-5 mkt-text font-black text-xl italic focus:border-red-600 focus:ring-4 focus:ring-red-600/10 transition-all outline-none">
+                                class="w-full mkt-input mkt-border rounded-2xl p-5 mkt-text font-black text-xl italic focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all outline-none">
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full bg-red-600 hover:bg-black text-white py-6 rounded-2xl font-black uppercase italic tracking-[0.2em] shadow-xl shadow-red-900/20 transition-all transform hover:-translate-y-1">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-black text-white py-6 rounded-2xl font-black uppercase italic tracking-[0.2em] shadow-xl shadow-indigo-900/20 transition-all transform hover:-translate-y-1">
                         SAVE PRODUCTION PARAMETERS 💾
                     </button>
                 </form>
@@ -150,11 +150,11 @@ new class extends Component {
                             {{ $is_maintenance ? 'DISABLE MAINTENANCE' : 'ENABLE MAINTENANCE' }}
                         </button>
                         
-                        <a href="{{ route('admin.backup') }}" class="block w-full bg-slate-900 text-white text-center py-4 rounded-2xl font-black uppercase italic text-[10px] tracking-widest hover:bg-red-600 transition shadow-lg">
+                        <a href="{{ route('admin.backup') }}" class="block w-full mkt-surface-alt mkt-text border mkt-border text-center py-4 rounded-2xl font-black uppercase italic text-[10px] tracking-widest hover:bg-indigo-600 hover:text-white transition shadow-lg">
                             DOWNLOAD DB BACKUP
                         </a>
 
-                        <button type="button" onclick="confirmPurgeLogs()" class="block w-full mkt-surface-alt mkt-text-muted border mkt-border py-4 rounded-2xl font-black uppercase italic text-[10px] tracking-widest hover:text-red-500 transition">
+                        <button type="button" onclick="confirmPurgeLogs()" class="block w-full mkt-surface-alt mkt-text-muted border mkt-border py-4 rounded-2xl font-black uppercase italic text-[10px] tracking-widest hover:text-indigo-600 transition">
                             PURGE AUDIT LOGS
                         </button>
                     </div>
@@ -162,7 +162,7 @@ new class extends Component {
 
                 <div class="mkt-surface-alt p-6 rounded-[2.5rem] border mkt-border">
                     <p class="text-[9px] text-slate-500 font-bold uppercase italic leading-relaxed">
-                        <span class="text-red-600 font-black italic">PRO TIP:</span> 
+                        <span class="text-indigo-600 font-black italic">PRO TIP:</span> 
                         Gunakan tombol simpan setelah mengubah parameter produksi untuk memastikan seluruh dashboard operator terupdate secara serentak.
                     </p>
                 </div>
@@ -189,7 +189,7 @@ new class extends Component {
             title: '<span style="color: #fff; font-style: italic; font-weight: 900; text-transform: uppercase;">BERSIHKAN LOG?</span>',
             background: '#0f172a',
             showCancelButton: true,
-            confirmButtonColor: '#dc2626',
+            confirmButtonColor: '#4f46e5',
             confirmButtonText: 'YA, HAPUS'
         }).then((result) => { if (result.isConfirmed) { $wire.dispatch('purge-logs-confirmed'); } })
     }

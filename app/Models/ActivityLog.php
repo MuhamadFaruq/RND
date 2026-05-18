@@ -12,6 +12,7 @@ class ActivityLog extends Model
         'action', 
         'division',
         'sap_no',
+        'art_no',
         'details', 
         'model', 
         'description', 

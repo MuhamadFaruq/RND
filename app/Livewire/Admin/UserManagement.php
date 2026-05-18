@@ -31,11 +31,12 @@ class UserManagement extends Component
 
     public function render()
     {
-        $users = User::with('division')
+        $users = User::with('divisionModel')
             ->where(function($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%')
-                    ->orWhere('role', 'like', '%' . $this->search . '%');
+                $sanitizedSearch = str_replace(['%', '_'], ['\%', '\_'], $this->search);
+                $query->where('name', 'like', '%' . $sanitizedSearch . '%')
+                    ->orWhere('email', 'like', '%' . $sanitizedSearch . '%')
+                    ->orWhere('role', 'like', '%' . $sanitizedSearch . '%');
             })
             // UBAH: Urutkan berdasarkan ID terkecil (biasanya admin) 
             // atau tetap latest() tapi cek halaman berikutnya.
@@ -84,7 +85,7 @@ class UserManagement extends Component
 
         // LOGIKA PENENTUAN ROLE & DIVISION_ID
         // Jika role yang dipilih berasal dari tabel divisi, kita isi juga division_id-nya
-        $selectedDivision = Division::where('name', $this->role)->first();
+        $selectedDivision = \App\Models\Division::where('name', 'like', $this->role)->first();
         $finalDivisionId = $selectedDivision ? $selectedDivision->id : $this->division_id;
 
         $user = User::updateOrCreate(['id' => $this->userId], [
@@ -96,18 +97,17 @@ class UserManagement extends Component
         ]);
 
         \App\Models\ActivityLog::create([
-            'user_id' => auth()->id(),
-            'action' => $action,
-            'division' => 'ADMIN_SYSTEM',
-            'sap_no' => '-',
-            'details' => "{$action}: {$user->name} ({$user->role})",
+            'user_id'     => auth()->id(),
+            'action'      => $action,
+            'division'    => 'ADMIN_SYSTEM',
+            'description' => "{$action}: {$user->name} ({$user->role})",
         ]);
 
         session()->flash('message', $this->userId ? 'User berhasil diperbarui.' : 'User berhasil dibuat.');
         $this->closeModal();
     }
 
-    public function edit($id)
+    public function editUser($id)
     {
         $user = User::findOrFail($id);
         $this->userId = $user->id;
@@ -136,11 +136,10 @@ class UserManagement extends Component
             $userName = $user->name;
             
             ActivityLog::create([
-                'user_id' => auth()->id(),
-                'action' => 'DELETE_USER',
-                'division' => 'ADMIN_SYSTEM',
-                'sap_no' => '-',
-                'details' => "Menghapus User: {$userName}",
+                'user_id'     => auth()->id(),
+                'action'      => 'DELETE_USER',
+                'division'    => 'ADMIN_SYSTEM',
+                'description' => "Menghapus User: {$userName}",
             ]);
 
             $user->delete();

@@ -12,9 +12,15 @@ class CheckDivision
     {
         $user = auth()->user();
 
+        // 0. Pastikan user sudah login
+        if (!$user) {
+            return redirect()->route('login')
+                ->with('error', 'Silahkan login terlebih dahulu.');
+        }
+
         // Maintenance Bypass untuk Super Admin & Impersonation
         if (app()->isDownForMaintenance()) {
-            if ($user && ($user->isSuperAdmin() || session()->has('impersonator_id'))) {
+            if ($user->isSuperAdmin() || session()->has('impersonator_id')) {
                 return $next($request);
             }
             abort(503);
@@ -27,6 +33,11 @@ class CheckDivision
 
         // 2. CEK OPERATOR BIASA
         $requestedDivision = $request->route('division');
+        
+        if (!$requestedDivision) {
+            abort(400, 'Parameter divisi tidak ditemukan di URL.');
+        }
+
         $userDivision = strtolower($user->division);
         $targetDivision = strtolower($requestedDivision);
 

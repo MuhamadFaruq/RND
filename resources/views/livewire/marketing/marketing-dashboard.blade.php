@@ -1,7 +1,12 @@
 <div>
     {{-- Tailwind & Chart.js sudah dikompilasi via Vite, tidak perlu CDN --}}
 
-<div x-data="{ openDetail: @entangle('showDetail'), selected: @entangle('selectedOrder') }" class="min-h-screen mkt-bg pt-2 pb-8 px-6 font-inter tracking-tight">
+<div x-data="{ 
+    openDetail: @entangle('showDetail'), 
+    selected: @entangle('selectedOrder'),
+    showLogDetail: false,
+    selectedLog: null
+}" class="min-h-screen mkt-bg pt-2 pb-8 px-6 font-inter tracking-tight">
     <div class="max-w-[1600px] mx-auto">
         
         {{-- HEADER UTAMA --}}
@@ -18,10 +23,21 @@
                         </p>
                     </div>
                 @endif
+
+                @if($currentMenu === 'calculator')
+                    <div class="animate-in fade-in duration-700">
+                        <h1 class="text-4xl font-black uppercase mkt-text leading-none">
+                            Price <span class="text-emerald-600">Simulator</span>
+                        </h1>
+                        <p class="text-sm font-bold mkt-text-muted uppercase tracking-[0.3em] mt-2 italic">
+                            Cost & Selling Price Calculation Tool
+                        </p>
+                    </div>
+                @endif
             </div>
 
                 {{-- SISI KANAN: STATUS LIVE & TANGGAL & JAM --}}
-            @if($currentMenu === 'dashboard')
+            @if($currentMenu === 'dashboard' || $currentMenu === 'calculator')
                 <div class="flex flex-row items-center gap-4 flex-shrink-0 ml-10 animate-in fade-in duration-700">
                     <div class="text-right border-r border-slate-200 pr-6 hidden md:block">
                         <p class="text-[10px] font-black text-slate-400 uppercase leading-none mb-1 tracking-widest">Global Factory Load</p>
@@ -75,7 +91,7 @@
                                         </div>
                                         <div class="flex flex-col items-end">
                                             <span class="bg-{{ $stage['color'] ?? 'slate' }}-100 text-{{ $stage['color'] ?? 'slate' }}-600 text-[8px] px-3 py-1 rounded-full font-black">CONNECTED</span>
-                                            <p class="text-[10px] font-black mkt-text mt-1">{{ $stage['load_count'] }} SAP</p>
+                                            <p class="text-[10px] font-black mkt-text mt-1">{{ $stage['load_count'] }} Artikel</p>
                                         </div>
                                     </div>
 
@@ -115,10 +131,10 @@
 
                 {{-- SUMMARY STATS --}}
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                    <div class="bg-slate-900 p-8 rounded-[3rem] shadow-xl text-white relative overflow-hidden group">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest relative z-10">Total Registered Orders</p>
-                        <h3 class="text-6xl font-black text-white mt-2 relative z-10 italic">{{ number_format($totalOrder) }}</h3>
-                        <div class="absolute -right-10 -bottom-10 opacity-5 text-9xl font-black italic group-hover:scale-110 transition-transform">SAP</div>
+                    <div class="mkt-surface p-8 rounded-[3rem] shadow-sm mkt-border border relative overflow-hidden group">
+                        <p class="text-[10px] font-black mkt-text-muted uppercase tracking-widest relative z-10">Total Registered Orders</p>
+                        <h3 class="text-6xl font-black mkt-text mt-2 relative z-10 italic">{{ number_format($totalOrder) }}</h3>
+                        <div class="absolute -right-10 -bottom-10 opacity-5 text-9xl font-black italic group-hover:scale-110 transition-transform mkt-text">ART</div>
                     </div>
 
                     <div class="mkt-surface p-8 rounded-[3rem] shadow-sm mkt-border border relative overflow-hidden">
@@ -153,7 +169,7 @@
                                     <span class="absolute left-5 top-4 mkt-text-muted group-focus-within:text-red-600 transition-colors">🔍</span>
                                     <input type="text" 
                                         wire:model.live="search" 
-                                        placeholder="Search SAP / Customer..." 
+                                        placeholder="CARI NOMOR ARTIKEL ATAU PELANGGAN..." 
                                         class="w-full pl-14 pr-6 py-4 mkt-input border-none rounded-[1.5rem] text-xs font-black uppercase italic focus:ring-4 focus:ring-red-600/10 transition-all outline-none">
                                 </div>
                                 <a href="{{ route('marketing.dashboard', ['menu' => 'input']) }}" class="hidden md:flex items-center gap-2 px-6 py-4 bg-red-600 hover:bg-black text-white rounded-[1.5rem] text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-red-600/20 whitespace-nowrap">
@@ -166,7 +182,7 @@
                             <table class="w-full text-left border-separate border-spacing-y-3" id="productionTable">
                                 <thead>
                                     <tr class="text-[10px] font-black mkt-text-muted uppercase tracking-widest">
-                                        <th class="px-4 pb-2">SAP NO</th>
+                                        <th class="px-4 pb-2">NO ARTIKEL</th>
                                         <th class="px-4 pb-2">Customer / Article</th>
                                         <th class="px-4 pb-2">Warna</th>
                                         <th class="px-4 pb-2">Status Pipeline</th>
@@ -177,11 +193,11 @@
                                     @forelse($recentOrders as $order)
                                         <tr class="mkt-surface-alt hover:opacity-80 transition-all group table-row-item">
                                             <td class="px-4 py-4 rounded-l-[1.5rem] font-black text-xs text-blue-600 italic sap-cell">
-                                                #{{ $order->sap_no }}
+                                                #{{ $order->art_no }}
                                             </td>
                                             <td class="px-4 py-4 customer-cell">
                                                 <p class="text-[10px] font-black mkt-text uppercase">{{ $order->pelanggan }}</p>
-                                                <p class="text-[9px] font-bold mkt-text-muted uppercase italic">{{ $order->art_no }}</p>
+                                                <p class="text-[9px] font-bold mkt-text-muted uppercase italic">{{ $order->sap_no }}</p>
                                             </td>
                                             <td class="px-4 py-4 text-[10px] font-black uppercase italic mkt-text">{{ $order->warna }}</td>
                                             <td class="px-4 py-4">
@@ -239,14 +255,19 @@
                         </h3>
                         <div class="space-y-4">
                             @foreach($recentOrders->where('status', 'knitting')->take(2) as $urgent)
-                            <div class="flex justify-between items-center bg-red-50/50 p-4 rounded-[1.5rem] border border-red-100">
-                                <div>
-                                    <p class="text-[10px] font-black text-red-600 uppercase italic leading-none">SAP #{{ $urgent->sap_no }}</p>
-                                    <p class="text-xs font-bold mkt-text mt-1 uppercase">{{ $urgent->pelanggan }}</p>
+                            <div class="flex justify-between items-center bg-red-50 dark:bg-red-900/20 p-4 rounded-[1.5rem] border border-red-100 dark:border-red-900/30">
+                                <div class="space-y-1">
+                                    <p class="text-[10px] font-black text-red-600 dark:text-red-400 uppercase italic leading-none">ARTIKEL #{{ $urgent->art_no }}</p>
+                                    <p class="text-xs font-bold mkt-text uppercase">{{ $urgent->pelanggan }}</p>
+                                    <div class="flex items-center gap-2 text-[9px] font-bold mt-1">
+                                        <span class="text-slate-600 dark:text-slate-300">📅 {{ $urgent->created_at->format('d/m/Y') }}</span>
+                                        <span class="text-slate-600 dark:text-slate-300">⏰ {{ $urgent->created_at->format('H:i') }} WIB</span>
+                                        <span class="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full uppercase text-[8px]">Nyangkut di: {{ strtoupper($urgent->status) }}</span>
+                                    </div>
                                 </div>
                                 <button wire:click="pushOperator({{ $urgent->id }})" 
                                         wire:loading.attr="disabled"
-                                        class="bg-slate-900 text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase hover:bg-red-600 transition-all italic flex items-center gap-2">
+                                        class="bg-slate-900 dark:bg-slate-800 text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase hover:bg-red-600 transition-all italic flex items-center gap-2">
                                     <span wire:loading.remove>Push Operator</span>
                                     <span wire:loading>🚀 Sending...</span>
                                 </button>
@@ -277,6 +298,10 @@
             <div class="animate-in slide-in-from-bottom-4 duration-500">
                 @livewire('marketing.order-list')
             </div>
+        @elseif($currentMenu === 'calculator')
+            <div class="animate-in slide-in-from-bottom-4 duration-500">
+                @livewire('marketing.price-calculator')
+            </div>
         @endif
         {{-- END DYNAMIC CONTENT --}}
 
@@ -306,16 +331,21 @@
                  x-transition:leave-end="translate-x-full"
                  class="w-screen max-w-3xl text-left">
                 
-                <div id="print-area" class="h-full flex flex-col bg-white shadow-2xl rounded-l-[3rem] overflow-hidden">
+                <div id="print-area" class="h-full flex flex-col mkt-surface shadow-2xl rounded-l-[3rem] overflow-hidden">
                     <div class="p-8 bg-slate-900 text-white flex justify-between items-center rounded-tl-[3rem] border-b border-white/10 no-print-bg">
                         <div class="flex-1">
                             <h2 class="text-2xl font-black italic uppercase tracking-tighter leading-none text-white">
                                 Industrial Order <span class="text-red-500 text-3xl italic">Detail</span>
                             </h2>
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">
-                                Internal Tracking ID: <span x-text="selected ? selected.sap_no : ''" class="text-white font-black"></span>
+                                Internal Tracking ID: <span x-text="selected ? selected.art_no : ''" class="text-white font-black"></span>
                             </p>
                         </div>
+                        
+                        <button @click="showLogDetail = true" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase transition-all flex items-center gap-2 shadow-lg shadow-indigo-900/50 mr-4 no-print">
+                            <span>Lihat Hasil</span>
+                            <span>👁️</span>
+                        </button>
                         
                         <button wire:click="closeDetail" class="bg-white/10 hover:bg-red-600 p-3 rounded-2xl transition group">
                             <svg class="no-print h-6 w-6 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -324,73 +354,73 @@
 
                     <div class="flex-1 overflow-y-auto p-8 space-y-8 pb-32 bg-slate-50/30">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                            <div class="mkt-surface p-6 rounded-[2rem] border mkt-border shadow-sm">
                                 <h3 class="text-red-600 font-black mb-4 border-b pb-2 uppercase italic tracking-tighter text-sm flex items-center">
                                     <span class="w-2 h-4 bg-red-600 mr-2 rounded-full"></span>I. Identity & Sales
                                 </h3>
                                 <div class="space-y-4">
-                                    <div class="flex justify-between border-b border-slate-50 pb-1 font-bold">
-                                        <p class="text-[10px] text-slate-400 uppercase tracking-widest">Pelanggan</p>
-                                        <p class="text-slate-800 uppercase" x-text="selected?.pelanggan"></p>
+                                    <div class="flex justify-between border-b mkt-border pb-1 font-bold">
+                                        <p class="text-[10px] mkt-text-muted uppercase tracking-widest">Pelanggan</p>
+                                        <p class="mkt-text uppercase" x-text="selected?.pelanggan"></p>
                                     </div>
-                                    <div class="flex justify-between border-b border-slate-50 pb-1 font-bold">
-                                        <p class="text-[10px] text-slate-400 uppercase tracking-widest">Artikel No</p>
-                                        <p class="text-slate-800 uppercase" x-text="selected?.art_no"></p>
+                                    <div class="flex justify-between border-b mkt-border pb-1 font-bold">
+                                        <p class="text-[10px] mkt-text-muted uppercase tracking-widest">Artikel No</p>
+                                        <p class="mkt-text uppercase" x-text="selected?.art_no"></p>
                                     </div>
-                                    <div class="flex justify-between border-b border-slate-50 pb-1 font-bold">
-                                        <p class="text-[10px] text-slate-400 uppercase tracking-widest">MKT Representative</p>
-                                        <p class="text-slate-800 italic" x-text="selected?.mkt"></p>
+                                    <div class="flex justify-between border-b mkt-border pb-1 font-bold">
+                                        <p class="text-[10px] mkt-text-muted uppercase tracking-widest">MKT Representative</p>
+                                        <p class="mkt-text italic" x-text="selected?.mkt"></p>
                                     </div>
                                     <div class="flex justify-between font-bold">
-                                        <p class="text-[10px] text-slate-400 uppercase tracking-widest">Keperluan</p>
-                                        <p class="text-slate-800" x-text="selected?.keperluan"></p>
+                                        <p class="text-[10px] mkt-text-muted uppercase tracking-widest">Keperluan</p>
+                                        <p class="mkt-text" x-text="selected?.keperluan"></p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                                <h3 class="text-slate-900 font-black mb-4 border-b pb-2 uppercase italic tracking-tighter text-sm flex items-center">
-                                    <span class="w-2 h-4 bg-slate-900 mr-2 rounded-full"></span>II. Technical Specs
+                            <div class="mkt-surface p-6 rounded-[2rem] border mkt-border shadow-sm">
+                                <h3 class="mkt-text font-black mb-4 border-b mkt-border pb-2 uppercase italic tracking-tighter text-sm flex items-center">
+                                    <span class="w-2 h-4 bg-red-600 mr-2 rounded-full"></span>II. Technical Specs
                                 </h3>
                                 <div class="space-y-4 font-bold">
-                                    <div class="flex justify-between border-b border-slate-50 pb-1">
-                                        <p class="text-[10px] text-slate-400 uppercase tracking-widest">Material</p>
-                                        <p class="text-slate-800 uppercase" x-text="selected?.material"></p>
+                                    <div class="flex justify-between border-b mkt-border pb-1">
+                                        <p class="text-[10px] mkt-text-muted uppercase tracking-widest">Material</p>
+                                        <p class="mkt-text uppercase" x-text="selected?.material"></p>
                                     </div>
-                                    <div class="flex justify-between border-b border-slate-50 pb-1">
-                                        <p class="text-[10px] text-slate-400 uppercase tracking-widest">Benang</p>
-                                        <p class="text-slate-800 uppercase" x-text="selected?.benang"></p>
+                                    <div class="flex justify-between border-b mkt-border pb-1">
+                                        <p class="text-[10px] mkt-text-muted uppercase tracking-widest">Benang</p>
+                                        <p class="mkt-text uppercase" x-text="selected?.benang"></p>
                                     </div>
-                                    <div class="flex justify-between border-b border-slate-50 pb-1">
-                                        <p class="text-[10px] text-slate-400 uppercase tracking-widest">Konstruksi Greige</p>
-                                        <p class="text-slate-800" x-text="selected?.konstruksi_greige"></p>
+                                    <div class="flex justify-between border-b mkt-border pb-1">
+                                        <p class="text-[10px] mkt-text-muted uppercase tracking-widest">Konstruksi Greige</p>
+                                        <p class="mkt-text" x-text="selected?.konstruksi_greige"></p>
                                     </div>
                                     <div class="flex justify-between">
-                                        <p class="text-[10px] text-slate-400 uppercase tracking-widest text-red-600">Finishing Warna</p>
+                                        <p class="text-[10px] mkt-text-muted uppercase tracking-widest text-red-600">Finishing Warna</p>
                                         <p class="text-red-600 uppercase italic" x-text="selected?.warna"></p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-slate-900 p-8 rounded-[3rem] text-white shadow-xl shadow-slate-200">
-                            <h3 class="text-red-500 font-black mb-6 uppercase italic tracking-tighter text-center underline underline-offset-8">Production Specification Matrix</h3>
+                        <div class="mkt-surface-alt p-8 rounded-[3rem] mkt-text border mkt-border shadow-sm">
+                            <h3 class="text-red-600 font-black mb-6 uppercase italic tracking-tighter text-center underline underline-offset-8">Production Specification Matrix</h3>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center font-bold">
-                                <div class="border-r border-white/10">
-                                    <p class="text-[9px] text-slate-400 uppercase mb-1">Kelompok Kain</p>
-                                    <p class="text-lg" x-text="selected?.kelompok_kain"></p>
+                                <div class="border-r mkt-border">
+                                    <p class="text-[9px] mkt-text-muted uppercase mb-1">Kelompok Kain</p>
+                                    <p class="text-lg mkt-text" x-text="selected?.kelompok_kain"></p>
                                 </div>
-                                <div class="border-r border-white/10">
-                                    <p class="text-[9px] text-slate-400 uppercase mb-1">Lebar / Gramasi</p>
-                                    <p class="text-lg"><span x-text="selected?.target_lebar"></span>" / <span x-text="selected?.target_gramasi"></span></p>
+                                <div class="border-r mkt-border">
+                                    <p class="text-[9px] mkt-text-muted uppercase mb-1">Lebar / Gramasi</p>
+                                    <p class="text-lg mkt-text"><span x-text="selected?.target_lebar"></span>" / <span x-text="selected?.target_gramasi"></span></p>
                                 </div>
-                                <div class="border-r border-white/10">
-                                    <p class="text-[9px] text-slate-400 uppercase mb-1">Belah / Bulat</p>
-                                    <p class="text-lg uppercase" x-text="selected?.belah_bulat"></p>
+                                <div class="border-r mkt-border">
+                                    <p class="text-[9px] mkt-text-muted uppercase mb-1">Belah / Bulat</p>
+                                    <p class="text-lg uppercase mkt-text" x-text="selected?.belah_bulat"></p>
                                 </div>
                                 <div>
-                                    <p class="text-[9px] text-slate-400 uppercase mb-1">Handfeel</p>
-                                    <p class="text-lg uppercase" x-text="selected?.handfeel"></p>
+                                    <p class="text-[9px] mkt-text-muted uppercase mb-1">Handfeel</p>
+                                    <p class="text-lg uppercase mkt-text" x-text="selected?.handfeel"></p>
                                 </div>
                             </div>
                         </div>
@@ -406,21 +436,21 @@
                             </div>
                         </div>
 
-                        <div class="bg-white p-8 rounded-[3rem] border-l-[12px] border-red-600 shadow-sm">
-                            <p class="text-[10px] font-black text-slate-400 uppercase mb-2 italic tracking-widest">Special Treatment & Instructions:</p>
-                            <p class="text-lg font-black text-slate-800 uppercase mb-4 underline decoration-red-600/30 underline-offset-4" x-text="selected?.treatment_khusus || '-'"></p>
-                            <hr class="border-slate-100 my-4">
-                            <p class="text-[10px] font-black text-slate-400 uppercase mb-2 italic tracking-widest">Internal Marketing Notes:</p>
-                            <p class="text-xs font-bold text-slate-600 leading-relaxed italic bg-slate-50 p-4 rounded-2xl" x-text="selected?.keterangan_artikel || 'No additional internal notes provided.'"></p>
+                        <div class="mkt-surface p-8 rounded-[3rem] border-l-[12px] border-red-600 shadow-sm border mkt-border">
+                            <p class="text-[10px] font-black mkt-text-muted uppercase mb-2 italic tracking-widest">Special Treatment & Instructions:</p>
+                            <p class="text-lg font-black mkt-text uppercase mb-4 underline decoration-red-600/30 underline-offset-4" x-text="selected?.treatment_khusus || '-'"></p>
+                            <hr class="mkt-border my-4">
+                            <p class="text-[10px] font-black mkt-text-muted uppercase mb-2 italic tracking-widest">Internal Marketing Notes:</p>
+                            <p class="text-xs font-bold mkt-text-muted leading-relaxed italic mkt-surface-alt p-4 rounded-2xl" x-text="selected?.keterangan_artikel || 'No additional internal notes provided.'"></p>
                         </div>
 
-                        <div class="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
-                            <h3 class="text-slate-900 font-black mb-8 uppercase italic tracking-tighter text-sm flex items-center">
+                        <div class="mkt-surface p-8 rounded-[3rem] border mkt-border shadow-sm overflow-hidden">
+                            <h3 class="mkt-text font-black mb-8 uppercase italic tracking-tighter text-sm flex items-center">
                                 <span class="w-2 h-4 bg-red-600 mr-2 rounded-full"></span>III. Production Milestone
                             </h3>
                             
                             <div class="relative">
-                                <div class="absolute left-4 top-0 h-full w-0.5 bg-slate-100"></div>
+                                <div class="absolute left-4 top-0 h-full w-0.5 mkt-surface-alt"></div>
                                 <div class="absolute left-4 top-0 w-0.5 bg-red-600 transition-all duration-700"
                                     :style="selected?.status === 'knitting' ? 'height: 10%' : 
                                             (selected?.status === 'dyeing' ? 'height: 20%' : 
@@ -446,30 +476,62 @@
                                     </div>
 
                                     @php
-                                        $milestones = [
-                                            ['id' => '02', 'status' => 'knitting', 'label' => 'Knitting Process', 'desc' => 'RAJUT UNIT DDT 2', 'after' => ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '03', 'status' => 'dyeing', 'label' => 'SCR / Dyeing', 'desc' => 'PROSES WARNA & PENCUCIAN', 'after' => ['relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '04', 'status' => 'relax-dryer', 'label' => 'Relax Dryer', 'desc' => 'PENGERINGAN TANPA TEGANGAN', 'after' => ['compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '05', 'status' => 'compactor', 'label' => 'Compactor', 'desc' => 'FINISHING BULAT (COTTON)', 'after' => ['heat-setting', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '06', 'status' => 'heat-setting', 'label' => 'Heat Setting', 'desc' => 'FINISHING BULAT (PE/POLYESTER)', 'after' => ['stenter', 'tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '07', 'status' => 'stenter', 'label' => 'Stenter Process', 'desc' => 'SETTING LEBAR & GRAMASI', 'after' => ['tumbler', 'fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '08', 'status' => 'tumbler', 'label' => 'Tumbler Dry', 'desc' => 'PROSES BULKING KAIN', 'after' => ['fleece', 'pengujian', 'qe', 'finished']],
-                                            ['id' => '09', 'status' => 'fleece', 'label' => 'Fleece / Brushing', 'desc' => 'GARUK BULU (UNIT FLEECE)', 'after' => ['pengujian', 'qe', 'finished']],
-                                            ['id' => '10', 'status' => 'pengujian', 'label' => 'QC & Lab Testing', 'desc' => 'PENGUJIAN FISIK KAIN', 'after' => ['qe', 'finished']],
-                                            ['id' => '11', 'status' => 'qe', 'label' => 'QE Approval', 'desc' => 'FINAL INSPECTION & RELEASE', 'after' => ['finished']],
-                                        ];
+                                        $milestones = [];
+                                        $milestones[] = ['status' => 'knitting', 'label' => 'Knitting Process', 'desc' => 'RAJUT UNIT DDT 2'];
+                                        $milestones[] = ['status' => 'dyeing', 'label' => 'SCR / Dyeing', 'desc' => 'PROSES WARNA & PENCUCIAN'];
+                                        
+                                        if (!empty($selectedOrder['req_tumbler'])) {
+                                            $milestones[] = ['status' => 'relax-dryer', 'label' => 'Relax Dryer', 'desc' => 'PENGERINGAN TANPA TEGANGAN'];
+                                        }
+                                        if (!empty($selectedOrder['req_compactor'])) {
+                                            $milestones[] = ['status' => 'compactor', 'label' => 'Compactor', 'desc' => 'FINISHING BULAT (COTTON)'];
+                                        }
+                                        if (!empty($selectedOrder['req_heat_setting'])) {
+                                            $milestones[] = ['status' => 'heat-setting', 'label' => 'Heat Setting', 'desc' => 'FINISHING BULAT (PE/POLYESTER)'];
+                                        }
+                                        if (!empty($selectedOrder['req_stenter'])) {
+                                            $milestones[] = ['status' => 'stenter', 'label' => 'Stenter Process', 'desc' => 'SETTING LEBAR & GRAMASI'];
+                                        }
+                                        if (!empty($selectedOrder['req_tumbler'])) {
+                                            $milestones[] = ['status' => 'tumbler', 'label' => 'Tumbler Dry', 'desc' => 'PROSES BULKING KAIN'];
+                                        }
+                                        if (!empty($selectedOrder['req_fleece'])) {
+                                            $milestones[] = ['status' => 'fleece', 'label' => 'Fleece / Brushing', 'desc' => 'GARUK BULU (UNIT FLEECE)'];
+                                        }
+                                        if (!empty($selectedOrder['req_pengujian'])) {
+                                            $milestones[] = ['status' => 'pengujian', 'label' => 'QC & Lab Testing', 'desc' => 'PENGUJIAN FISIK KAIN'];
+                                        }
+                                        if (!empty($selectedOrder['req_qe'])) {
+                                            $milestones[] = ['status' => 'qe', 'label' => 'QE Approval', 'desc' => 'FINAL INSPECTION & RELEASE'];
+                                        }
+                                        
+                                        // Generate IDs and after array dynamically
+                                        $allStatuses = array_map(fn($m) => $m['status'], $milestones);
+                                        $allStatuses[] = 'finished';
+                                        
+                                        $id = 2;
+                                        foreach($milestones as $key => &$m) {
+                                            $m['id'] = str_pad($id++, 2, '0', STR_PAD_LEFT);
+                                            $m['after'] = array_slice($allStatuses, $key + 1);
+                                        }
                                     @endphp
 
                                     @foreach($milestones as $m)
                                         @php $log = $activitiesLogs[$m['status']][0] ?? null; @endphp
                                         <div class="flex items-start gap-6">
                                             <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-500"
-                                                :class="[ @foreach($m['after'] as $a)'{{$a}}',@endforeach ].includes(selected?.status) ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'">
+                                                :class="[ @foreach($m['after'] as $a)'{{$a}}',@endforeach ].includes(selected?.status) ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' : 'bg-slate-100 text-slate-600'">
                                                 <span class="text-[10px] font-black" x-text="[ @foreach($m['after'] as $a)'{{$a}}',@endforeach ].includes(selected?.status) ? '✓' : '{{ $m['id'] }}'"></span>
                                             </div>
-                                            <div class="flex-1">
-                                                <p class="text-xs font-black uppercase italic" :class="selected?.status === '{{ $m['status'] }}' ? 'text-red-600 animate-pulse' : ''">{{ $m['label'] }}</p>
-                                                <p class="text-[9px] font-bold text-slate-400 uppercase">{{ $m['desc'] }}</p>
+                                            <div class="flex-1 flex justify-between items-center">
+                                                <div>
+                                                    <p class="text-xs font-black uppercase italic" :class="selected?.status === '{{ $m['status'] }}' ? 'text-red-600 animate-pulse' : 'text-slate-800'">{{ $m['label'] }}</p>
+                                                    <p class="text-[9px] font-bold text-slate-400 uppercase">{{ $m['desc'] }}</p>
+                                                    @if($log)
+                                                        <p class="text-[8px] font-black text-emerald-500 mt-1">DONE: {{ \Carbon\Carbon::parse($log['created_at'])->format('d/m H:i') }}</p>
+                                                    @endif
+                                                </div>
+                                                
                                                 @if($log)
                                                     <p class="text-[8px] font-black text-emerald-500 mt-1">DONE: {{ \Carbon\Carbon::parse($log['created_at'])->format('d/m H:i') }}</p>
                                                 @endif
@@ -516,7 +578,17 @@
             </div>
         </div>
 
-    <div class="mb-6 flex justify-between items-start"> </div>
+
+
+    {{-- SECONDARY MODAL: TECHNICAL DATA DETAILS --}}
+    <div x-show="showLogDetail" @close-log-detail.window="showLogDetail = false" class="fixed inset-0 z-[110] flex items-center justify-center p-4" x-cloak style="display: none;">
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md transition-opacity" @click="showLogDetail = false"></div>
+        <div class="relative z-10 w-full max-w-4xl">
+            @if($selectedOrder)
+                <livewire:order-tracking-detail :order-id="$selectedOrder['id']" :key="$selectedOrder['id']" />
+            @endif
+        </div>
+    </div>
     </div>
 
     <style>

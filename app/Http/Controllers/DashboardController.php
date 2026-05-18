@@ -2,73 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\MarketingOrder;
 use App\Models\ProductionActivity;
 use App\Models\User;
-use App\Models\Division;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ProductionExport;
-use Carbon\Carbon;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     /**
-     * Dashboard Utama (Halaman Index setelah Login)
+     * Dashboard Dispatcher: Mengarahkan user berdasarkan role.
      */
-    public function index(): \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+    public function index()
     {
         $user = auth()->user();
 
-        // 1. Daftar role yang masuk kategori Operator
-        $operatorRoles = [
-            'knitting', 'dyeing', 'relax-dryer', 'finishing', 
-            'stenter', 'tumbler', 'fleece', 'pengujian', 'qe'
-        ];
-
-        // 2. Jika user adalah salah satu dari operator di atas
-        if (in_array($user->role, $operatorRoles)) {
+        // 1. Operator: Go to Logbook
+        if (in_array($user->role, ['operator', 'knitting', 'dyeing', 'relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe'])) {
             return redirect()->route('operator.logbook');
         }
 
-        // 3. Jika user adalah Marketing
+        // 2. Marketing: Go to Marketing Dashboard
         if ($user->role === 'marketing') {
             return redirect()->route('marketing.dashboard');
         }
 
-        if (in_array($user->role, ['super-admin', 'admin'])) {
-            // Jika file visual Anda ada di: resources/views/livewire/admin/dashboard.blade.php
-            return view('livewire.admin.dashboard'); 
-        }
-
-        // 4. Default untuk Admin (Menampilkan statistik umum)
-        $stats = [
-            ['label' => 'Total SAP Terdaftar', 'value' => MarketingOrder::count(), 'icon' => '📋', 'color' => 'text-blue-600'],
-            ['label' => 'Aktivitas Hari Ini', 'value' => ProductionActivity::whereDate('created_at', today())->count(), 'icon' => '⚡', 'color' => 'text-red-600'],
-            ['label' => 'User Terdaftar', 'value' => User::count(), 'icon' => '👥', 'color' => 'text-green-600'],
-        ];
-
-        return view('dashboard', compact('stats'));
+        // 3. Admin & Superadmin: Show the standard dashboard view
+        return view('dashboard');
     }
 
     /**
-     * Monitoring Dashboard (Tampilan Admin/Monitoring)
-     * Digunakan untuk melihat summary order
+     * Impersonate User (Super-Admin only)
      */
-    // app/Http/Controllers/DashboardController.php
-
-// app/Http/Controllers/DashboardController.php
-
-public function monitoring()
+    public function impersonate($id)
     {
-        // Redirect ke Livewire MarketingDashboard yang sudah menangani semua data
-        // Controller biasa tidak bisa menyuplai Livewire properties seperti stages, factoryLoad, dll.
-        return redirect()->route('marketing.dashboard');
+        $userToImpersonate = User::findOrFail($id);
+
+        if (auth()->user()->role !== 'super-admin') {
+            abort(403);
+        }
+
+        session()->put('impersonator_id', auth()->id());
+        auth()->login($userToImpersonate);
+
+        return redirect()->route('dashboard');
+    }
+
+    /**
+     * Stop Impersonating
+     */
+    public function stopImpersonate()
+    {
+        if (!session()->has('impersonator_id')) {
+            return redirect()->route('dashboard');
+        }
+
+        $adminId = session()->pull('impersonator_id');
+        $adminUser = User::find($adminId);
+
+        auth()->login($adminUser);
+
+        return redirect()->route('admin.users');
     }
 
     /**
@@ -76,108 +69,20 @@ public function monitoring()
      */
     public function getRealTimeStats()
     {
-        $logStats = ProductionActivity::select('type', DB::raw('count(*) as total'))
-            ->where('created_at', '>=', now()->subDay())
-            ->groupBy('type')
-            ->get()
-            ->pluck('total', 'type');
-
         return response()->json([
-            'success' => true,
-            'data' => [
-                'knitting' => $logStats['knitting'] ?? 0,
-                'dyeing'   => $logStats['dyeing'] ?? 0,
-                'qc'       => $logStats['pengujian'] ?? 0,
-            ]
+            'total_articles' => MarketingOrder::count(),
+            'daily_activity' => ProductionActivity::whereDate('created_at', today())->count(),
+            'active_users'   => User::whereNotNull('last_seen')->where('last_seen', '>=', now()->subMinutes(5))->count(),
         ]);
     }
 
     /**
-     * Export report to Excel
-     */
-    public function exportExcel()
-    {
-        if (Auth::user()->role === 'operator') {
-            abort(403, 'Unauthorized.');
-        }
-
-        try {
-            return Excel::download(
-                new ProductionExport, 
-                'LAPORAN_PRODUKSI_DUNIATEX_'.now()->format('d-m-Y').'.xlsx'
-            );
-        } catch (\Exception $e) {
-            Log::error("Export Error: " . $e->getMessage());
-            return back()->with('error', 'Gagal export data.');
-        }
-    }
-
-    /**
-     * Approval & Rejection untuk Manajer QE
-     */
-    public function handleQEAction(Request $request, $id)
-    {
-        $order = MarketingOrder::findOrFail($id);
-        $action = $request->input('action'); 
-        $reason = $request->input('reason'); 
-
-        if ($action === 'approve') {
-            $order->update(['status' => 'finished']);
-            return back()->with('success', "Order SAP {$order->sap_no} SELESAI.");
-        }
-
-        if ($action === 'reject') {
-            $order->update([
-                'status' => 'rework',
-                'keterangan' => $order->keterangan . " | REJECTED: " . $reason
-            ]);
-            return back()->with('warning', "Order SAP {$order->sap_no} REWORK.");
-        }
-    }
-
-    /**
-     * Generate Label Roll (QR Code)
-     */
-    public function generateLabel($sap_no)
-    {
-        try {
-            $order = MarketingOrder::where('sap_no', $sap_no)->firstOrFail();
-            $qrString = "SAP:{$order->sap_no}|ART:{$order->art_no}|PLG:{$order->pelanggan}";
-
-            $qrcode = QrCode::size(150)
-                ->color(237, 28, 36)
-                ->margin(1)
-                ->generate($qrString);
-
-            return response()->json([
-                'status' => 'success',
-                'qrcode' => (string)$qrcode,
-                'order' => $order
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Not Found'], 404);
-        }
-    }
-
-    /**
-     * API Detail untuk Scanner
-     */
-    public function getOrderDetailApi($sap_no)
-    {
-        try {
-            return response()->json(MarketingOrder::where('sap_no', $sap_no)->firstOrFail());
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Not Found'], 404);
-        }
-    }
-
-    /**
-     * Check if system is in maintenance mode (Heartbeat API)
+     * API Check Maintenance
      */
     public function checkMaintenanceStatus()
     {
         return response()->json([
-            'is_maintenance' => app()->isDownForMaintenance()
+            'is_down' => app()->isDownForMaintenance()
         ]);
     }
 }

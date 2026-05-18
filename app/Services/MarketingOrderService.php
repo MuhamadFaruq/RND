@@ -32,9 +32,9 @@ class MarketingOrderService
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function($q) use ($search) {
-                $q->where('sap_no', 'like', "%{$search}%")
+                $q->where('art_no', 'like', "%{$search}%")
                   ->orWhere('pelanggan', 'like', "%{$search}%")
-                  ->orWhere('art_no', 'like', "%{$search}%");
+                  ->orWhere('sap_no', 'like', "%{$search}%");
             });
         }
 
@@ -58,10 +58,10 @@ class MarketingOrderService
     /**
      * Load tracking logs grouped by division.
      */
-    public function getTrackingLogs(string $sapNo): array
+    public function getTrackingLogs(string $artNo): array
     {
         return ProductionActivity::with('operator')
-            ->whereHas('marketingOrder', fn($q) => $q->where('sap_no', $sapNo))
+            ->whereHas('marketingOrder', fn($q) => $q->where('art_no', $artNo))
             ->orderBy('created_at', 'asc')
             ->get()
             ->groupBy('division_name')

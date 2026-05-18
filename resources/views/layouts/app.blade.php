@@ -20,28 +20,48 @@
     </script>
     <title>Duniatex RND System</title>
 
+    <link rel="icon" type="image/png" href="{{ asset('images/lg.png') }}">
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: 'var(--mkt-bg)',
+                        surface: 'var(--mkt-surface)',
+                        'surface-alt': 'var(--mkt-surface-alt)',
+                        border: 'var(--mkt-border)',
+                        'app-text': 'var(--mkt-text)',
+                        'app-text-muted': 'var(--mkt-text-muted)',
+                        'input-bg': 'var(--mkt-input-bg)',
+                    }
+                }
+            }
+        }
+    </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --mkt-bg: #f8fafc;
+            --mkt-bg: #fcfdfe;
             --mkt-surface: #ffffff;
-            --mkt-surface-alt: #f1f5f9;
-            --mkt-border: #e2e8f0;
-            --mkt-text: #0f172a;
-            --mkt-text-muted: #64748b;
-            --mkt-input-bg: #f8fafc;
+            --mkt-surface-alt: #f1f4f9;
+            --mkt-border: #edf2f7;
+            --mkt-text: #1a202c;
+            --mkt-text-muted: #718096;
+            --mkt-input-bg: #f7fafc;
         }
 
         .dark {
-            --mkt-bg: #0f172a;
-            --mkt-surface: #1e293b;
-            --mkt-surface-alt: #0f172a;
-            --mkt-border: #334155;
-            --mkt-text: #f1f5f9;
-            --mkt-text-muted: #94a3b8;
-            --mkt-input-bg: #1e293b;
+            --mkt-bg: #0b0f19;
+            --mkt-surface: #151c2c;
+            --mkt-surface-alt: #1e293b;
+            --mkt-border: #26334d;
+            --mkt-text: #f8fafc;
+            --mkt-text-muted: #8395a7;
+            --mkt-input-bg: #0b0f19;
         }
 
         html {
@@ -65,12 +85,28 @@
             background-color: var(--mkt-surface) !important;
         }
 
+        .dark .mkt-surface {
+            background-color: rgba(21, 28, 44, 0.6) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+        }
+
         .mkt-surface-alt {
             background-color: var(--mkt-surface-alt) !important;
         }
 
+        .dark .mkt-surface-alt {
+            background-color: rgba(30, 41, 59, 0.6) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+        }
+
         .mkt-border {
             border-color: var(--mkt-border) !important;
+        }
+
+        .dark .mkt-border {
+            border-color: rgba(255, 255, 255, 0.1) !important;
         }
 
         .mkt-text {
@@ -84,6 +120,11 @@
         .mkt-input {
             background-color: var(--mkt-input-bg) !important;
             color: var(--mkt-text) !important;
+        }
+
+        .dark .mkt-input {
+            background-color: rgba(11, 15, 25, 0.8) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
         }
 
         /* Smooth transitions on theme change */
@@ -113,7 +154,7 @@
         }
 
         .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-            background: #ef4444;
+            background: #4f46e5;
         }
     </style>
     @livewireStyles
@@ -124,10 +165,10 @@
     <div class="min-h-screen">
         @if(session()->has('impersonator_id'))
             <div
-                class="bg-red-600 text-white p-2 text-center text-[10px] font-black uppercase italic tracking-widest sticky top-0 z-[100] flex justify-center items-center gap-4">
+                class="bg-indigo-600 text-white p-2 text-center text-[10px] font-black uppercase italic tracking-widest sticky top-0 z-[100] flex justify-center items-center gap-4">
                 ⚠️ MODE IMPERSONATE: Anda sedang masuk sebagai {{ auth()->user()->name }} ({{ auth()->user()->role }})
                 <a href="{{ route('admin.stop-impersonate') }}"
-                    class="bg-white text-red-600 px-4 py-1 rounded-full hover:bg-slate-100 transition-all text-xs">
+                    class="bg-white text-indigo-600 px-4 py-1 rounded-full hover:bg-slate-100 transition-all text-xs">
                     KEMBALI KE ADMIN
                 </a>
             </div>
@@ -145,7 +186,7 @@
                     <div class="flex items-center">
                         <div class="shrink-0 flex items-center">
                             <a href="{{ route('dashboard') }}"
-                                class="text-xl font-extrabold tracking-wider text-red-600">
+                                class="text-xl font-extrabold tracking-wider text-indigo-600">
                                 RND <span class="mkt-text">DUNIATEX</span>
                             </a>
                         </div>
@@ -153,61 +194,65 @@
                         {{-- Horizontal Menu: Hidden on screens smaller than XL (iPad Landscape/Portrait) --}}
                         <div class="hidden xl:flex space-x-2 xl:ml-10 items-center">
                             <a href="{{ Auth::user()->role === 'marketing' ? route('marketing.dashboard', ['menu' => 'dashboard']) : route('dashboard') }}"
-                                class="px-3 py-2 rounded-md text-sm font-bold transition {{ (request()->query('menu') === 'dashboard' || request()->routeIs('dashboard') || request()->routeIs('marketing.dashboard')) && request()->query('menu') !== 'input' && request()->query('menu') !== 'orders' ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                class="px-3 py-2 rounded-md text-sm font-bold transition {{ (request()->query('menu') === 'dashboard' || request()->routeIs('dashboard') || request()->routeIs('marketing.dashboard')) && request()->query('menu') !== 'input' && request()->query('menu') !== 'orders' ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
                                 Dashboard
                             </a>
 
                             @if(Auth::user()->role === 'marketing')
                                 <a href="{{ route('marketing.dashboard', ['menu' => 'input']) }}"
-                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'input' ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'input' ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
                                     Input Marketing
                                 </a>
                                 <a href="{{ route('marketing.dashboard', ['menu' => 'orders']) }}"
-                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'orders' ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'orders' ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
                                     Daftar Order
+                                </a>
+                                <a href="{{ route('marketing.dashboard', ['menu' => 'calculator']) }}"
+                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'calculator' ? 'bg-emerald-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    Kalkulator HPP
                                 </a>
                             @endif
 
                             @if(in_array(Auth::user()->role, ['operator', 'knitting', 'dyeing', 'relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe']))
                                 <a href="{{ route('operator.logbook', ['menu' => 'orders']) }}"
-                                    class="px-3 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'orders' ? 'bg-blue-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-3 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'orders' ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
                                     Permintaan
                                 </a>
                                 <a href="{{ route('operator.logbook', ['menu' => 'history']) }}"
-                                    class="px-3 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'history' ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-3 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'history' ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
                                     Riwayat
                                 </a>
                             @endif
 
                             @if(in_array(auth()->user()->role, ['admin', 'super-admin']))
                                 <a href="{{ route('admin.monitoring') }}"
-                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.monitoring') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.monitoring') ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
                                     Monitoring
                                 </a>
 
                                 <a href="{{ route('admin.unit-monitoring') }}"
-                                    class="{{ request()->routeIs('admin.unit-monitoring') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }} px-4 py-2 rounded-lg font-bold transition">
+                                    class="{{ request()->routeIs('admin.unit-monitoring') ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }} px-4 py-2 rounded-lg font-bold transition">
                                     Unit Monitoring
                                 </a>
 
                                 <a href="{{ route('admin.activity-logs') }}"
-                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.activity-logs') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.activity-logs') ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
                                     Audit Trail
                                 </a>
 
                                 @if(auth()->user()->role === 'super-admin')
                                     <a href="{{ route('admin.users') }}"
-                                        class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.users') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                        class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.users') ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
                                         Users Management
                                     </a>
 
                                     <a href="{{ route('admin.divisions') }}"
-                                        class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.divisions') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                        class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.divisions') ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
                                         Divisions
                                     </a>
 
                                     <a href="{{ route('admin.config') }}"
-                                        class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.config') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                        class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.config') ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
                                         System Config
                                     </a>
                                 @endif
@@ -216,9 +261,9 @@
                             {{-- Global Search: Hidden on mobile, shown on XL --}}
                             <div class="hidden 2xl:flex items-center ml-8 relative group">
                                 <span
-                                    class="absolute left-4 text-slate-500 group-focus-within:text-red-500 transition-colors">🔍</span>
-                                <input type="text" placeholder="GLOBAL SAP SEARCH..."
-                                    class="pl-12 pr-4 py-2 w-64 mkt-surface-alt border mkt-border rounded-xl text-[10px] font-black uppercase italic focus:ring-2 focus:ring-red-600/20 outline-none transition-all placeholder:mkt-text-muted"
+                                    class="absolute left-4 mkt-text-muted opacity-50 group-focus-within:text-indigo-600 group-focus-within:opacity-100 transition-colors">🔍</span>
+                                <input wire:model.live="search" type="text" placeholder="CARI NOMOR ARTIKEL ATAU PELANGGAN..." 
+                                    class="pl-12 pr-4 py-2 w-64 mkt-input border mkt-border rounded-xl text-[10px] font-black uppercase italic focus:ring-2 focus:ring-indigo-600/20 outline-none transition-all placeholder:mkt-text-muted"
                                     onkeypress="if(event.key === 'Enter') { window.location.href = '/admin/unit-monitoring?search=' + this.value; }">
                             </div>
                         </div>
@@ -292,7 +337,7 @@
 
                     <div class="p-6 h-full flex flex-col">
                         <div class="flex justify-between items-center mb-10">
-                            <div class="text-lg font-black text-red-600 italic">MENU <span
+                            <div class="text-lg font-black text-indigo-600 italic">MENU <span
                                     class="mkt-text">EXPLORER</span></div>
                             <button @click="open = false" class="p-2 rounded-xl mkt-surface-alt mkt-text-muted">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -412,6 +457,29 @@
                 color: '#fff',
                 customClass: {
                     popup: 'border border-white/10 backdrop-blur-md rounded-2xl'
+                }
+            });
+        });
+
+        window.addEventListener('show-alert', event => {
+            Swal.fire({
+                icon: event.detail.type || 'warning',
+                title: event.detail.title,
+                text: event.detail.text,
+                showCancelButton: event.detail.showCancelButton || false,
+                confirmButtonText: event.detail.confirmButtonText || 'OK',
+                cancelButtonText: event.detail.cancelButtonText || 'Batal',
+                background: '#0f172a',
+                color: '#fff',
+                customClass: {
+                    popup: 'border border-white/10 backdrop-blur-xl rounded-3xl',
+                    title: 'font-black italic uppercase tracking-tighter',
+                    confirmButton: 'rounded-xl font-bold italic tracking-widest uppercase text-xs px-6 py-3 mx-2',
+                    cancelButton: 'rounded-xl font-bold italic tracking-widest uppercase text-xs px-6 py-3 mx-2'
+                }
+            }).then((result) => {
+                if (result.isConfirmed && event.detail.callback) {
+                    Livewire.dispatch(event.detail.callback, event.detail.params || {});
                 }
             });
         });

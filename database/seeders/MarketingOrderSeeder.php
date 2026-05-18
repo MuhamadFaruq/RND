@@ -33,9 +33,9 @@ class MarketingOrderSeeder extends Seeder
         ];
 
         foreach ($orders as $order) {
-            // Gunakan updateOrInsert dengan kriteria sap_no
+            // Gunakan updateOrInsert dengan kriteria art_no (Nomor Artikel sebagai identitas unik utama)
             DB::table('marketing_orders')->updateOrInsert(
-                ['sap_no' => $order['sap_no']], // Kriteria pencarian
+                ['art_no' => $order['art_no']], // Kriteria pencarian primer
                 $order // Data yang dimasukkan/diupdate
             );
         }

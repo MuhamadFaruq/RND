@@ -5,13 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
-use App\Models\AuditLog;
+use App\Models\ActivityLog;
 
 class BackupController extends Controller
 {
     public function download()
-{
-    try {
+    {
+        if (auth()->user()->role !== 'super-admin') {
+            abort(403, 'Akses ditolak: Hanya Super Admin yang dapat mengunduh backup.');
+        }
+
+        try {
         $dbName = env('DB_DATABASE');
         $dbUser = env('DB_USERNAME');
         $dbPass = env('DB_PASSWORD');
@@ -38,13 +42,14 @@ class BackupController extends Controller
             return back()->with('error', 'Gagal backup: ' . (isset($output[0]) ? $output[0] : 'Unknown Error'));
         }
 
-        // Catat ke Audit Log
-        \App\Models\AuditLog::create([
+        // Catat ke Activity Log
+        ActivityLog::create([
             'user_id' => auth()->id(),
             'action' => 'DATABASE_BACKUP',
-            'module' => 'System',
-            'details' => "Super Admin mengunduh database: $filename",
+            'model' => 'SYSTEM',
+            'description' => "Super Admin mengunduh database: $filename",
             'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent()
         ]);
 
         if (file_exists($path)) {

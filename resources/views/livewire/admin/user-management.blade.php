@@ -4,17 +4,17 @@
         {{-- HEADER: Mengikuti gaya Monitoring --}}
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 border-b mkt-border pb-8 gap-6">
             <div>
-                <h1 class="text-4xl md:text-6xl font-black italic tracking-tighter uppercase text-red-600 leading-none">
+                <h1 class="text-4xl md:text-6xl font-black italic tracking-tighter uppercase text-indigo-600 leading-none">
                     Users <span class="mkt-text">Control</span>
                 </h1>
                 <p class="mkt-text-muted font-bold tracking-widest uppercase text-[10px] md:text-xs mt-3 italic">Duniatex Group - Access Management</p>
             </div>
-            <button wire:click="openModal" class="w-full md:w-auto bg-red-600 text-white px-8 py-3 rounded-2xl font-black uppercase italic shadow-2xl hover:bg-red-700 transition transform hover:scale-105 tracking-tighter">
+            <button wire:click="openModal" class="w-full md:w-auto bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black uppercase italic shadow-2xl hover:bg-indigo-700 transition transform hover:scale-105 tracking-tighter">
                 + Tambah Personel
             </button>
         </div>
 
-        <div class="mkt-surface p-1 rounded-3xl border mkt-border mb-10 shadow-lg flex items-center transition-all focus-within:ring-2 focus-within:ring-red-500/20">
+        <div class="mkt-surface p-1 rounded-3xl border mkt-border mb-10 shadow-lg flex items-center transition-all focus-within:ring-2 focus-within:ring-indigo-500/20">
             <div class="pl-6 pr-3">
                 <svg class="w-5 h-5 mkt-text-muted opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
@@ -40,7 +40,7 @@
                             <th class="px-8 py-6 text-right">Otoritas</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700/50">
+                    <tbody class="divide-y divide-border">
                         @foreach($users as $user)
                         <tr class="hover:mkt-surface-alt/50 transition-colors border-b mkt-border last:border-0">
                             <td class="px-8 py-7">
@@ -55,7 +55,7 @@
                                 </span>
                             </td>
                             <td class="px-8 py-7 text-center">
-                                <span class="text-[11px] font-black mkt-text uppercase tracking-tighter opacity-80">{{ $user->division->name ?? 'MASTER ADMIN' }}</span>
+                                <span class="text-[11px] font-black mkt-text uppercase tracking-tighter opacity-80">{{ $user->divisionModel->name ?? 'MASTER ADMIN' }}</span>
                             </td>
                             <td class="px-8 py-7 text-center">
                                 @if($user->last_seen)
@@ -107,12 +107,12 @@
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
                 <div class="relative transform overflow-hidden rounded-[2.5rem] mkt-surface border mkt-border text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                     
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-600 to-transparent"></div>
 
                     <div class="px-8 pt-8 pb-6">
                         <div class="mb-8">
                             <h3 class="text-3xl font-black italic uppercase tracking-tighter mkt-text" id="modal-title">
-                                {{ $userId ? 'Update' : 'Register' }} <span class="text-red-600">Personel</span>
+                                {{ $userId ? 'Update' : 'Register' }} <span class="text-indigo-600">Personel</span>
                             </h3>
                             <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-[0.2em] mt-1">
                                 Duniatex Group - Access Management System
@@ -123,7 +123,7 @@
                             <div>
                                 <label class="block text-[10px] font-black mkt-text-muted uppercase tracking-widest mb-2 ml-1">Nama Lengkap</label>
                                 <input type="text" wire:model="name" 
-                                    class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-red-600 focus:ring-0 transition-all placeholder:mkt-text-muted" 
+                                    class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-indigo-600 focus:ring-0 transition-all placeholder:mkt-text-muted" 
                                     placeholder="Contoh: Budi Santoso">
                                 @error('name') <span class="text-red-500 text-[10px] font-bold uppercase mt-1 ml-1">{{ $message }}</span> @enderror
                             </div>
@@ -131,16 +131,15 @@
                             <div>
                                 <label class="block text-[10px] font-black mkt-text-muted uppercase tracking-widest mb-2 ml-1">Email Corporate</label>
                                 <input type="email" wire:model="email" 
-                                    class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-red-600 focus:ring-0 transition-all placeholder:mkt-text-muted" 
+                                    class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-indigo-600 focus:ring-0 transition-all placeholder:mkt-text-muted" 
                                     placeholder="name@duniatex.com">
                                 @error('email') <span class="text-red-500 text-[10px] font-bold uppercase mt-1 ml-1">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-[10px] font-black mkt-text-muted uppercase tracking-widest mb-2 ml-1">Otoritas / Role</label>
                                     <select wire:model="role" 
-                                        class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-red-600 focus:ring-0 transition-all uppercase text-xs">
+                                        class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-indigo-600 focus:ring-0 transition-all uppercase text-xs">
                                         <option value="">Pilih Otoritas</option>
                                         @foreach($divisions as $div)
                                             <option value="{{ strtolower($div->name) }}">{{ strtoupper($div->name) }}</option>
@@ -151,7 +150,7 @@
                                 <div>
                                     <label class="block text-[10px] font-black mkt-text-muted uppercase tracking-widest mb-2 ml-1">Password</label>
                                     <input type="password" wire:model="password" 
-                                        class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-red-600 focus:ring-0 transition-all placeholder:mkt-text-muted" 
+                                        class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-indigo-600 focus:ring-0 transition-all placeholder:mkt-text-muted" 
                                         placeholder="********">
                                 </div>
                             </div>
@@ -160,7 +159,7 @@
 
                     <div class="mkt-bg px-8 py-6 flex flex-row-reverse gap-3 border-t mkt-border">
                         <button type="button" wire:click="save" 
-                            class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl font-black italic uppercase tracking-widest text-xs transition-all shadow-[0_0_20px_rgba(220,38,38,0.2)]">
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-black italic uppercase tracking-widest text-xs transition-all shadow-[0_0_20px_rgba(79,70,229,0.2)]">
                             {{ $userId ? 'SIMPAN PERUBAHAN' : 'DAFTARKAN PERSONEL' }}
                         </button>
                         <button type="button" wire:click="closeModal" 

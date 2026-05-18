@@ -30,7 +30,11 @@ class AppServiceProvider extends ServiceProvider
             return $user->role === 'super-admin' ? true : null;
         });
         Gate::define('access-superadmin', function ($user) {
-            return $user->role === 'admin' || $user->role === 'superadmin'; //
+            return $user->role === 'admin' || $user->role === 'super-admin'; //
+        });
+        
+        Gate::define('is-super-admin', function ($user) {
+            return $user->role === 'super-admin';
         });
         
         // Daftarkan tag <x-app-layout> agar mengarah ke layouts/app.blade.php

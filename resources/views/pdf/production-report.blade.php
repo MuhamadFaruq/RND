@@ -138,23 +138,27 @@
         <table class="data-table"> {{-- Gunakan CSS tabel Anda --}}
             <thead>
                 <tr>
-                    <th>SAP NO</th>
-                    <th>ARTIKEL</th>
+                    <th>NO ARTIKEL</th>
+                    <th>LEGACY SAP ID</th>
                     <th>BENANG 1 & YL</th>
                     <th>BENANG 2 & YL</th>
                     <th>TOTAL KG</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($activities as $act)
+                @forelse($activities as $act)
                     <tr>
-                        <td>{{ $act->marketingOrder->sap_no ?? '-' }}</td>
-                        <td>{{ $act->marketingOrder->art_no ?? '-' }}</td>
+                        <td style="font-weight: bold;">{{ $act->marketingOrder->art_no ?? '-' }}</td>
+                        <td class="opacity-60">{{ $act->marketingOrder->sap_no ?? '-' }}</td>
                         <td>{{ $act->technical_data['benang_1'] ?? '-' }} ({{ $act->technical_data['yl_1'] ?? 0 }})</td>
                         <td>{{ $act->technical_data['benang_2'] ?? '-' }} ({{ $act->technical_data['yl_2'] ?? 0 }})</td>
                         <td style="font-weight: bold;">{{ number_format($act->kg, 2) }}</td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 10px; color: #888;">Tidak ada data produksi untuk periode ini</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -167,21 +171,25 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>SAP NO</th>
+                    <th>NO ARTIKEL</th>
                     <th>WARNA / HANDFEEL</th>
                     <th>TARGET LEBAR/GRAMASI</th>
                     <th>HASIL KG</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($activities as $act)
+                @forelse($activities as $act)
                     <tr>
-                        <td>{{ $act->marketingOrder->sap_no ?? '-' }}</td>
-                        <td>{{ $act->warna }} / {{ $act->handfeel }}</td>
-                        <td>{{ $act->target_lebar }} / {{ $act->target_gramasi }}</td>
+                        <td style="font-weight: bold;">{{ $act->marketingOrder->art_no ?? '-' }}</td>
+                        <td>{{ $act->marketingOrder->warna ?? '-' }} / {{ $act->marketingOrder->handfeel ?? '-' }}</td>
+                        <td>{{ $act->marketingOrder->target_lebar ?? '-' }} / {{ $act->marketingOrder->target_gramasi ?? '-' }}</td>
                         <td style="font-weight: bold;">{{ number_format($act->kg, 2) }}</td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 10px; color: #888;">Tidak ada data produksi untuk periode ini</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -196,19 +204,23 @@
                 <tr>
                     <th>WAKTU</th>
                     <th>DIVISI</th>
-                    <th>SAP NO</th>
+                    <th>NO ARTIKEL</th>
                     <th>HASIL (KG)</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($activities->take(50) as $act)
+                @forelse($activities->take(50) as $act)
                     <tr>
                         <td>{{ $act->created_at->format('H:i') }}</td>
                         <td>{{ strtoupper($act->division_name) }}</td>
-                        <td>{{ $act->marketingOrder->sap_no ?? '-' }}</td>
+                        <td style="font-weight: bold;">{{ $act->marketingOrder->art_no ?? '-' }}</td>
                         <td>{{ number_format($act->kg, 2) }}</td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 10px; color: #888;">Tidak ada data produksi untuk periode ini</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -222,8 +234,8 @@
     <table style="width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 10px;">
         <thead>
             <tr style="background-color: #f8f9fa;">
-                <th style="border: 1px solid #eee; padding: 8px;">SAP NO</th>
-                <th style="border: 1px solid #eee; padding: 8px;">ARTIKEL / PELANGGAN</th>
+                <th style="border: 1px solid #eee; padding: 8px;">NO ARTIKEL</th>
+                <th style="border: 1px solid #eee; padding: 8px;">LEGACY SAP ID</th>
                 <th style="border: 1px solid #eee; padding: 8px;">BENANG 1 & YL</th>
                 <th style="border: 1px solid #eee; padding: 8px;">BENANG 2 & YL</th>
                 <th style="border: 1px solid #eee; padding: 8px;">BENANG 3 & YL</th>
@@ -232,11 +244,11 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($activities->where('division_name', 'knitting') as $act)
+            @forelse($activities->where('division_name', 'knitting') as $act)
             <tr>
-                <td style="border: 1px solid #eee; padding: 6px; font-weight: bold;">{{ $act->marketingOrder->sap_no ?? '-' }}</td>
+                <td style="border: 1px solid #eee; padding: 6px; font-weight: bold;">{{ $act->marketingOrder->art_no ?? '-' }}</td>
                 <td style="border: 1px solid #eee; padding: 6px;">
-                    {{ $act->marketingOrder->art_no ?? '-' }} <br>
+                    <span style="color: #888; font-size: 7px;">{{ $act->marketingOrder->sap_no ?? '-' }}</span><br>
                     <span style="color: #666;">{{ $act->marketingOrder->pelanggan ?? '-' }}</span>
                 </td>
                 {{-- Mengambil data dari JSON technical_data --}}
@@ -246,7 +258,11 @@
                 <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_4'] ?? '-' }} <br> (YL: {{ $act->technical_data['yl_4'] ?? 0 }})</td>
                 <td style="border: 1px solid #eee; padding: 6px; font-weight: bold;">{{ $act->kg }} KG / {{ $act->roll }} Roll</td>
             </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="7" style="border: 1px solid #eee; padding: 10px; text-align: center; color: #888;">Tidak ada data benang untuk periode ini</td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </div>

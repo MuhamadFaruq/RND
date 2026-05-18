@@ -1,10 +1,14 @@
-<div class="mkt-surface p-6 rounded-[2.5rem] shadow-sm border mkt-border flex justify-between items-center group italic hover:border-orange-300 transition-all">
+{{-- resources/views/livewire/operator/partials/tumbler-table.blade.php --}}
+<div class="mkt-surface p-6 rounded-[2.5rem] shadow-sm border mkt-border flex justify-between items-center group italic hover:border-orange-500 transition-all duration-300">
     <div class="flex items-center gap-6">
-        <div class="bg-orange-50 text-orange-600 w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl shadow-sm">
+        <div class="bg-orange-600/20 text-orange-400 w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl shadow-lg border border-orange-500/30">
             🌀
         </div>
         <div class="text-left">
-            <span class="text-[10px] font-black text-orange-600 uppercase tracking-widest">#{{ $job->sap_no }}</span>
+            <span class="text-[10px] font-black text-orange-400 uppercase tracking-widest drop-shadow-[0_0_5px_rgba(249,115,22,0.3)]">#{{ $job->art_no }}</span>
+            @if($job->is_urgent)
+                <span class="ml-2 bg-red-600 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase animate-pulse">URGENT</span>
+            @endif
             <h4 class="text-xl font-black mkt-text leading-none uppercase">{{ $job->art_no }}</h4>
             <p class="text-[10px] font-bold mkt-text-muted uppercase mt-1">{{ $job->pelanggan }}</p>
         </div>
@@ -17,7 +21,7 @@
         </div>
         
         <button wire:click="showOrderDetail({{ $job->id }})" 
-            class="bg-slate-900 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">
+            class="mkt-surface-alt border mkt-border mkt-text px-6 py-3 rounded-2xl text-[10px] font-black uppercase hover:bg-indigo-600 hover:text-white hover:border-transparent transition-all duration-300 shadow-md">
             DETAIL & PROSES
         </button>
     </div>

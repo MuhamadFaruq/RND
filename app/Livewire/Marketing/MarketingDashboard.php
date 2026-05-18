@@ -23,6 +23,12 @@ class MarketingDashboard extends Component
     public function mount()
     {
         $this->currentMenu = request()->query('menu', 'dashboard');
+        
+        // Allowed menus
+        $allowedMenus = ['dashboard', 'input', 'orders', 'calculator'];
+        if (!in_array($this->currentMenu, $allowedMenus)) {
+            $this->currentMenu = 'dashboard';
+        }
     }
 
     public $search = '';
@@ -57,9 +63,9 @@ class MarketingDashboard extends Component
         $order = MarketingOrder::find($orderId);
         $order->update(['is_urgent' => true]);
 
-        session()->flash('success', "Operator Divisi telah diperingatkan untuk SAP #{$order->sap_no}");
+        session()->flash('success', "Operator Divisi telah diperingatkan untuk Artikel #{$order->art_no}");
         $this->dispatch('show-toast', 
-            message: "Sinyal Prioritas Terkirim ke Operator untuk SAP #{$order->sap_no}!",
+            message: "Sinyal Prioritas Terkirim ke Operator untuk Artikel #{$order->art_no}!",
             type: 'success'
         );
     }
@@ -69,7 +75,7 @@ class MarketingDashboard extends Component
         $order = MarketingOrder::findOrFail($id);
         // Store as plain array — Livewire 3 cannot serialize Eloquent Model as public property
         $this->selectedOrder = $order->toArray();
-        $this->loadTrackingLogs($order->sap_no);
+        $this->loadTrackingLogs($order->art_no);
         $this->showDetail = true;
     }
 
@@ -80,10 +86,10 @@ class MarketingDashboard extends Component
         $this->activitiesLogs = [];
     }
 
-    public function loadTrackingLogs($sap)
+    public function loadTrackingLogs($artNo)
     {
         $this->activitiesLogs = \App\Models\ProductionActivity::with('operator')
-            ->whereHas('marketingOrder', fn($q) => $q->where('sap_no', $sap))
+            ->whereHas('marketingOrder', fn($q) => $q->where('art_no', $artNo))
             ->orderBy('created_at', 'asc')
             ->get()
             ->groupBy('division_name')
@@ -97,9 +103,9 @@ class MarketingDashboard extends Component
         
         if ($this->search) {
             $query->where(function($q) {
-                $q->where('sap_no', 'like', "%{$this->search}%")
+                $q->where('art_no', 'like', "%{$this->search}%")
                 ->orWhere('pelanggan', 'like', "%{$this->search}%")
-                ->orWhere('art_no', 'like', "%{$this->search}%");
+                ->orWhere('sap_no', 'like', "%{$this->search}%");
             });
         }
 
@@ -170,9 +176,9 @@ class MarketingDashboard extends Component
 
         // 2. Terapkan Filter Search (Penting agar input "HALLO" berfungsi)
         $orderQuery->when($this->search, function($q) {
-            $q->where('sap_no', 'like', "%{$this->search}%")
+            $q->where('art_no', 'like', "%{$this->search}%")
             ->orWhere('pelanggan', 'like', "%{$this->search}%")
-            ->orWhere('art_no', 'like', "%{$this->search}%");
+            ->orWhere('sap_no', 'like', "%{$this->search}%");
         });
 
         // 3. Cache hasil getMachineWorkload agar tidak dipanggil berulang (19 query per panggilan)

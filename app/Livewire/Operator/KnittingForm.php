@@ -13,27 +13,32 @@ use Illuminate\Support\Facades\DB;
 class KnittingForm extends Component
 {
     // Deklarasikan semua properti
-    public $operator_name,$sap_no, $tanggal, $no_mesin, $type_mesin, $gauge_inch, $jml_feeder, $jml_jarum, $konstruksi_greige;
+    public $operator_name,$artikelNo, $sap_no, $tanggal, $no_mesin, $type_mesin, $gauge_inch, $jml_feeder, $jml_jarum, $konstruksi_greige;
     public $lebar, $gramasi, $kg, $roll;
     public $benang_1, $benang_2, $benang_3, $benang_4;
+    public $benang_1_percent, $benang_2_percent, $benang_3_percent, $benang_4_percent;
     public $yl_1, $yl_2, $yl_3, $yl_4;
     public $note, $produksi_per_day;
+    public $kgDeviation = false;
+    public $rollDeviation = false;
 
     public $order_detail = null;
+    public $productionHistory = [];
+    public $activeDetailTab = 'marketing';
 
-    public function mount($orderId = null, $sap = null)
+    public function mount($artikel = null, $orderId = null)
     {
         $this->tanggal = now()->format('Y-m-d');
         
         // LOGIKA EDIT: Jika ada orderId, ambil data dari production_activities
-        if ($orderId) {
+        if (is_numeric($orderId)) {
             $activity = ProductionActivity::where('marketing_order_id', $orderId)
                 ->where('division_name', 'knitting')
                 ->latest()
                 ->first();
 
             if ($activity) {
-                $this->sap_no = $activity->marketingOrder->sap_no ?? '';
+                $this->artikelNo = $activity->marketingOrder->art_no ?? $activity->marketingOrder->sap_no ?? '';
                 $this->kg     = $activity->kg;
                 $this->roll   = $activity->roll;
                 
@@ -47,57 +52,85 @@ class KnittingForm extends Component
                 $this->no_mesin         = $tech['no_mesin'] ?? '';
                 $this->type_mesin       = $tech['type_mesin'] ?? '';
                 $this->gauge_inch       = $tech['gauge_inch'] ?? '';
-                $this->jml_feeder       = $tech['jml_feeder'] ?? 0;
-                $this->jml_jarum        = $tech['jml_jarum'] ?? 0;
-                $this->lebar            = $tech['lebar'] ?? 0;
-                $this->gramasi          = $tech['gramasi'] ?? 0;
+                $this->jml_feeder       = $tech['jml_feeder'] ?? '';
+                $this->jml_jarum        = $tech['jml_jarum'] ?? '';
+                $this->lebar            = $tech['lebar'] ?? '';
+                $this->gramasi          = $tech['gramasi'] ?? '';
                 $this->note             = $tech['note'] ?? '';
-                $this->produksi_per_day = $tech['produksi_per_day'] ?? 0;
+                $this->produksi_per_day = $tech['produksi_per_day'] ?? '';
                 
                 for ($i = 1; $i <= 4; $i++) {
                     $this->{'benang_' . $i} = $tech['benang_' . $i] ?? '';
-                    $this->{'yl_' . $i}     = $tech['yl_' . $i] ?? 0;
+                    $this->{'benang_' . $i . '_percent'} = $tech['benang_' . $i . '_percent'] ?? '';
+                    $this->{'yl_' . $i}     = $tech['yl_' . $i] ?? '';
                 }
 
                 // Panggil detail artikel (Pelanggan, Warna, dll)
-                $this->updatedSapNo($this->sap_no, true); // Tambahkan parameter true untuk bypass status check
+                $this->updatedArtikelNo($this->artikelNo, true); 
                 return;
             }
         }
 
-        // LOGIKA INPUT BARU: Ambil SAP dari Route atau Query String
-        $targetSap = $sap ?? request()->query('sap');
-        if ($targetSap) {
-            $this->sap_no = $targetSap;
-            $this->updatedSapNo($targetSap);
+        // LOGIKA INPUT BARU: Ambil Artikel dari Route atau Query String (mendukung 'artikel' atau legacy 'sap')
+        $targetIdentifier = $artikel ?? request()->query('artikel') ?? request()->query('sap');
+        if ($targetIdentifier) {
+            $this->artikelNo = $targetIdentifier;
+            $this->updatedArtikelNo($targetIdentifier);
         }
     }
 
-    public function updatedSapNo($value, $isEdit = false)
+    public function updatedArtikelNo($value, $isEdit = false)
     {
-        $query = MarketingOrder::where('sap_no', $value);
-        
-        // Jika bukan sedang edit, hanya boleh ambil yang statusnya masih 'knitting'
-        if (!$isEdit) {
-            $query->where('status', 'knitting');
-        }
+        $repo = app(\App\Repositories\OrderRepository::class);
+        $order = $repo->findByIdentifier($value);
 
-        $order = $query->first();
+        // Jika bukan sedang edit, cek apakah statusnya masih 'knitting'
+        if ($order && !$isEdit && $order->status !== 'knitting') {
+            $order = null;
+        }
 
         if ($order) {
             $this->order_detail = [
-                'id'        => $order->id,
-                'art_no'    => $order->art_no,
-                'pelanggan' => $order->pelanggan,
-                'warna'     => $order->warna,
+                'id'          => $order->id,
+                'art_no'      => $order->art_no,
+                'sap_no'      => $order->sap_no,
+                'pelanggan'   => $order->pelanggan,
+                'warna'       => $order->warna,
+                'material'    => $order->material,
+                'kg_target'   => $order->kg_target,
+                'roll_target' => $order->roll_target,
+                'benang'      => $order->benang,
+                // Tambahan Field Lengkap
+                'keterangan'  => $order->keterangan_artikel,
+                'keperluan'   => $order->keperluan,
+                'konstruksi'  => $order->konstruksi_greige,
+                'kelompok'    => $order->kelompok_kain,
+                'target_lebar' => $order->target_lebar,
+                'target_gramasi' => $order->target_gramasi,
+                'handfeel'    => $order->handfeel,
+                'treatment'   => $order->treatment_khusus,
+                'belah_bulat' => $order->belah_bulat,
+                'urgent'      => $order->is_urgent,
+                // RND Info
+                'rnd_gramasi' => $order->rnd_gramasi_greige,
+                'rnd_mesin'   => $order->rnd_mesin_rajut,
+                'rnd_jenis'   => $order->rnd_jenis_mesin_rajut,
             ];
 
+            $this->sap_no = $order->sap_no;
+
+            // Load Production History for Traceability in Modal
+            $this->productionHistory = ProductionActivity::with('operator')
+                ->where('marketing_order_id', $order->id)
+                ->orderBy('created_at', 'asc')
+                ->get()->toArray();
+            
             // LOGIKA PENTING:
             // Jika sedang INPUT BARU (bukan edit), ambil lebar/gramasi dari target marketing.
             // Jika sedang EDIT, biarkan nilai lebar/gramasi tetap menggunakan hasil input operator yang sudah di-load di mount().
             if (!$isEdit) {
-                $this->lebar = $order->target_lebar;
-                $this->gramasi = $order->target_gramasi;
+                $this->lebar = '';
+                $this->gramasi = '';
             }
             
         } else {
@@ -105,10 +138,36 @@ class KnittingForm extends Component
         }
     }
 
+    public function updatedKg($value)
+    {
+        $this->checkDeviation();
+    }
+
+    public function updatedRoll($value)
+    {
+        $this->checkDeviation();
+    }
+
+    protected function checkDeviation()
+    {
+        if ($this->order_detail) {
+            $kgTarget = $this->order_detail['kg_target'];
+            $rollTarget = $this->order_detail['roll_target'];
+            
+            if ($kgTarget > 0 && is_numeric($this->kg)) {
+                $this->kgDeviation = abs($this->kg - $kgTarget) / $kgTarget > 0.1;
+            }
+            
+            if ($rollTarget > 0 && is_numeric($this->roll)) {
+                $this->rollDeviation = abs($this->roll - $rollTarget) / $rollTarget > 0.1;
+            }
+        }
+    }
+
     public function save()
     {
         $this->validate([
-            'sap_no'           => 'required|exists:marketing_orders,sap_no',
+            'artikelNo'        => 'required',
             'operator_name'    => 'required|min:3',
             'tanggal'          => 'required|date',
             'no_mesin'         => 'required',
@@ -122,12 +181,30 @@ class KnittingForm extends Component
             'roll'             => 'required|numeric|min:1',
         ]);
 
-        $marketingOrder = MarketingOrder::where('sap_no', $this->sap_no)->first();
+        if ($this->kgDeviation || $this->rollDeviation) {
+            $this->dispatch('show-alert', [
+                'type' => 'warning',
+                'title' => 'Deviasi Terdeteksi!',
+                'text' => 'Input KG atau Roll menyimpang lebih dari 10% dari target. Apakah Anda yakin ingin melanjutkan?',
+                'showCancelButton' => true,
+                'confirmButtonText' => 'Ya, Lanjutkan',
+                'cancelButtonText' => 'Periksa Kembali',
+                'callback' => 'submitForm'
+            ]);
+            return;
+        }
+
+        $this->submitForm();
+    }
+
+    public function submitForm()
+    {
+        $repo = app(\App\Repositories\OrderRepository::class);
+        $marketingOrder = $repo->findByIdentifier($this->artikelNo);
 
         try {
-            // Panggil ProductionService untuk memproses Knitting
-            $productionService = app(ProductionService::class);
-            $productionService->processKnitting(
+            $service = app(\App\Services\ProductionService::class);
+            $service->processKnitting(
                 $marketingOrder->id,
                 auth()->id(),
                 $this->kg,
@@ -142,9 +219,13 @@ class KnittingForm extends Component
                     'lebar'            => $this->lebar,
                     'gramasi'          => $this->gramasi,
                     'benang_1'         => $this->benang_1,
+                    'benang_1_percent' => $this->benang_1_percent,
                     'benang_2'         => $this->benang_2,
+                    'benang_2_percent' => $this->benang_2_percent,
                     'benang_3'         => $this->benang_3,
+                    'benang_3_percent' => $this->benang_3_percent,
                     'benang_4'         => $this->benang_4,
+                    'benang_4_percent' => $this->benang_4_percent,
                     'yl_1'             => $this->yl_1,
                     'yl_2'             => $this->yl_2,
                     'yl_3'             => $this->yl_3,

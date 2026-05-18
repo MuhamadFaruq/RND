@@ -34,7 +34,7 @@ class ProductionReportController extends Controller
         if ($mode === 'rajut') {
             $query->where('division_name', 'knitting');
         } elseif ($mode === 'warna') {
-            $query->whereIn('division_name', ['dyeing', 'finishing']);
+            $query->whereIn('division_name', ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece']);
         }
 
         $activities = $query->latest()->get();

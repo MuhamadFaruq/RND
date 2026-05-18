@@ -4,7 +4,7 @@
         
         {{-- 1. DASHBOARD SUPER ADMIN / ADMIN --}}
         @if(in_array(auth()->user()->role, ['super-admin', 'admin']))
-            <livewire:admin.dashboard />
+            <livewire:admin.admin-dashboard />
         @endif
 
         {{-- 2. DASHBOARD MARKETING --}}

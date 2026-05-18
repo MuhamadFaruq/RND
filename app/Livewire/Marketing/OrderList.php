@@ -5,6 +5,7 @@ namespace App\Livewire\Marketing;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\MarketingOrder;
+use App\Models\ActivityLog;
 use App\Exports\MarketingOrdersExport;
 use App\Services\MarketingOrderService;
 use Maatwebsite\Excel\Facades\Excel;
@@ -61,7 +62,22 @@ class OrderList extends Component
     public function deleteOrder($id)
     {
         try {
-            MarketingOrder::findOrFail($id)->delete();
+            $order = MarketingOrder::findOrFail($id);
+            $artNo = $order->art_no;
+            $sapNo = $order->sap_no;
+            
+            $order->delete();
+
+            // LOGGING AUDIT TRAIL
+            ActivityLog::create([
+                'user_id'     => auth()->id(),
+                'action'      => 'DELETE_ORDER',
+                'division'    => 'MARKETING',
+                'art_no'      => $artNo,
+                'sap_no'      => $sapNo,
+                'description' => "Menghapus Order Artikel: {$artNo}",
+            ]);
+
             if ($this->selectedOrder && ($this->selectedOrder['id'] ?? null) == $id) {
                 $this->closeDetail();
             }
@@ -76,7 +92,7 @@ class OrderList extends Component
         $order = MarketingOrder::findOrFail($id);
         // Store as plain array — Livewire 3 cannot serialize Eloquent Model as public property
         $this->selectedOrder = $order->toArray();
-        $this->loadTrackingLogs($order->sap_no);
+        $this->loadTrackingLogs($order->art_no);
         $this->showDetail = true;
     }
 
@@ -87,10 +103,10 @@ class OrderList extends Component
         $this->activitiesLogs = [];
     }
 
-    public function loadTrackingLogs(string $sap)
+    public function loadTrackingLogs(string $artNo)
     {
         $service = app(MarketingOrderService::class);
-        $this->activitiesLogs = $service->getTrackingLogs($sap);
+        $this->activitiesLogs = $service->getTrackingLogs($artNo);
     }
 
     public function render(MarketingOrderService $service)

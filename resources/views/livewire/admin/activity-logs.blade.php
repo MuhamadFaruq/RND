@@ -19,10 +19,11 @@ new class extends Component {
     {
         $query = ActivityLog::with('user')->latest();
 
-        // Filter Pencarian (SAP, Nama, Deskripsi)
+        // Filter Pencarian (Art No, Nama, Aksi, Deskripsi)
         if ($this->search) {
             $query->where(function($q) {
-                $q->where('sap_no', 'like', '%' . $this->search . '%')
+                $q->where('art_no', 'like', '%' . $this->search . '%')
+                  ->orWhere('sap_no', 'like', '%' . $this->search . '%')
                   ->orWhere('description', 'like', '%' . $this->search . '%')
                   ->orWhere('action', 'like', '%' . $this->search . '%')
                   ->orWhereHas('user', function($sq) {
@@ -53,7 +54,7 @@ new class extends Component {
         {{-- HEADER --}}
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 border-b mkt-border pb-8 gap-6">
             <div>
-                <h1 class="text-4xl md:text-5xl font-black italic tracking-tighter uppercase text-red-600 leading-none">
+                <h1 class="text-4xl md:text-5xl font-black italic tracking-tighter uppercase text-indigo-600 leading-none">
                     Audit <span class="mkt-text">Trail</span>
                 </h1>
                 <p class="mkt-text-muted font-bold tracking-widest uppercase text-[10px] md:text-xs mt-3 italic">Duniatex Group - Security & Activity Logs</p>
@@ -61,13 +62,13 @@ new class extends Component {
             <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
                 {{-- Search Bar --}}
                 <div class="relative group">
-                    <span class="absolute left-4 top-3.5 opacity-40">🔍</span>
-                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari SAP / Admin / Aksi..." 
-                        class="w-full md:w-64 pl-12 pr-4 py-3 mkt-surface border mkt-border rounded-2xl text-[10px] font-black uppercase italic focus:ring-2 focus:ring-red-600/20 outline-none transition-all">
+                    <span class="absolute left-4 top-3.5 mkt-text-muted opacity-40 group-focus-within:text-indigo-600 group-focus-within:opacity-100 transition-all">🔍</span>
+                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari ARTIKEL / SAP / Admin / Aksi..." 
+                        class="w-full md:w-64 pl-12 pr-4 py-3 mkt-input border mkt-border rounded-2xl text-[10px] font-black uppercase italic focus:ring-2 focus:ring-indigo-600/20 outline-none transition-all">
                 </div>
 
                 {{-- Action Filter --}}
-                <select wire:model.live="actionFilter" class="mkt-surface border mkt-border rounded-2xl px-6 py-3 text-[10px] font-black uppercase italic outline-none focus:ring-2 focus:ring-red-600/20 transition-all">
+                <select wire:model.live="actionFilter" class="mkt-input border mkt-border rounded-2xl px-6 py-3 text-[10px] font-black uppercase italic outline-none focus:ring-2 focus:ring-indigo-600/20 transition-all">
                     <option value="">Semua Aksi</option>
                     <option value="LOGIN">LOGIN</option>
                     <option value="LOGOUT">LOGOUT</option>
@@ -77,10 +78,10 @@ new class extends Component {
                 </select>
 
                 {{-- Date Filter --}}
-                <input type="date" wire:model.live="dateFilter" class="mkt-surface border mkt-border rounded-2xl px-6 py-3 text-[10px] font-black uppercase italic outline-none focus:ring-2 focus:ring-red-600/20 transition-all">
+                <input type="date" wire:model.live="dateFilter" class="mkt-input border mkt-border rounded-2xl px-6 py-3 text-[10px] font-black uppercase italic outline-none focus:ring-2 focus:ring-indigo-600/20 transition-all">
                 
                 @if($search || $actionFilter || $dateFilter)
-                    <button wire:click="$set('search', ''); $set('actionFilter', ''); $set('dateFilter', '');" class="bg-red-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase italic hover:bg-black transition-all">
+                    <button wire:click="$set('search', ''); $set('actionFilter', ''); $set('dateFilter', '');" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase italic hover:bg-black transition-all">
                         Reset
                     </button>
                 @endif
@@ -96,11 +97,11 @@ new class extends Component {
                             <th class="px-8 py-6">Waktu</th>
                             <th class="px-8 py-6">Operator</th>
                             <th class="px-8 py-6 text-center">Aksi</th>
-                            <th class="px-8 py-6 text-center">Model / SAP</th>
+                            <th class="px-8 py-6 text-center">IDENTITAS / ARTIKEL</th>
                             <th class="px-8 py-6">Keterangan</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700/50">
+                    <tbody class="divide-y divide-border">
                         @forelse($logs as $log)
                         <tr class="hover:mkt-surface-alt/50 transition-colors border-b mkt-border last:border-0">
                             {{-- Waktu --}}
@@ -137,11 +138,16 @@ new class extends Component {
                                 </span>
                             </td>
 
-                            {{-- Model / SAP --}}
+                            {{-- Identitas Artikel --}}
                             <td class="px-8 py-7 text-center">
-                                <span class="text-red-600 dark:text-red-500 font-black text-sm tracking-tighter uppercase italic">
-                                    #{{ $log->sap_no ?? ($log->model ?? 'SYSTEM') }}
-                                </span>
+                                <div class="flex flex-col">
+                                    <span class="text-indigo-600 dark:text-indigo-500 font-black text-sm tracking-tighter uppercase italic">
+                                        {{ $log->art_no ?? '#' . ($log->sap_no ?? ($log->model ?? 'SYSTEM')) }}
+                                    </span>
+                                    @if($log->art_no && $log->sap_no)
+                                        <span class="text-[8px] mkt-text-muted font-bold opacity-50 uppercase tracking-widest mt-1">LEGACY SAP: {{ $log->sap_no }}</span>
+                                    @endif
+                                </div>
                             </td>
 
                             {{-- Keterangan --}}

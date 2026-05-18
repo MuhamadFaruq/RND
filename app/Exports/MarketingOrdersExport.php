@@ -29,14 +29,14 @@ class MarketingOrdersExport implements FromCollection, WithMapping, WithHeadings
             ['Periode: ' . $this->labelPeriode], // Keterangan dinamis di sini
             ['Tanggal Cetak: ' . now()->format('d/m/Y H:i')],
             [''],
-            ['SAP NO', 'ART NO', 'TANGGAL', 'PELANGGAN', 'MKT', 'KEPERLUAN', 'KONSTRUKSI GREIGE', 'MATERIAL', 'BENANG', 'KELOMPOK KAIN', 'TARGET LEBAR', 'BELAH/BULAT', 'TARGET GRAMASI', 'WARNA', 'HANDFEEL', 'TREATMENT KHUSUS', 'ROLL', 'KG', 'KETERANGAN']
+            ['NO ARTIKEL', 'LEGACY SAP ID', 'TANGGAL', 'PELANGGAN', 'MKT', 'KEPERLUAN', 'KONSTRUKSI GREIGE', 'MATERIAL', 'BENANG', 'KELOMPOK KAIN', 'TARGET LEBAR', 'BELAH/BULAT', 'TARGET GRAMASI', 'WARNA', 'HANDFEEL', 'TREATMENT KHUSUS', 'ROLL', 'KG', 'KETERANGAN']
         ];
     }
 
     public function map($order): array {
         return [
-            $order->sap_no,
             $order->art_no,
+            $order->sap_no,
             $order->tanggal,
             $order->pelanggan,
             $order->mkt,

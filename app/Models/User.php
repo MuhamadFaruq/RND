@@ -72,18 +72,29 @@ class User extends Authenticatable
     }
 
     public function isAdmin(): bool {
-        return $this->role === UserRole::ADMIN->value;
+        return in_array($this->role, [UserRole::ADMIN->value, UserRole::SUPER_ADMIN->value]);
     }
 
     public function isOperator(): bool {
-        return $this->role === UserRole::OPERATOR->value;
+        return in_array($this->role, [
+            UserRole::OPERATOR->value,
+            UserRole::KNITTING->value,
+            UserRole::DYEING->value,
+            UserRole::FINISHING->value,
+            UserRole::STENTER->value,
+            UserRole::RELAX_DRYER->value,
+            UserRole::TUMBLER->value,
+            UserRole::FLEECE->value,
+            UserRole::PENGUJIAN->value,
+            UserRole::QE->value,
+        ]);
     }
 
     public function isMarketing(): bool {
         return $this->role === UserRole::MARKETING->value;
     }
     
-    public function division()
+    public function divisionModel()
     {
         // Pastikan foreign key di tabel users adalah 'division_id'
         return $this->belongsTo(Division::class, 'division_id');
