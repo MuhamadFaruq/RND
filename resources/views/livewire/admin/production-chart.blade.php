@@ -298,7 +298,7 @@ new class extends Component
                         {{-- Tampilkan angka KG jika data > 0 --}}
                         @if($count > 0)
                             <span class="text-[10px] font-black text-white leading-none tracking-tighter">
-                                {{ number_format($count, 1) }} KG
+                                {{ (float)$count }} KG
                             </span>
                         @endif
                     </div>
@@ -306,7 +306,7 @@ new class extends Component
                     {{-- Tooltip tetap dipertahankan untuk detail presisi --}}
                     <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block z-20">
                         <div class="mkt-surface mkt-text text-[8px] font-black p-2 rounded-lg shadow-2xl border mkt-border whitespace-nowrap uppercase">
-                            JAM {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}:00 — {{ number_format($count, 2) }} KG
+                            JAM {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}:00 — {{ (float)$count }} KG
                         </div>
                     </div>
                     <p class="text-[8px] font-bold text-slate-500 mt-2 text-center">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</p>
@@ -372,7 +372,7 @@ new class extends Component
                         />
                         
                         {{-- INFORMASI MUNCUL SAAT KURSOR DI ATAS TITIK --}}
-                        <title>{{ $d['label'] ?? 'Data' }} ({{ $d['day'] ?? '-' }}): {{ number_format($d['total'] ?? 0, 1) }} KG</title>
+                        <title>{{ $d['label'] ?? 'Data' }} ({{ $d['day'] ?? '-' }}): {{ (float)($d['total'] ?? 0) }} KG</title>
                     </g>
                 @endforeach
             </svg>

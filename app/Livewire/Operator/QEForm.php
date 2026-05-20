@@ -115,7 +115,7 @@ class QEForm extends Component
                 ]
             );
 
-            session()->flash('message', 'Data QE Final Description berhasil disimpan! ✨');
+            session()->flash('message', 'Data QE Final Description berhasil disimpan! ');
             return redirect()->route('operator.logbook');
         } catch (\Exception $e) {
             $this->dispatch('show-error-toast', message: 'Gagal menyimpan data QE: ' . $e->getMessage());

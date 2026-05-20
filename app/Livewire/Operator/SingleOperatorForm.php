@@ -92,49 +92,49 @@ class SingleOperatorForm extends Component
                 'key'    => 'dyeing',
                 'label'  => 'SCR / Dyeing',
                 'flag'   => null,
-                'icon'   => '🧪',
-                'fields' => ['dyeing_operator', 'dyeing_cek_greige', 'dyeing_tanggal', 'dyeing_no_mesin', 'dyeing_jenis_mesin', 'dyeing_gramasi', 'dyeing_lebar', 'dyeing_warna', 'dyeing_kode_warna', 'dyeing_dye_system', 'dyeing_treatment'],
+                'icon'   => '',
+                'fields' => ['dyeing_cek_greige', 'dyeing_lebar', 'dyeing_gramasi', 'dyeing_tanggal', 'dyeing_jenis_mesin', 'dyeing_no_mesin', 'dyeing_warna', 'dyeing_kode_warna', 'dyeing_dye_system', 'dyeing_treatment', 'dyeing_operator'],
             ],
             [
                 'key'    => 'relax-dryer',
                 'label'  => 'Relax Dryer',
                 'flag'   => null,
-                'icon'   => '💨',
+                'icon'   => '',
                 'fields' => ['relax_operator', 'relax_tanggal', 'relax_chemical', 'relax_handfeel', 'relax_no_mesin', 'relax_overfeed', 'relax_suhu', 'relax_speed', 'relax_lebar', 'relax_gramasi', 'relax_shrinkage'],
             ],
             [
                 'key'    => 'compactor',
                 'label'  => 'Compactor',
                 'flag'   => 'req_compactor',
-                'icon'   => '🔧',
+                'icon'   => '',
                 'fields' => ['compactor_operator', 'compactor_tanggal', 'compactor_no_mesin', 'compactor_rangka', 'compactor_suhu', 'compactor_speed', 'compactor_overfeed', 'compactor_felt', 'compactor_delivery_speed', 'compactor_folding_speed', 'compactor_lebar', 'compactor_gramasi', 'compactor_shrinkage'],
             ],
             [
                 'key'    => 'heat-setting',
                 'label'  => 'Heat Setting',
                 'flag'   => 'req_heat_setting',
-                'icon'   => '🌡️',
+                'icon'   => '',
                 'fields' => ['heat_operator', 'heat_tanggal', 'heat_no_mesin', 'heat_rangka', 'heat_suhu', 'heat_speed', 'heat_overfeed', 'heat_delivery_speed', 'heat_folding_speed', 'heat_lebar', 'heat_gramasi'],
             ],
             [
                 'key'    => 'stenter',
                 'label'  => 'Stenter',
                 'flag'   => 'req_stenter',
-                'icon'   => '📐',
+                'icon'   => '',
                 'fields' => ['stenter_operator', 'stenter_no_mesin'],
             ],
             [
                 'key'    => 'tumbler',
                 'label'  => 'Tumbler',
                 'flag'   => 'req_tumbler',
-                'icon'   => '🌀',
+                'icon'   => '',
                 'fields' => ['tumbler_operator', 'tumbler_tanggal', 'tumbler_no_mesin', 'tumbler_suhu', 'tumbler_steam_inject', 'tumbler_hotwind', 'tumbler_coldwind', 'tumbler_lebar', 'tumbler_gramasi', 'tumbler_shrinkage'],
             ],
             [
                 'key'    => 'fleece',
                 'label'  => 'Fleece',
                 'flag'   => 'req_fleece',
-                'icon'   => '🧶',
+                'icon'   => '',
                 'fields' => ['fleece_no_mesin'],
             ],
         ];
@@ -143,6 +143,18 @@ class SingleOperatorForm extends Component
     // ─── Lifecycle ─────────────────────────────────────────────────────────────
 
     public function mount(?string $artikel = null): void
+    {
+        $this->initializeFormFields();
+
+        // Jika Artikel dipassing via URL (mendukung 'artikel' atau legacy 'sap'), otomatis lookup
+        $targetIdentifier = $artikel ?? request()->query('artikel') ?? request()->query('sap');
+        if ($targetIdentifier) {
+            $this->artikelInput = $targetIdentifier;
+            $this->lookupArtikel();
+        }
+    }
+
+    protected function initializeFormFields(): void
     {
         $this->dyeing_tanggal    = now()->format('Y-m-d');
         $this->relax_tanggal     = now()->format('Y-m-d');
@@ -176,13 +188,6 @@ class SingleOperatorForm extends Component
             'tanggal' => now()->format('Y-m-d'), 'operator' => '', 'speed' => '',
             'cloth_out' => '', 'expending' => '', 'shear' => '', 'lebar_gramasi' => ''
         ];
-
-        // Jika Artikel dipassing via URL (mendukung 'artikel' atau legacy 'sap'), otomatis lookup
-        $targetIdentifier = $artikel ?? request()->query('artikel') ?? request()->query('sap');
-        if ($targetIdentifier) {
-            $this->artikelInput = $targetIdentifier;
-            $this->lookupArtikel();
-        }
     }
 
     // ─── SAP Lookup ────────────────────────────────────────────────────────────
@@ -212,7 +217,7 @@ class SingleOperatorForm extends Component
         $this->dyeing_kode_warna = ''; 
         
         // Reset dynamic arrays to prevent data leaking from previous search
-        $this->mount();
+        $this->initializeFormFields();
         // JEJAK PRODUKSI (Traceability)
         $this->productionHistory = ProductionActivity::with('operator')
             ->where('marketing_order_id', $order->id)
@@ -245,6 +250,16 @@ class SingleOperatorForm extends Component
         if (count($this->savedDivisions) === count($this->activeSteps) && count($this->activeSteps) > 0) {
             $this->currentStepIndex = count($this->activeSteps) - 1;
         }
+
+        // Load data or prefill defaults for the currently active step
+        if (!empty($this->activeSteps)) {
+            $activeKey = $this->activeSteps[$this->currentStepIndex]['key'];
+            if (in_array($activeKey, $this->savedDivisions)) {
+                $this->loadSavedData($activeKey);
+            } else {
+                $this->prefillStepDefaults($activeKey);
+            }
+        }
     }
 
     // ─── Computed helpers ──────────────────────────────────────────────────────
@@ -255,28 +270,28 @@ class SingleOperatorForm extends Component
      */
     public function getChecklist(): array
     {
-        if (! $this->order) {
+        if (!$this->order) {
             return [];
         }
 
-        $activeKeys = collect($this->activeSteps)->pluck('key')->toArray();
-
-        return collect($this->getPipelineDefinition())->map(function ($step) use ($activeKeys) {
-            if (! in_array($step['key'], $activeKeys)) {
-                $status = 'skipped';
-            } elseif (in_array($step['key'], $this->savedDivisions)) {
+        $checklist = [];
+        foreach ($this->activeSteps as $index => $step) {
+            $status = 'pending';
+            if (in_array($step['key'], $this->savedDivisions)) {
                 $status = 'saved';
-            } elseif (
-                isset($this->activeSteps[$this->currentStepIndex]) &&
-                $this->activeSteps[$this->currentStepIndex]['key'] === $step['key']
-            ) {
+            } elseif ($index === $this->currentStepIndex) {
                 $status = 'active';
-            } else {
-                $status = 'pending';
             }
 
-            return array_merge($step, ['status' => $status]);
-        })->toArray();
+            $checklist[] = [
+                'key'           => $step['key'],
+                'label'         => $step['label'],
+                'icon'          => $step['icon'],
+                'status'        => $status,
+            ];
+        }
+
+        return $checklist;
     }
 
     /**
@@ -302,10 +317,54 @@ class SingleOperatorForm extends Component
                 
                 if (in_array($key, $this->savedDivisions)) {
                     $this->loadSavedData($key);
+                } else {
+                    $this->prefillStepDefaults($key);
                 }
                 break;
             }
         }
+    }
+
+    public function toggleWorkflowFlag(string $flag): void
+    {
+        if (!$this->order) return;
+        
+        $currentVal = (bool) $this->order->{$flag};
+        $newVal = !$currentVal;
+        
+        // Update database
+        $this->order->update([
+            $flag => $newVal
+        ]);
+        
+        // Log activity log for audit trail
+        \App\Models\ActivityLog::create([
+            'user_id'     => auth()->id(),
+            'action'      => 'UPDATE_WORKFLOW',
+            'division'    => 'OPERATOR',
+            'art_no'      => $this->order->art_no,
+            'sap_no'      => $this->order->sap_no,
+            'description' => "Operator mengubah alur proses: " . strtoupper(str_replace('req_', '', $flag)) . " menjadi " . ($newVal ? 'AKTIF' : 'NON-AKTIF'),
+        ]);
+
+        // Re-build active steps
+        $this->activeSteps = collect($this->getPipelineDefinition())
+            ->filter(fn($step) => $step['flag'] === null || (bool) $this->order->{$step['flag']} === true)
+            ->values()
+            ->toArray();
+
+        // Refresh saved divisions
+        $this->savedDivisions = \App\Models\ProductionActivity::where('marketing_order_id', $this->order->id)
+            ->whereIn('division_name', collect($this->activeSteps)->pluck('key')->toArray())
+            ->pluck('division_name')
+            ->toArray();
+        
+        // Recalculate current index if it exceeds
+        if ($this->currentStepIndex >= count($this->activeSteps)) {
+            $this->currentStepIndex = max(0, count($this->activeSteps) - 1);
+        }
+
+        $this->dispatch('show-toast', message: "Alur proses berhasil diperbarui!", type: 'success');
     }
 
     protected function loadSavedData(string $key): void
@@ -330,6 +389,131 @@ class SingleOperatorForm extends Component
             $this->dyeing_kode_warna  = $techData['kode_warna'] ?? '';
             $this->dyeing_dye_system  = $techData['dye_system'] ?? '';
             $this->dyeing_treatment   = $techData['treatment'] ?? '';
+        } elseif ($key === 'relax-dryer') {
+            $this->relax_operator     = $techData['operator'] ?? '';
+            $this->relax_tanggal      = $techData['tanggal'] ?? now()->format('Y-m-d');
+            $this->relax_no_mesin     = $techData['no_mesin'] ?? '';
+            $this->relax_suhu         = $techData['suhu'] ?? '';
+            $this->relax_speed        = $techData['speed'] ?? '';
+            $this->relax_chemical     = $techData['chemical'] ?? '';
+            $this->relax_handfeel     = $techData['handfeel'] ?? '';
+            $this->relax_overfeed     = $techData['overfeed'] ?? '';
+            $this->relax_lebar        = $techData['lebar'] ?? '';
+            $this->relax_gramasi      = $techData['gramasi'] ?? '';
+            $this->relax_shrinkage    = $techData['shrinkage'] ?? '';
+        } elseif ($key === 'compactor') {
+            $this->compactor_operator       = $techData['operator'] ?? '';
+            $this->compactor_tanggal        = $techData['tanggal'] ?? now()->format('Y-m-d');
+            $this->compactor_no_mesin       = $techData['no_mesin'] ?? '';
+            $this->compactor_rangka         = $techData['rangka'] ?? '';
+            $this->compactor_suhu           = $techData['suhu'] ?? '';
+            $this->compactor_speed          = $techData['speed'] ?? '';
+            $this->compactor_overfeed       = $techData['overfeed'] ?? '';
+            $this->compactor_felt           = $techData['felt'] ?? '';
+            $this->compactor_delivery_speed = $techData['delivery_speed'] ?? '';
+            $this->compactor_folding_speed  = $techData['folding_speed'] ?? '';
+            $this->compactor_lebar          = $techData['lebar'] ?? '';
+            $this->compactor_gramasi        = $techData['gramasi'] ?? '';
+            $this->compactor_shrinkage      = $techData['shrinkage'] ?? '';
+        } elseif ($key === 'heat-setting') {
+            $this->heat_operator       = $techData['operator'] ?? '';
+            $this->heat_tanggal        = $techData['tanggal'] ?? now()->format('Y-m-d');
+            $this->heat_no_mesin       = $techData['no_mesin'] ?? '';
+            $this->heat_rangka         = $techData['rangka'] ?? '';
+            $this->heat_suhu           = $techData['suhu'] ?? '';
+            $this->heat_speed          = $techData['speed'] ?? '';
+            $this->heat_overfeed       = $techData['overfeed'] ?? '';
+            $this->heat_delivery_speed = $techData['delivery_speed'] ?? '';
+            $this->heat_folding_speed  = $techData['folding_speed'] ?? '';
+            $this->heat_lebar          = $techData['lebar'] ?? '';
+        } elseif ($key === 'stenter') {
+            $this->stenter_operator  = $techData['operator'] ?? '';
+            $this->stenter_no_mesin = $techData['no_mesin'] ?? '';
+            $this->stenter_preset    = $techData['preset'] ?? $this->stenter_preset;
+            $this->stenter_drying    = $techData['drying'] ?? $this->stenter_drying;
+            $this->stenter_finishing = $techData['finishing'] ?? $this->stenter_finishing;
+        }
+    }
+
+    protected function prefillStepDefaults(string $key): void
+    {
+        if (!$this->order) return;
+
+        if ($key === 'dyeing') {
+            $this->dyeing_warna = '';
+            $this->dyeing_lebar = '';
+            $this->dyeing_gramasi = '';
+            $this->dyeing_tanggal = now()->format('Y-m-d');
+            $this->dyeing_cek_greige = ''; 
+            $this->dyeing_operator = '';
+            $this->dyeing_jenis_mesin = '';
+            $this->dyeing_no_mesin = '';
+            $this->dyeing_kode_warna = '';
+            $this->dyeing_dye_system = '';
+            $this->dyeing_treatment = '';
+        } elseif ($key === 'relax-dryer') {
+            $this->relax_operator = '';
+            $this->relax_tanggal = now()->format('Y-m-d');
+            $this->relax_chemical = '';
+            $this->relax_handfeel = '';
+            $this->relax_no_mesin = '';
+            $this->relax_overfeed = '';
+            $this->relax_suhu = '';
+            $this->relax_speed = '';
+            $this->relax_lebar = '';
+            $this->relax_gramasi = '';
+            $this->relax_shrinkage = '';
+        } elseif ($key === 'compactor') {
+            $this->compactor_operator = '';
+            $this->compactor_tanggal = now()->format('Y-m-d');
+            $this->compactor_no_mesin = '';
+            $this->compactor_rangka = '';
+            $this->compactor_suhu = '';
+            $this->compactor_speed = '';
+            $this->compactor_overfeed = '';
+            $this->compactor_felt = '';
+            $this->compactor_delivery_speed = '';
+            $this->compactor_folding_speed = '';
+            $this->compactor_lebar = '';
+            $this->compactor_gramasi = '';
+            $this->compactor_shrinkage = '';
+        } elseif ($key === 'heat-setting') {
+            $this->heat_operator       = '';
+            $this->heat_tanggal        = now()->format('Y-m-d');
+            $this->heat_no_mesin       = '';
+            $this->heat_rangka         = '';
+            $this->heat_suhu           = '';
+            $this->heat_speed          = '';
+            $this->heat_overfeed       = '';
+            $this->heat_delivery_speed = '';
+            $this->heat_folding_speed  = '';
+            $this->heat_lebar          = '';
+            $this->heat_gramasi        = '';
+        } elseif ($key === 'stenter') {
+            $this->stenter_operator = '';
+            $this->stenter_no_mesin = '';
+
+            $defaultFields = [
+                'tanggal'   => now()->format('Y-m-d'), 
+                'suhu'      => '', 
+                'speed'     => '', 
+                'padder'    => '',
+                'rangka'    => '', 
+                'overfeed_a' => '', 
+                'overfeed_b' => '', 
+                'fan'       => '',
+                'delivery'  => '', 
+                'folding'   => '', 
+                'chem1'     => '', 
+                'chem2'     => '',
+                'lebar'     => '', 
+                'gramasi'   => '', 
+                'shrinkage' => ''
+            ];
+
+            $this->stenter_preset    = $defaultFields;
+            $this->stenter_drying    = $defaultFields;
+            $this->stenter_finishing = $defaultFields;
         }
     }
 
@@ -395,7 +579,7 @@ class SingleOperatorForm extends Component
         };
 
         $this->savedDivisions[] = $divisionKey;
-        $this->dispatch('show-toast', message: "✅ Data {$divisionKey} berhasil disimpan!", type: 'success');
+        $this->dispatch('show-toast', message: "Data {$divisionKey} berhasil disimpan!", type: 'success');
 
         if ($this->currentStepIndex < count($this->activeSteps) - 1) {
             $this->currentStepIndex++;
@@ -424,7 +608,7 @@ class SingleOperatorForm extends Component
             ]);
         });
 
-        session()->flash('message', "Semua data berhasil dikirim! Order #" . $this->order->art_no . " → {$nextStatus}. 🚀");
+        session()->flash('message', "Semua data berhasil dikirim! Order #" . $this->order->art_no . " → {$nextStatus}. ");
 
         return redirect()->route('operator.logbook', ['menu' => 'orders']);
     }

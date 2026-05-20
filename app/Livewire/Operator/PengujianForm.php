@@ -115,7 +115,7 @@ class PengujianForm extends Component
                 ]
             );
 
-            session()->flash('message', 'Data Pengujian QC & LAB berhasil disimpan! 🏆');
+            session()->flash('message', 'Data Pengujian QC & LAB berhasil disimpan! ');
             return redirect()->route('operator.logbook');
         } catch (\Exception $e) {
             $this->dispatch('show-error-toast', message: 'Gagal menyimpan data Pengujian: ' . $e->getMessage());

@@ -32,6 +32,13 @@ class ActivityRepository
     {
         return ProductionActivity::with('marketingOrder')
             ->where('operator_id', $userId)
+            ->whereIn('id', function ($query) use ($userId) {
+                $query->selectRaw('MAX(id)')
+                      ->from('production_activities')
+                      ->where('operator_id', $userId)
+                      ->whereNull('deleted_at')
+                      ->groupBy('marketing_order_id');
+            })
             ->when($search, function ($q) use ($search) {
                 $q->whereHas('marketingOrder', function ($sq) use ($search) {
                     $sq->where(function ($query) use ($search) {

@@ -10,8 +10,8 @@
 
             <div class="mkt-surface p-6 rounded-[2.5rem] shadow-sm border mkt-border flex justify-between items-center group italic hover:border-violet-500 transition-all duration-300">
                 <div class="flex items-center gap-6">
-                    <div class="bg-violet-600/20 text-violet-400 w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl shadow-lg border border-violet-500/30">
-                        ☁️
+                    <div class="bg-violet-600/20 text-violet-400 w-14 h-14 rounded-2xl flex items-center justify-center font-black text-sm shadow-lg border border-violet-500/30">
+                        RD
                     </div>
                     <div class="text-left">
                         <span class="text-[10px] font-black text-violet-400 uppercase tracking-widest drop-shadow-[0_0_5px_rgba(139,92,246,0.3)]">#{{ $job->art_no }}</span>
@@ -26,7 +26,7 @@
                 <div class="flex items-center gap-8">
                     <div class="text-right border-r pr-8 mkt-border">
                         <p class="text-[9px] font-black mkt-text-muted uppercase leading-none">Target Berat</p>
-                        <p class="text-base font-black mkt-text italic">{{ number_format($job->kg_target, 1) }} KG</p>
+                        <p class="text-base font-black mkt-text italic">{{ (float)$job->kg_target }} KG</p>
                     </div>
                     
                     <button wire:click="showOrderDetail({{ $job->id }})" 
@@ -79,8 +79,11 @@
                         <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Handfeel</label>
                         <select wire:model="handfeel" class="w-full mkt-surface-alt border mkt-border rounded-xl px-4 py-3 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 focus:outline-none font-bold mkt-text">
                             <option value="">Pilih Handfeel</option>
+                            <option value="Super Soft">Super Soft</option>
                             <option value="Soft">Soft</option>
-                            <option value="Hard">Hard</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Hard/Stiff">Hard / Stiff</option>
+                            <option value="Ikuti Sample">Ikuti Sample</option>
                         </select>
                     </div>
                 </div>
@@ -128,8 +131,7 @@
                 </div>
 
                 <button type="submit" class="w-full bg-violet-600 text-white py-4 rounded-2xl font-black text-xs uppercase hover:bg-violet-700 transition-all shadow-xl shadow-violet-600/30 mt-4">
-                    SIMPAN & TERUSKAN KE COMPACTOR 🚀
-                </button>
+                    SIMPAN & TERUSKAN KE COMPACTOR                 </button>
             </form>
         </div>
     @endif

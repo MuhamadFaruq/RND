@@ -28,7 +28,66 @@
             </div>
         @endif
 
-        <div class="mkt-surface rounded-[2.5rem] overflow-hidden shadow-2xl border mkt-border transition-all">
+        {{-- MOBILE USER FEED (Visible only on mobile/tablet < md) --}}
+        <div class="block md:hidden space-y-4 mb-6">
+            @foreach($users as $user)
+                <div class="mkt-surface p-4 rounded-2xl border mkt-border shadow-md relative overflow-hidden flex flex-col gap-3">
+                    <div class="absolute left-0 top-0 w-1.5 h-full bg-blue-500"></div>
+                    
+                    <div class="flex justify-between items-start pl-2">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-black mkt-text uppercase tracking-tight italic">{{ $user->name }}</span>
+                            <span class="text-[8px] mkt-text-muted font-bold lowercase opacity-70">{{ $user->email }}</span>
+                        </div>
+                        <span class="px-2.5 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-lg uppercase text-[8px] font-black tracking-widest inline-block shadow-sm">
+                            {{ $user->role }}
+                        </span>
+                    </div>
+
+                    <div class="border-t border-dashed mkt-border pl-2 pt-2 flex flex-col gap-2">
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-[8px] font-black text-slate-500 uppercase italic">Unit Divisi</span>
+                            <span class="text-[10px] font-black mkt-text uppercase tracking-tighter opacity-80">{{ $user->divisionModel->name ?? 'MASTER ADMIN' }}</span>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <span class="text-[8px] font-black text-slate-500 uppercase italic">Online Status</span>
+                            @if($user->last_seen)
+                                <span class="text-emerald-500 font-mono text-[10px] font-bold">{{ \Carbon\Carbon::parse($user->last_seen)->diffForHumans() }}</span>
+                            @else
+                                <span class="text-[9px] mkt-text-muted font-black uppercase opacity-35 italic">Offline</span>
+                            @endif
+                        </div>
+
+                        <div class="flex justify-end gap-3 mt-1.5 pt-2 border-t mkt-border">
+                            @if(auth()->user()->role === 'super-admin' && auth()->id() !== $user->id)
+                                <a href="{{ route('admin.impersonate', $user->id) }}" 
+                                class="px-3 py-2 bg-amber-500/10 text-amber-600 dark:text-amber-500 rounded-xl border border-amber-500/20 hover:bg-amber-500 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest shadow-sm">
+                                    Masuk
+                                </a>
+                            @endif
+                            
+                            <button wire:click="editUser({{ $user->id }})" class="p-2.5 mkt-surface-alt mkt-text rounded-xl border mkt-border hover:border-blue-500 hover:text-blue-500 transition-all shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            </button>
+
+                            @if(auth()->id() !== $user->id)
+                                <button onclick="confirmDelete({{ $user->id }}, '{{ $user->name }}')" class="p-2.5 mkt-surface-alt text-red-500 rounded-xl border mkt-border hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            @else
+                                <div class="p-2.5 mkt-surface-alt mkt-text-muted rounded-xl border mkt-border opacity-30 cursor-not-allowed">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        {{-- DESKTOP USER MANAGEMENT TABLE (Visible only on md and larger) --}}
+        <div class="hidden md:block mkt-surface rounded-[2.5rem] overflow-hidden shadow-2xl border mkt-border transition-all">
             <div class="overflow-x-auto">
                 <table class="w-full text-left italic font-bold min-w-[1000px]">
                     <thead>
@@ -82,7 +141,7 @@
                                     </button>
 
                                     @if(auth()->id() !== $user->id)
-                                        <button onclick="confirmDelete({{ $user->id }})" class="p-3 mkt-surface-alt text-red-500 rounded-2xl border mkt-border hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                                        <button onclick="confirmDelete({{ $user->id }}, '{{ $user->name }}')" class="p-3 mkt-surface-alt text-red-500 rounded-2xl border mkt-border hover:bg-red-500 hover:text-white transition-all shadow-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                         </button>
                                     @else

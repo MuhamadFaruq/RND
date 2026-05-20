@@ -1,11 +1,11 @@
-<div x-data="{ showDetail: false }" class="py-12 mkt-bg min-h-screen font-sans italic tracking-tighter text-left mkt-text">
-    <div class="max-w-6xl mx-auto px-4">
+<div x-data="{ showDetail: false }" class="py-4 md:py-8 mkt-bg min-h-screen font-sans italic tracking-tighter text-left mkt-text">
+    <div class="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6">
 
         {{-- HEADER --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 items-center mb-12 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 items-center mb-6 gap-4">
             {{-- Kiri: Judul --}}
             <div class="text-left">
-                <h2 class="text-5xl font-black uppercase mkt-text leading-none tracking-tighter">
+                <h2 class="text-2xl md:text-3xl font-black uppercase mkt-text leading-none tracking-tighter">
                     Knitting <span class="text-violet-500 italic">Logbook</span>
                 </h2>
                 <div class="flex items-center gap-2 mt-3">
@@ -18,7 +18,7 @@
             <div class="flex justify-center">
                 @if($order_detail)
                     <button type="button" @click="showDetail = true"
-                        class="bg-indigo-600/80 backdrop-blur-md border border-white/10 px-10 py-4 rounded-2xl text-[11px] font-black uppercase text-white hover:bg-indigo-600 hover:scale-105 transition-all shadow-lg flex items-center gap-2">
+                        class="bg-indigo-600/80 backdrop-blur-md border border-white/10 px-6 py-3 rounded-xl text-[10px] font-black uppercase text-white hover:bg-indigo-600 hover:scale-105 transition-all shadow-lg flex items-center gap-2">
                         <span>ℹ️</span> DETAIL ORDER ARTIKEL
                     </button>
                 @endif
@@ -27,7 +27,7 @@
             {{-- Kanan: Navigasi --}}
             <div class="flex justify-end">
                 <a href="{{ route('operator.logbook') }}"
-                    class="group mkt-surface-alt border mkt-border px-8 py-4 rounded-2xl text-[10px] font-black uppercase mkt-text-muted hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all shadow-xl">
+                    class="group mkt-surface-alt border mkt-border px-5 py-3 rounded-xl text-[9px] font-black uppercase mkt-text-muted hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all shadow-md">
                     ← Kembali ke Logbook
                 </a>
             </div>
@@ -35,36 +35,36 @@
 
         @if (session()->has('message'))
             <div
-                class="mb-8 p-6 bg-emerald-600/80 backdrop-blur-md text-white rounded-3xl font-black uppercase text-xs italic shadow-lg animate-pulse">
-                🚀 {{ session('message') }}
+                class="mb-6 p-4 bg-emerald-600/80 backdrop-blur-md text-white rounded-2xl font-black uppercase text-[10px] italic shadow-lg animate-pulse">
+                {{ session('message') }}
             </div>
         @endif
 
-        <form wire:submit.prevent="save" class="space-y-8">
+        <form wire:submit.prevent="save" class="space-y-5">
 
             {{-- SECTION 01: SPESIFIKASI MESIN --}}
-            <div class="mkt-surface p-10 rounded-[3.5rem] shadow-sm border mkt-border relative overflow-hidden">
+            <div class="mkt-surface p-4 md:p-6 rounded-2xl shadow-sm border mkt-border relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-600/10 rounded-bl-full -mr-10 -mt-10 opacity-50">
                 </div>
 
-                <div class="flex items-center gap-4 mb-10 relative z-10">
+                <div class="flex items-center gap-3 mb-6 relative z-10">
                     <div
-                        class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-600/20">
+                        class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-md">
                         01</div>
                     <div>
-                        <h3 class="text-sm font-black uppercase mkt-text tracking-widest">Spesifikasi Mesin</h3>
+                        <h3 class="text-sm font-black uppercase mkt-text tracking-widest">I. MESIN</h3>
                         <p class="text-[9px] mkt-text-muted font-bold uppercase italic">Identitas mesin dan nomor marketing order</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-8 relative z-10">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-5 relative z-10">
                     {{-- NOMOR ARTIKEL --}}
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase text-violet-400 ml-2 tracking-widest">Nomor Artikel (Keyword Produk)</label>
                         <div class="relative">
                             <input value="{{ $order_detail['art_no'] ?? '-' }}" type="text" readonly
-                                class="w-full mkt-surface-alt border mkt-border rounded-2xl py-5 px-6 font-black text-sm mkt-text-muted cursor-not-allowed italic uppercase">
-                            <span class="absolute right-4 top-5 text-indigo-600">🔖</span>
+                                class="w-full mkt-surface-alt border mkt-border rounded-xl py-3 px-4 font-black text-xs mkt-text-muted cursor-not-allowed italic uppercase">
+                            <span class="absolute right-4 top-5 text-indigo-600"></span>
                         </div>
                     </div>
 
@@ -73,8 +73,8 @@
                         <label class="text-[10px] font-black uppercase mkt-text-muted ml-2 tracking-widest">Artikel Order No (Legacy)</label>
                         <div class="relative">
                             <input wire:model.live="sap_no" type="text" readonly
-                                class="w-full mkt-surface-alt border mkt-border rounded-2xl py-5 px-6 font-black text-xs mkt-text-muted cursor-not-allowed italic">
-                            <span class="absolute right-4 top-5 text-slate-400">🔒</span>
+                                class="w-full mkt-surface-alt border mkt-border rounded-xl py-3 px-4 font-black text-xs mkt-text-muted cursor-not-allowed italic">
+                            <span class="absolute right-4 top-5 text-slate-400"></span>
                         </div>
                     </div>
 
@@ -82,9 +82,13 @@
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase mkt-text-muted ml-2 tracking-widest">Operator Bertugas</label>
                         <div class="relative">
-                            <span class="absolute left-6 top-5 text-indigo-600 font-bold">👤</span>
+                            <span class="absolute left-6 top-5 text-indigo-600 font-bold">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                            </span>
                             <input type="text" wire:model="operator_name" placeholder="TULIS NAMA LENGKAP..."
-                                class="w-full pl-14 pr-6 py-5 mkt-surface-alt border mkt-border rounded-2xl text-sm font-black mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none uppercase italic placeholder-slate-400">
+                                class="w-full pl-10 pr-4 py-3 mkt-surface-alt border mkt-border rounded-xl text-xs font-black mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none uppercase italic placeholder-slate-400">
                         </div>
                         @error('operator_name') <span
                             class="text-[9px] text-violet-400 font-black italic ml-2 uppercase">{{ $message }}</span>
@@ -93,9 +97,9 @@
 
                     {{-- TANGGAL --}}
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2 tracking-widest">Tanggal Produksi</label>
+                        <label class="text-[10px] font-black uppercase text-violet-400 ml-2 tracking-widest">TANGGAL</label>
                         <input wire:model="tanggal" type="date"
-                            class="w-full mkt-surface-alt border mkt-border rounded-2xl py-5 px-6 font-black text-sm mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none">
+                            class="w-full mkt-surface-alt border mkt-border rounded-xl py-3 px-4 font-black text-xs mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none">
                         @error('tanggal') <span
                             class="text-[9px] text-violet-400 font-black italic ml-2 uppercase">{{ $message }}</span>
                         @enderror
@@ -103,45 +107,45 @@
 
                     {{-- DETAIL MESIN (ROW 2) --}}
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">No Mesin (DD)</label>
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">NO MESIN</label>
                         <input wire:model="no_mesin" type="text" placeholder="CONTOH: K01"
-                            class="w-full mkt-surface-alt border mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
+                            class="w-full mkt-surface-alt border mkt-border rounded-xl py-3 px-4 font-black text-xs mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
                         @error('no_mesin') <span
                             class="text-[9px] text-violet-400 font-black italic ml-2 uppercase">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">Type Mesin (DD)</label>
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">TYPE MESIN</label>
                         <input wire:model="type_mesin" type="text" placeholder="PAI LUNG / DLL"
-                            class="w-full mkt-surface-alt border mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none uppercase placeholder-slate-400">
+                            class="w-full mkt-surface-alt border mkt-border rounded-xl py-3 px-4 font-black text-xs mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none uppercase placeholder-slate-400">
                         @error('type_mesin') <span
                             class="text-[9px] text-violet-400 font-black italic ml-2 uppercase">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2 tracking-widest">Gauge / Inch (DD)</label>
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2 tracking-widest">GAUGE / INCH</label>
                         <input wire:model="gauge_inch" type="text" placeholder="CONTOH: 28G.30"
-                            class="w-full mkt-surface-alt border mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
+                            class="w-full mkt-surface-alt border mkt-border rounded-xl py-3 px-4 font-black text-xs mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
                         @error('gauge_inch') <span
                             class="text-[9px] text-violet-400 font-black italic ml-2 uppercase">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">Jml Feeder (INT)</label>
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">JML FEEDER</label>
                         <input wire:model="jml_feeder" type="number" placeholder="MASUKKAN JML FEEDER"
-                            class="w-full mkt-surface-alt border mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
+                            class="w-full mkt-surface-alt border mkt-border rounded-xl py-3 px-4 font-black text-xs mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
                         @error('jml_feeder') <span
                             class="text-[9px] text-violet-400 font-black italic ml-2 uppercase">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">Jml Jarum (INT)</label>
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2">JML JARUM</label>
                         <input wire:model="jml_jarum" type="number" placeholder="MASUKKAN JML JARUM"
-                            class="w-full mkt-surface-alt border mkt-border rounded-2xl py-4 px-6 font-black text-sm mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
+                            class="w-full mkt-surface-alt border mkt-border rounded-xl py-3 px-4 font-black text-xs mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
                         @error('jml_jarum') <span
                             class="text-[9px] text-violet-400 font-black italic ml-2 uppercase">{{ $message }}</span>
                         @enderror
@@ -150,51 +154,52 @@
             </div>
 
             {{-- SECTION 02: HASIL PRODUKSI --}}
-            <div class="mkt-surface p-10 rounded-[3.5rem] shadow-sm border mkt-border">
-                <div class="flex items-center gap-4 mb-10">
+            <div class="mkt-surface p-4 md:p-6 rounded-2xl shadow-sm border mkt-border">
+                <div class="flex items-center gap-3 mb-6">
                     <div
-                        class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-600/20">
+                        class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-md">
                         02</div>
                     <div>
-                        <h3 class="text-sm font-black uppercase mkt-text tracking-widest">Hasil Produksi Greige</h3>
+                        <h3 class="text-sm font-black uppercase mkt-text tracking-widest">II. HASIL GREIGE</h3>
                         <p class="text-[9px] mkt-text-muted font-bold uppercase italic">Input data fisik kain yang dihasilkan</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div class="mkt-surface-alt border mkt-border p-6 rounded-3xl space-y-4">
-                        <label class="text-[9px] font-black uppercase mkt-text-muted block text-center tracking-widest">Lebar</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="mkt-surface-alt border mkt-border p-4 rounded-2xl space-y-2">
+                        <label class="text-[9px] font-black uppercase mkt-text-muted block text-center tracking-widest">LEBAR</label>
                         <input wire:model="lebar" type="number" step="0.01" placeholder="LEBAR"
-                            class="w-full mkt-surface border mkt-border rounded-2xl py-4 text-center font-black text-2xl mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
+                            class="w-full mkt-surface border mkt-border rounded-xl py-3 text-center font-black text-lg mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
                         @error('lebar') <p class="text-[8px] text-violet-400 font-black text-center mt-1 uppercase">{{ $message }}</p> @enderror
                     </div>
-                    <div class="mkt-surface-alt border mkt-border p-6 rounded-3xl space-y-4">
-                        <label class="text-[9px] font-black uppercase mkt-text-muted block text-center tracking-widest">Gramasi</label>
+                    <div class="mkt-surface-alt border mkt-border p-4 rounded-2xl space-y-2">
+                        <label class="text-[9px] font-black uppercase mkt-text-muted block text-center tracking-widest">GRAMASI</label>
                         <input wire:model="gramasi" type="number" placeholder="GRAMASI"
-                            class="w-full mkt-surface border mkt-border rounded-2xl py-4 text-center font-black text-2xl mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
+                            class="w-full mkt-surface border mkt-border rounded-xl py-3 text-center font-black text-lg mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
                         @error('gramasi') <p class="text-[8px] text-violet-400 font-black text-center mt-1 uppercase">{{ $message }}</p> @enderror
                     </div>
-                    <div class="mkt-surface-alt border-2 border-indigo-600/30 p-6 rounded-3xl space-y-4 relative overflow-hidden group">
+                    <div class="mkt-surface-alt border-2 border-indigo-600/30 p-4 rounded-2xl space-y-2 relative overflow-hidden group">
                         <div class="absolute top-0 right-0 w-8 h-8 bg-indigo-600 text-white flex items-center justify-center text-[10px] rounded-bl-xl font-black">KG</div>
-                        <label class="text-[9px] font-black uppercase text-violet-400 block text-center tracking-widest">Weight (KG)</label>
+                        <label class="text-[9px] font-black uppercase text-violet-400 block text-center tracking-widest">KG</label>
+                        <label class="text-[9px] font-black uppercase text-violet-500 block text-center tracking-widest">(Toleransi MAX 10%) dan jika desimal menggunakan . bukan ,</label>
                         <input wire:model.live="kg" type="text" placeholder="BERAT KG"
-                            class="w-full mkt-surface border border-indigo-600/20 rounded-2xl py-4 text-center font-black text-4xl text-violet-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
+                            class="w-full mkt-surface border border-indigo-600/20 rounded-xl py-3 text-center font-black text-2xl text-violet-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
                         @error('kg') <p class="text-[8px] text-violet-400 font-black text-center mt-1 uppercase">{{ $message }}</p> @enderror
                         @if($kgDeviation)
                             <div class="mt-2 p-2 bg-amber-500/20 border border-amber-500 rounded-xl text-[10px] text-amber-500 font-black text-center uppercase">
-                                ⚠️ Deviasi KG Melebihi 10%!
+                                Deviasi KG Melebihi 10%!
                             </div>
                         @endif
                     </div>
-                    <div class="mkt-surface-alt border-2 border-indigo-600/30 p-6 rounded-3xl space-y-4 relative overflow-hidden group">
-                        <div class="absolute top-0 right-0 w-8 h-8 bg-indigo-600 text-white flex items-center justify-center text-[10px] rounded-bl-xl font-black">RL</div>
-                        <label class="text-[9px] font-black uppercase text-violet-400 block text-center tracking-widest">Roll Count</label>
+                    <div class="mkt-surface-alt border-2 border-indigo-600/30 p-4 rounded-2xl space-y-2 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-8 h-8 bg-indigo-600 text-white flex items-center justify-center text-[10px] rounded-bl-xl font-black">ROL</div>
+                        <label class="text-[9px] font-black uppercase text-violet-400 block text-center tracking-widest">ROLL</label>
                         <input wire:model.live="roll" type="number" placeholder="JML ROLL"
-                            class="w-full mkt-surface border border-indigo-600/20 rounded-2xl py-4 text-center font-black text-4xl text-violet-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
+                            class="w-full mkt-surface border border-indigo-600/20 rounded-xl py-3 text-center font-black text-2xl text-violet-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
                         @error('roll') <p class="text-[8px] text-violet-400 font-black text-center mt-1 uppercase">{{ $message }}</p> @enderror
                         @if($rollDeviation)
                             <div class="mt-2 p-2 bg-amber-500/20 border border-amber-500 rounded-xl text-[10px] text-amber-500 font-black text-center uppercase">
-                                ⚠️ Deviasi Roll Melebihi 10%!
+                                Deviasi Roll Melebihi 10%!
                             </div>
                         @endif
                     </div>
@@ -202,62 +207,106 @@
             </div>
 
             {{-- SECTION 03: TEKNIS BENANG --}}
-            <div class="mkt-surface p-12 rounded-[4rem] shadow-sm border mkt-border overflow-hidden relative">
-                <div class="absolute top-0 right-0 p-12 opacity-5 select-none pointer-events-none">
-                    <span class="text-[120px] font-black uppercase italic leading-none block text-slate-800">DUNIATEX</span>
-                    <span class="text-[120px] font-black uppercase italic leading-none block text-slate-800">KNITTING</span>
+            <div class="mkt-surface p-4 md:p-6 rounded-2xl shadow-sm border mkt-border overflow-hidden relative">
+                <div class="absolute top-0 right-0 p-8 opacity-5 select-none pointer-events-none">
+                    <span class="text-[80px] font-black uppercase italic leading-none block text-slate-800">DUNIATEX</span>
+                    <span class="text-[80px] font-black uppercase italic leading-none block text-slate-800">KNITTING</span>
                 </div>
 
-                <div class="flex items-center gap-4 mb-12 relative z-10">
-                    <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-xl italic shadow-xl shadow-indigo-600/20">03</div>
+                <div class="flex items-center gap-3 mb-6 relative z-10">
+                    <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-sm italic shadow-md">03</div>
                     <div>
-                        <h3 class="text-sm font-black uppercase mkt-text tracking-[0.2em]">Penggunaan Benang & YL</h3>
+                        <h3 class="text-sm font-black uppercase mkt-text tracking-[0.2em]">III. PENGGUNAAN BENANG & YARN LENGTH (YL)</h3>
                         <p class="text-[9px] mkt-text-muted font-bold uppercase italic">Persentase campuran benang dan Yarn Length</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
                     @foreach(range(1, 4) as $i)
-                        <div class="p-6 mkt-surface-alt border mkt-border rounded-[2.5rem] space-y-6 hover:border-violet-500/50 transition-all group shadow-sm">
+                        <div class="p-4 mkt-surface-alt border mkt-border rounded-2xl space-y-4 hover:border-violet-500/50 transition-all group shadow-sm">
                             <div class="space-y-4">
                                 <div class="space-y-2">
-                                    <label class="text-[9px] font-black uppercase mkt-text-muted group-hover:text-violet-400 transition-colors tracking-widest block ml-2">Benang {{ $i }} (Type)</label>
+                                    <label class="text-[9px] font-black uppercase mkt-text-muted group-hover:text-violet-400 transition-colors tracking-widest block ml-2">BENANG {{ $i }}</label>
                                     @php $b_field = 'benang_' . $i; @endphp
                                     <input wire:model="{{ $b_field }}" type="text" placeholder="MISAL: POLY 75/72..."
-                                        class="w-full mkt-surface border mkt-border rounded-2xl py-4 px-6 font-black text-xs mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all italic uppercase placeholder-slate-400">
+                                        class="w-full mkt-surface border mkt-border rounded-xl py-3 px-4 font-black text-[11px] mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all italic uppercase placeholder-slate-400">
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-[9px] font-black uppercase mkt-text-muted group-hover:text-violet-400 transition-colors tracking-widest block ml-2">Penggunaan {{ $i }} (%)</label>
+                                    <label class="text-[9px] font-black uppercase mkt-text-muted group-hover:text-violet-400 transition-colors tracking-widest block ml-2">LOT {{ $i }}</label>
+                                    @php $l_field = 'benang_' . $i . '_lot'; @endphp
+                                    <input wire:model="{{ $l_field }}" type="text" placeholder="MISAL: LOT123..."
+                                        class="w-full mkt-surface border mkt-border rounded-xl py-3 px-4 font-black text-[11px] mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder-slate-400">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[9px] font-black uppercase mkt-text-muted group-hover:text-violet-400 transition-colors tracking-widest block ml-2">% {{ $i }}</label>
                                     @php $p_field = 'benang_' . $i . '_percent'; @endphp
                                     <input wire:model="{{ $p_field }}" type="text" placeholder="MISAL: 88%"
-                                        class="w-full mkt-surface border mkt-border rounded-2xl py-4 px-6 font-black text-xs text-violet-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder-slate-400">
+                                        class="w-full mkt-surface border mkt-border rounded-xl py-3 px-4 font-black text-[11px] text-violet-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder-slate-400">
                                 </div>
                             </div>
 
                             <div class="space-y-2 pt-4 border-t mkt-border">
-                                <label class="text-[9px] font-black uppercase mkt-text-muted group-hover:text-violet-400 transition-colors tracking-widest block ml-2">YL {{ $i }} (INT)</label>
+                                <label class="text-[9px] font-black uppercase mkt-text-muted group-hover:text-violet-400 transition-colors tracking-widest block ml-2">YL{{ $i }}</label>
                                 @php $y_field = 'yl_' . $i; @endphp
                                 <input wire:model="{{ $y_field }}" type="number" placeholder="YL VALUE"
-                                    class="w-full mkt-surface border mkt-border rounded-2xl py-4 px-6 font-black text-xs mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder-slate-400">
+                                    class="w-full mkt-surface border mkt-border rounded-xl py-3 px-4 font-black text-[11px] mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder-slate-400">
                             </div>
                         </div>
                     @endforeach
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mt-16 pt-12 border-t mkt-border relative z-10">
-                    <div class="space-y-3">
-                        <label class="text-[11px] font-black uppercase mkt-text-muted ml-4 italic tracking-[0.2em]">Note / Keterangan</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 pt-6 border-t mkt-border relative z-10">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase mkt-text-muted ml-2 italic tracking-wider">NOTE</label>
                         <textarea wire:model="note" rows="3"
-                            class="w-full mkt-surface border mkt-border rounded-[2.5rem] py-6 px-8 font-bold text-sm mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder-slate-400"
+                            class="w-full mkt-surface border mkt-border rounded-2xl py-4 px-5 font-bold text-xs mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder-slate-400"
                             placeholder="Catatan kondisi mesin, benang, atau instruksi khusus..."></textarea>
                     </div>
                     <div class="flex flex-col justify-end">
-                        <div class="mkt-surface-alt border mkt-border p-8 rounded-[3rem] group hover:border-violet-500 transition-all">
-                            <label class="text-[10px] font-black uppercase text-violet-400 mb-4 block tracking-[0.2em] italic text-center">Target Produksi / Day (KG)</label>
+                        <div class="mkt-surface-alt border mkt-border p-5 rounded-2xl group hover:border-violet-500 transition-all">
+                            <label class="text-[9px] font-black uppercase text-violet-400 mb-2 block tracking-wider italic text-center">PRODUKSI / DAY (KG)</label>
                             <input wire:model="produksi_per_day" type="number"
-                                class="w-full bg-transparent border-none font-black text-5xl text-violet-400 text-center focus:ring-0 placeholder:text-slate-300 italic"
+                                class="w-full bg-transparent border-none font-black text-3xl text-violet-400 text-center focus:ring-0 placeholder:text-slate-300 italic"
                                 placeholder="000">
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- SECTION 04: DATA R&D --}}
+            <div class="mkt-surface p-4 md:p-6 rounded-2xl shadow-sm border mkt-border relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-bl-full -mr-10 -mt-10 opacity-50"></div>
+
+                <div class="flex items-center gap-3 mb-6 relative z-10">
+                    <div
+                        class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-md">
+                        04</div>
+                    <div>
+                        <h3 class="text-sm font-black uppercase mkt-text tracking-widest">IV. DATA R&D</h3>
+                        <p class="text-[9px] mkt-text-muted font-bold uppercase italic">Spesifikasi data R&D untuk greige dan mesin rajut</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 relative z-10">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase text-blue-400 ml-2 tracking-widest">GRAMASI GREIGE</label>
+                        <input wire:model="rnd_gramasi_greige" type="text" placeholder="TULIS GRAMASI GREIGE..."
+                            class="w-full mkt-surface border mkt-border rounded-xl py-3 px-4 font-black text-xs mkt-text focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none placeholder-slate-500 italic uppercase">
+                        @error('rnd_gramasi_greige') <span class="text-[9px] text-violet-400 font-black italic ml-2 uppercase">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase text-blue-400 ml-2 tracking-widest">MESIN RAJUT</label>
+                        <input wire:model="rnd_mesin_rajut" type="text" placeholder="TULIS MESIN RAJUT..."
+                            class="w-full mkt-surface border mkt-border rounded-xl py-3 px-4 font-black text-xs mkt-text focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none placeholder-slate-500 italic uppercase">
+                        @error('rnd_mesin_rajut') <span class="text-[9px] text-violet-400 font-black italic ml-2 uppercase">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase text-blue-400 ml-2 tracking-widest">JENIS MESIN RAJUT</label>
+                        <input wire:model="rnd_jenis_mesin_rajut" type="text" placeholder="TULIS JENIS MESIN RAJUT..."
+                            class="w-full mkt-surface border mkt-border rounded-xl py-3 px-4 font-black text-xs mkt-text focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none placeholder-slate-500 italic uppercase">
+                        @error('rnd_jenis_mesin_rajut') <span class="text-[9px] text-violet-400 font-black italic ml-2 uppercase">{{ $message }}</span> @enderror
                     </div>
                 </div>
             </div>
@@ -289,7 +338,7 @@
          @click.away="showDetail = false"
          style="display: none;">
         
-        <div class="mkt-surface w-full max-w-3xl rounded-[3rem] border mkt-border shadow-2xl relative overflow-hidden italic flex flex-col max-h-[85vh]">
+        <div class="mkt-surface w-full max-w-3xl rounded-2xl md:rounded-[3rem] border mkt-border shadow-2xl relative overflow-hidden italic flex flex-col max-h-[85vh]">
             {{-- Header Modal --}}
             <div class="px-10 pt-10 pb-6 border-b mkt-border mkt-surface-alt sticky top-0 z-10 flex items-center justify-between">
                 <div class="flex items-center gap-4">
@@ -317,7 +366,7 @@
             </div>
 
             {{-- Content Area --}}
-            <div class="overflow-y-auto flex-1 p-10 custom-scrollbar bg-transparent">
+            <div class="overflow-y-auto flex-1 p-6 md:p-10 custom-scrollbar bg-transparent">
                 {{-- TAB: MARKETING --}}
                 @if($activeDetailTab === 'marketing')
                     <div class="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 text-left">
@@ -417,11 +466,11 @@
                             <div class="grid grid-cols-4 gap-6 mkt-surface-alt border mkt-border p-6 rounded-3xl">
                                 <div>
                                     <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TARGET KG</p>
-                                    <p class="text-lg font-black text-orange-500 italic">{{ number_format($order_detail['kg_target'], 1) }} KG</p>
+                                    <p class="text-lg font-black text-orange-500 italic">{{ (float)$order_detail['kg_target'] }} KG</p>
                                 </div>
                                 <div>
                                     <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TARGET ROLL</p>
-                                    <p class="text-lg font-black text-orange-500 italic">{{ $order_detail['roll_target'] }} RL</p>
+                                    <p class="text-lg font-black text-orange-500 italic">{{ $order_detail['roll_target'] }} ROLL</p>
                                 </div>
                                 <div class="col-span-2">
                                     <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">KETERANGAN ARTIKEL</p>
@@ -531,7 +580,7 @@
                                             </div>
                                             <div class="col-span-2 mkt-surface-alt p-4 rounded-xl border border-emerald-500/10">
                                                 <p class="text-[7px] mkt-text-muted font-black uppercase mb-1 italic">ACTUAL WEIGHT (KG)</p>
-                                                <p class="text-2xl font-black text-emerald-500 italic">{{ number_format($history['kg'], 1) }} <span class="text-[10px] mkt-text-muted">KG</span></p>
+                                                <p class="text-2xl font-black text-emerald-500 italic">{{ (float)$history['kg'] }} <span class="text-[10px] mkt-text-muted">KG</span></p>
                                             </div>
                                         </div>
                                     </div>
@@ -547,6 +596,9 @@
                                                         <p class="text-[10px] font-black mkt-text uppercase leading-tight truncate">
                                                             {{ $history['technical_data']['benang_'.$i] }}
                                                         </p>
+                                                        @if(!empty($history['technical_data']['benang_'.$i.'_lot']))
+                                                            <p class="text-[9px] font-black text-slate-500 uppercase leading-none">LOT: {{ $history['technical_data']['benang_'.$i.'_lot'] }}</p>
+                                                        @endif
                                                         @if(!empty($history['technical_data']['benang_'.$i.'_percent']))
                                                             <p class="text-[11px] font-black text-indigo-600 tracking-tighter leading-none">{{ $history['technical_data']['benang_'.$i.'_percent'] }}</p>
                                                         @endif
@@ -584,11 +636,11 @@
                                     <div class="grid grid-cols-3 gap-6 mkt-surface-alt border mkt-border p-6 rounded-2xl text-left">
                                         <div>
                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">ACTUAL WEIGHT</p>
-                                            <p class="text-[11px] font-black text-emerald-500 italic leading-none">{{ number_format($history['kg'], 1) }} KG</p>
+                                            <p class="text-[11px] font-black text-emerald-500 italic leading-none">{{ (float)$history['kg'] }} KG</p>
                                         </div>
                                         <div>
                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">ACTUAL ROLL</p>
-                                            <p class="text-[11px] font-black text-emerald-500 italic leading-none">{{ $history['roll'] }} RL</p>
+                                            <p class="text-[11px] font-black text-emerald-500 italic leading-none">{{ $history['roll'] }} ROLL</p>
                                         </div>
                                         <div>
                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">MACHINE NO</p>
@@ -646,6 +698,9 @@
                         roll: @this.get('roll'),
                         lebar: @this.get('lebar'),
                         gramasi: @this.get('gramasi'),
+                        rnd_gramasi_greige: @this.get('rnd_gramasi_greige'),
+                        rnd_mesin_rajut: @this.get('rnd_mesin_rajut'),
+                        rnd_jenis_mesin_rajut: @this.get('rnd_jenis_mesin_rajut'),
                     };
                     localStorage.setItem(storageKey, JSON.stringify(data));
                 }

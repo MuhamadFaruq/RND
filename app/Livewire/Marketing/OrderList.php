@@ -66,22 +66,48 @@ class OrderList extends Component
             $artNo = $order->art_no;
             $sapNo = $order->sap_no;
             
-            $order->delete();
+            $user = auth()->user();
+            
+            // Check if production has already started (there are production activities recorded)
+            $productionCount = $order->productionActivities()->count();
+            
+            if ($productionCount > 0) {
+                // If not Superadmin, block it completely
+                if (!$user->isSuperAdmin()) {
+                    $this->dispatch('show-error-toast', message: 'Order tidak dapat dihapus karena sudah masuk tahap produksi. Hubungi Plant Manager / Superadmin.');
+                    return;
+                }
+            }
+            
+            // SIMPAN KE COLD STORAGE (ARCHIVE)
+            \App\Models\ArchivedOrder::create([
+                'original_order_id' => $order->id,
+                'sap_no' => $sapNo,
+                'art_no' => $artNo,
+                'tanggal' => $order->tanggal,
+                'pelanggan' => $order->pelanggan,
+                'mkt' => $order->mkt,
+                'original_data' => $order->toArray(),
+                'production_logs' => $order->productionActivities->toArray(),
+                'deleted_by' => $user->id,
+                'reason' => "Dihapus dari Marketing Order List",
+            ]);
 
+            $order->forceDelete(); // Menghapus secara permanen agar data di tabel berelasi juga terhapus (cascade) dan nomor artikel/SAP bisa dipakai ulang
             // LOGGING AUDIT TRAIL
             ActivityLog::create([
                 'user_id'     => auth()->id(),
                 'action'      => 'DELETE_ORDER',
-                'division'    => 'MARKETING',
+                'division'    => $user->role ?? 'MARKETING',
                 'art_no'      => $artNo,
                 'sap_no'      => $sapNo,
-                'description' => "Menghapus Order Artikel: {$artNo}",
+                'description' => "Menghapus Order Artikel: {$artNo}. Alasan: Dihapus oleh " . $user->name . ($productionCount > 0 ? " (Order sudah berjalan produksi)" : " (Order belum berjalan produksi)"),
             ]);
 
             if ($this->selectedOrder && ($this->selectedOrder['id'] ?? null) == $id) {
                 $this->closeDetail();
             }
-            $this->dispatch('show-toast', message: 'Order berhasil dihapus.', type: 'success');
+            $this->dispatch('show-toast', message: 'Order berhasil dihapus & dicatat di log sistem.', type: 'success');
         } catch (\Exception $e) {
             $this->dispatch('show-error-toast', message: 'Gagal menghapus order: ' . $e->getMessage());
         }

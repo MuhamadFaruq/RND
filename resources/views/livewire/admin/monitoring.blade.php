@@ -6,8 +6,6 @@ use App\Models\MarketingOrder;
 use App\Models\Division;
 use App\Models\Setting;
 use Carbon\Carbon;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ProductionExport;
 
 new class extends Component
 {
@@ -35,46 +33,6 @@ new class extends Component
             'DONE' => 'text-emerald-400 bg-emerald-950/50 border-emerald-800',
             default => 'mkt-text-muted mkt-surface border mkt-border',
         };
-    }
-
-    public function exportExcel()
-    {
-        $date = $this->filterDate;
-        $mode = $this->activeTab;
-        $operator = $this->selectedOperator;
-
-        $exists = \App\Models\ProductionActivity::whereDate('created_at', $date)
-            ->when($mode === 'rajut', function($q) {
-                $q->where('division_name', 'KNITTING');
-            })
-            ->when($mode === 'warna', function($q) {
-                $q->whereIn('division_name', ['DYEING', 'FINISHING']);
-            })
-            ->when($operator !== 'SEMUA', function($q) use ($operator) {
-                $q->where('operator_id', $operator); 
-            })
-            ->exists();
-
-        if (!$exists) {
-            $this->dispatch('notify', [
-                'message' => 'Data produksi untuk tanggal ' . $date . ' dengan kriteria tersebut tidak ditemukan.', 
-                'type' => 'error'
-            ]);
-            return;
-        }
-
-        \App\Models\ActivityLog::create([
-            'user_id' => auth()->id(),
-            'action' => 'EXPORT',
-            'model' => 'ProductionReport',
-            'description' => "Export Excel tanggal $date untuk Operator ID: " . ($operator == 'SEMUA' ? 'Semua' : $operator),
-            'ip_address' => request()->ip(),
-        ]);
-
-        return \Maatwebsite\Excel\Facades\Excel::download(
-            new \App\Exports\ProductionExport($date, $date, $mode, 'SEMUA', $operator), 
-            'Produksi_' . $date . '.xlsx'
-        );
     }
 
     public function with()
@@ -132,7 +90,7 @@ new class extends Component
 ?>
 
 <div class="min-h-screen w-full mkt-bg mkt-text font-sans italic flex flex-col transition-colors duration-300">
-    <div @if($isToday) wire:poll.10s @endif class="p-4 md:p-8 flex-grow container mx-auto">
+    <div @if($isToday) wire:poll.10s @endif class="p-4 md:p-8 flex-grow w-full max-w-full px-4 md:px-10">
         
         {{-- HEADER --}}
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 border-b mkt-border pb-6 gap-6">
@@ -152,9 +110,6 @@ new class extends Component
                             <option value="{{ $op->id }}">{{ strtoupper($op->name) }}</option>
                         @endforeach
                     </select>
-                    <button wire:click.prevent="exportExcel" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all flex items-center gap-2 whitespace-nowrap">
-                        Export
-                    </button>
                 </div>
 
                 <div class="flex lg:flex-col items-center lg:items-end justify-between w-full lg:w-auto min-w-[120px]">
@@ -164,87 +119,87 @@ new class extends Component
             </div>
         </div>
 
-        {{-- QUICK SUMMARY HEADER (3 COLUMNS) --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {{-- QUICK SUMMARY HEADER (3 COLUMNS - SIDE BY SIDE ON MOBILE) --}}
+        <div class="grid grid-cols-3 gap-3 md:gap-6 mb-8">
             {{-- Rajut --}}
-            <div class="mkt-surface border border-indigo-600/20 p-5 rounded-3xl flex justify-between items-center group hover:bg-indigo-950/10 transition-all">
+            <div class="mkt-surface border border-indigo-600/20 p-3 md:p-5 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1 group hover:bg-indigo-950/10 transition-all shadow-sm">
                 <div>
-                    <p class="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-1 italic">Accumulation: RAJUT</p>
-                    <h4 class="text-3xl font-black italic tracking-tighter mkt-text">
-                        {{ number_format($summary['rajut_kg'], 2) }} <span class="text-xs mkt-text-muted uppercase">KG</span>
+                    <p class="text-[7px] sm:text-[9px] md:text-[10px] font-black text-indigo-500 uppercase tracking-wider md:tracking-[0.2em] mb-0.5 md:mb-1 italic">RAJUT</p>
+                    <h4 class="text-sm sm:text-xl md:text-3xl font-black italic tracking-tighter mkt-text leading-none">
+                        {{ (float)$summary['rajut_kg'] }}<span class="text-[7px] sm:text-[9px] md:text-xs mkt-text-muted uppercase ml-0.5">KG</span>
                     </h4>
                 </div>
-                <div class="text-right">
-                    <span class="text-2xl font-black italic text-slate-700 group-hover:text-indigo-600 transition-colors">
+                <div class="lg:text-right mt-1 lg:mt-0 flex items-baseline lg:block gap-1">
+                    <span class="text-xs sm:text-lg md:text-2xl font-black italic text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 transition-colors leading-none">
                         {{ number_format($summary['rajut_roll']) }}
                     </span>
-                    <p class="text-[9px] font-bold text-slate-500 uppercase italic">Rolls</p>
+                    <span class="text-[7px] sm:text-[9px] font-bold text-slate-500 uppercase italic leading-none">Rolls</span>
                 </div>
             </div>
 
             {{-- Warna --}}
-            <div class="mkt-surface border border-blue-600/20 p-5 rounded-3xl flex justify-between items-center group hover:bg-blue-950/10 transition-all">
+            <div class="mkt-surface border border-blue-600/20 p-3 md:p-5 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1 group hover:bg-blue-950/10 transition-all shadow-sm">
                 <div>
-                    <p class="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-1 italic">Accumulation: WARNA</p>
-                    <h4 class="text-3xl font-black italic tracking-tighter mkt-text">
-                        {{ number_format($summary['warna_kg'], 2) }} <span class="text-xs mkt-text-muted uppercase">KG</span>
+                    <p class="text-[7px] sm:text-[9px] md:text-[10px] font-black text-blue-500 uppercase tracking-wider md:tracking-[0.2em] mb-0.5 md:mb-1 italic">WARNA</p>
+                    <h4 class="text-sm sm:text-xl md:text-3xl font-black italic tracking-tighter mkt-text leading-none">
+                        {{ (float)$summary['warna_kg'] }}<span class="text-[7px] sm:text-[9px] md:text-xs mkt-text-muted uppercase ml-0.5">KG</span>
                     </h4>
                 </div>
-                <div class="text-right">
-                    <span class="text-2xl font-black italic text-slate-700 group-hover:text-blue-600 transition-colors">
+                <div class="lg:text-right mt-1 lg:mt-0 flex items-baseline lg:block gap-1">
+                    <span class="text-xs sm:text-lg md:text-2xl font-black italic text-slate-700 dark:text-slate-200 group-hover:text-blue-600 transition-colors leading-none">
                         {{ number_format($summary['warna_roll']) }}
                     </span>
-                    <p class="text-[9px] font-bold text-slate-500 uppercase italic">Rolls</p>
+                    <span class="text-[7px] sm:text-[9px] font-bold text-slate-500 uppercase italic leading-none">Rolls</span>
                 </div>
             </div>
 
             {{-- Marketing --}}
-            <div class="mkt-surface border border-emerald-600/20 p-5 rounded-3xl flex justify-between items-center group hover:bg-emerald-950/10 transition-all shadow-xl">
+            <div class="mkt-surface border border-emerald-600/20 p-3 md:p-5 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1 group hover:bg-emerald-950/10 transition-all shadow-md">
                 <div>
-                    <p class="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-1 italic">Accumulation: MARKETING</p>
-                    <h4 class="text-3xl font-black italic tracking-tighter mkt-text">
-                        {{ number_format($summary['marketing_kg'], 2) }} <span class="text-xs mkt-text-muted uppercase">KG</span>
+                    <p class="text-[7px] sm:text-[9px] md:text-[10px] font-black text-emerald-500 uppercase tracking-wider md:tracking-[0.2em] mb-0.5 md:mb-1 italic">MARKETING</p>
+                    <h4 class="text-sm sm:text-xl md:text-3xl font-black italic tracking-tighter mkt-text leading-none">
+                        {{ (float)$summary['marketing_kg'] }}<span class="text-[7px] sm:text-[9px] md:text-xs mkt-text-muted uppercase ml-0.5">KG</span>
                     </h4>
                 </div>
-                <div class="text-right">
-                    <span class="text-2xl font-black italic text-slate-700 group-hover:text-emerald-500 transition-colors">
+                <div class="lg:text-right mt-1 lg:mt-0 flex items-baseline lg:block gap-1">
+                    <span class="text-xs sm:text-lg md:text-2xl font-black italic text-slate-700 dark:text-slate-200 group-hover:text-emerald-500 transition-colors leading-none">
                         {{ number_format($summary['marketing_mo']) }}
                     </span>
-                    <p class="text-[9px] font-bold text-slate-500 uppercase italic">Orders</p>
+                    <span class="text-[7px] sm:text-[9px] font-bold text-slate-500 uppercase italic leading-none">Orders</span>
                 </div>
             </div>
         </div>
 
-        {{-- WIDGETS STATISTIK --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-10">
+        {{-- WIDGETS STATISTIK (2-COLUMN GRID ON MOBILE FOR COMPACTNESS) --}}
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6 mb-10">
             {{-- Total Output Card --}}
-            <div class="mkt-surface p-8 rounded-[2.5rem] border mkt-border shadow-2xl relative overflow-hidden group">
-                <p class="text-[10px] font-black text-slate-500 uppercase mb-3 italic tracking-widest">Total Output (KG)</p>
-                <div class="flex items-baseline gap-2">
-                    <h3 class="text-4xl font-black italic tracking-tighter mkt-text">{{ number_format($todayProduction, 2) }}</h3>
-                    <span class="text-xs font-bold text-indigo-600 uppercase italic">Live</span>
+            <div class="mkt-surface p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[2.5rem] border mkt-border shadow-lg relative overflow-hidden group">
+                <p class="text-[8px] md:text-[10px] font-black text-slate-500 uppercase mb-1 md:mb-3 italic tracking-wider md:tracking-widest">Total Output (KG)</p>
+                <div class="flex items-baseline gap-1 md:gap-2">
+                    <h3 class="text-lg sm:text-2xl md:text-4xl font-black italic tracking-tighter mkt-text">{{ (float)$todayProduction }}</h3>
+                    <span class="text-[8px] md:text-xs font-bold text-indigo-600 uppercase italic">Live</span>
                 </div>
-                <div class="absolute left-0 top-0 w-1.5 h-full bg-indigo-600 shadow-[0_0_20px_rgba(79,70,229,0.5)]"></div>
+                <div class="absolute left-0 top-0 w-1 h-full bg-indigo-600 shadow-[0_0_20px_rgba(79,70,229,0.5)]"></div>
             </div>
 
             {{-- Marketing Unit Card --}}
-            <div class="mkt-surface p-8 rounded-[2.5rem] border mkt-border shadow-2xl relative overflow-hidden group hover:border-emerald-500/50 transition-all">
-                <p class="text-[10px] font-black text-slate-500 uppercase mb-3 italic tracking-widest">Marketing</p>
-                <div class="flex items-baseline gap-2">
-                    <h3 class="text-4xl font-black italic tracking-tighter mkt-text">{{ $summary['marketing_mo'] }}</h3>
-                    <span class="text-xs font-bold text-emerald-500 uppercase italic">Orders</span>
+            <div class="mkt-surface p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[2.5rem] border mkt-border shadow-lg relative overflow-hidden group hover:border-emerald-500/50 transition-all">
+                <p class="text-[8px] md:text-[10px] font-black text-slate-500 uppercase mb-1 md:mb-3 italic tracking-wider md:tracking-widest">Marketing</p>
+                <div class="flex items-baseline gap-1 md:gap-2">
+                    <h3 class="text-lg sm:text-2xl md:text-4xl font-black italic tracking-tighter mkt-text">{{ $summary['marketing_mo'] }}</h3>
+                    <span class="text-[8px] md:text-xs font-bold text-emerald-500 uppercase italic">Orders</span>
                 </div>
-                <div class="absolute left-0 top-0 w-1.5 h-full bg-emerald-600 shadow-[0_0_20px_rgba(16,185,129,0.5)]"></div>
+                <div class="absolute left-0 top-0 w-1 h-full bg-emerald-600 shadow-[0_0_20px_rgba(16,185,129,0.5)]"></div>
             </div>
 
             @foreach($divisionStats as $stat)
-            <div class="mkt-surface p-8 rounded-[2.5rem] border mkt-border shadow-2xl relative overflow-hidden">
-                <p class="text-[10px] font-black text-slate-500 uppercase mb-3 italic tracking-widest">{{ $stat->name }}</p>
-                <div class="flex items-baseline gap-2">
-                    <h3 class="text-4xl font-black italic tracking-tighter mkt-text">{{ $stat->production_activities_count }}</h3>
-                    <span class="text-xs font-bold text-blue-500 uppercase italic">Units</span>
+            <div class="mkt-surface p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[2.5rem] border mkt-border shadow-lg relative overflow-hidden">
+                <p class="text-[8px] md:text-[10px] font-black text-slate-500 uppercase mb-1 md:mb-3 italic tracking-wider md:tracking-widest">{{ $stat->name }}</p>
+                <div class="flex items-baseline gap-1 md:gap-2">
+                    <h3 class="text-lg sm:text-2xl md:text-4xl font-black italic tracking-tighter mkt-text">{{ $stat->production_activities_count }}</h3>
+                    <span class="text-[8px] md:text-xs font-bold text-blue-500 uppercase italic">Units</span>
                 </div>
-                <div class="absolute left-0 top-0 w-1.5 h-full bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.5)]"></div>
+                <div class="absolute left-0 top-0 w-1 h-full bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.5)]"></div>
             </div>
             @endforeach
         </div>
@@ -283,7 +238,7 @@ new class extends Component
                                     {{ $activity->technical_data['no_mesin'] ?? '-' }}
                                 </span>
                             </td>
-                            <td class="px-8 py-7 text-right font-black text-2xl text-indigo-600 dark:text-indigo-500 tracking-tighter">{{ number_format($activity->kg, 2) }}</td>
+                            <td class="px-8 py-7 text-right font-black text-2xl text-indigo-600 dark:text-indigo-500 tracking-tighter">{{ (float)$activity->kg }}</td>
                         </tr>
                         @empty
                         <tr><td colspan="6" class="p-20 text-center mkt-text-muted font-black uppercase text-xs italic">Data Tidak Ditemukan</td></tr>

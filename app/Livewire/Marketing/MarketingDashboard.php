@@ -140,16 +140,16 @@ class MarketingDashboard extends Component
     protected function getMachineWorkload()
     {
         $stages = [
-            ['name' => 'Knitting', 'unit' => 'Weaving Unit', 'color' => 'blue', 'icon' => '🧶', 'status' => 'knitting'],
-            ['name' => 'Dyeing', 'unit' => 'Coloring Unit', 'color' => 'amber', 'icon' => '🧪', 'status' => 'dyeing'],
-            ['name' => 'Relax Dryer', 'unit' => 'Drying Unit', 'color' => 'cyan', 'icon' => '💨', 'status' => 'relax-dryer'],
-            ['name' => 'Compactor', 'unit' => 'Compactor Unit', 'color' => 'green', 'icon' => '🌀', 'status' => 'compactor'],
-            ['name' => 'Heat Setting', 'unit' => 'Heat Setting Unit', 'color' => 'indigo', 'icon' => '🌡️', 'status' => 'heat-setting'],
-            ['name' => 'Stenter', 'unit' => 'Stenter Unit', 'color' => 'violet', 'icon' => '📏', 'status' => 'stenter'],
-            ['name' => 'Tumbler', 'unit' => 'Tumbler Unit', 'color' => 'orange', 'icon' => '🌀', 'status' => 'tumbler'],
-            ['name' => 'Fleece', 'unit' => 'Fleece Unit', 'color' => 'rose', 'icon' => '🧥', 'status' => 'fleece'],
-            ['name' => 'Pengujian', 'unit' => 'Testing Unit', 'color' => 'emerald', 'icon' => '🔬', 'status' => 'pengujian'],
-            ['name' => 'QE', 'unit' => 'QE Unit', 'color' => 'green', 'icon' => '✅', 'status' => 'qe'],
+            ['name' => 'Knitting', 'unit' => 'Weaving Unit', 'color' => 'blue', 'icon' => '', 'status' => 'knitting'],
+            ['name' => 'Dyeing', 'unit' => 'Coloring Unit', 'color' => 'amber', 'icon' => '', 'status' => 'dyeing'],
+            ['name' => 'Relax Dryer', 'unit' => 'Drying Unit', 'color' => 'cyan', 'icon' => '', 'status' => 'relax-dryer'],
+            ['name' => 'Compactor', 'unit' => 'Compactor Unit', 'color' => 'green', 'icon' => '', 'status' => 'compactor'],
+            ['name' => 'Heat Setting', 'unit' => 'Heat Setting Unit', 'color' => 'indigo', 'icon' => '', 'status' => 'heat-setting'],
+            ['name' => 'Stenter', 'unit' => 'Stenter Unit', 'color' => 'violet', 'icon' => '', 'status' => 'stenter'],
+            ['name' => 'Tumbler', 'unit' => 'Tumbler Unit', 'color' => 'orange', 'icon' => '', 'status' => 'tumbler'],
+            ['name' => 'Fleece', 'unit' => 'Fleece Unit', 'color' => 'rose', 'icon' => '', 'status' => 'fleece'],
+            ['name' => 'Pengujian', 'unit' => 'Testing Unit', 'color' => 'emerald', 'icon' => '', 'status' => 'pengujian'],
+            ['name' => 'QE', 'unit' => 'QE Unit', 'color' => 'green', 'icon' => '', 'status' => 'qe'],
         ];
 
         $maxCapacity = \App\Models\Setting::where('key', 'max_capacity')->first()->value ?? 1000;

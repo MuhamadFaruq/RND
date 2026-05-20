@@ -60,7 +60,7 @@
             --mkt-surface-alt: #1e293b;
             --mkt-border: #26334d;
             --mkt-text: #f8fafc;
-            --mkt-text-muted: #8395a7;
+            --mkt-text-muted: #cbd5e1; /* Jauh lebih cerah untuk kontras superior di mode gelap */
             --mkt-input-bg: #0b0f19;
         }
 
@@ -86,9 +86,9 @@
         }
 
         .dark .mkt-surface {
-            background-color: rgba(21, 28, 44, 0.6) !important;
-            backdrop-filter: blur(10px) !important;
-            -webkit-backdrop-filter: blur(10px) !important;
+            background-color: #151c2c !important; /* Latar belakang padat, tidak transparan lagi */
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
         }
 
         .mkt-surface-alt {
@@ -96,9 +96,9 @@
         }
 
         .dark .mkt-surface-alt {
-            background-color: rgba(30, 41, 59, 0.6) !important;
-            backdrop-filter: blur(10px) !important;
-            -webkit-backdrop-filter: blur(10px) !important;
+            background-color: #1e293b !important; /* Latar belakang padat, tidak transparan lagi */
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
         }
 
         .mkt-border {
@@ -161,12 +161,12 @@
 </head>
 {{-- Dark mode body background is handled by mkt-bg on child components --}}
 
-<body class="font-sans antialiased text-white">
+<body class="font-sans antialiased text-slate-800 dark:text-slate-100 transition-colors duration-300">
     <div class="min-h-screen">
         @if(session()->has('impersonator_id'))
             <div
                 class="bg-indigo-600 text-white p-2 text-center text-[10px] font-black uppercase italic tracking-widest sticky top-0 z-[100] flex justify-center items-center gap-4">
-                ⚠️ MODE IMPERSONATE: Anda sedang masuk sebagai {{ auth()->user()->name }} ({{ auth()->user()->role }})
+                MODE IMPERSONATE: Anda sedang masuk sebagai {{ auth()->user()->name }} ({{ auth()->user()->role }})
                 <a href="{{ route('admin.stop-impersonate') }}"
                     class="bg-white text-indigo-600 px-4 py-1 rounded-full hover:bg-slate-100 transition-all text-xs">
                     KEMBALI KE ADMIN
@@ -178,7 +178,7 @@
             @if(app()->isDownForMaintenance() && auth()->user()->isSuperAdmin())
                 <div
                     class="bg-amber-600/90 backdrop-blur-md text-white py-1.5 text-center text-[10px] font-black uppercase italic tracking-[0.3em] animate-pulse border-b border-amber-500/50">
-                    ⚠️ SYSTEM IN MAINTENANCE MODE: Seluruh role (Marketing & Operator) saat ini terkunci.
+                    SYSTEM IN MAINTENANCE MODE: Seluruh role (Marketing & Operator) saat ini terkunci.
                 </div>
             @endif
             <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -194,65 +194,65 @@
                         {{-- Horizontal Menu: Hidden on screens smaller than XL (iPad Landscape/Portrait) --}}
                         <div class="hidden xl:flex space-x-2 xl:ml-10 items-center">
                             <a href="{{ Auth::user()->role === 'marketing' ? route('marketing.dashboard', ['menu' => 'dashboard']) : route('dashboard') }}"
-                                class="px-3 py-2 rounded-md text-sm font-bold transition {{ (request()->query('menu') === 'dashboard' || request()->routeIs('dashboard') || request()->routeIs('marketing.dashboard')) && request()->query('menu') !== 'input' && request()->query('menu') !== 'orders' ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                class="px-3 py-2 rounded-md text-sm font-bold transition {{ (request()->query('menu') === 'dashboard' || request()->routeIs('dashboard') || request()->routeIs('marketing.dashboard')) && request()->query('menu') !== 'input' && request()->query('menu') !== 'orders' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                                 Dashboard
                             </a>
 
                             @if(Auth::user()->role === 'marketing')
                                 <a href="{{ route('marketing.dashboard', ['menu' => 'input']) }}"
-                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'input' ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'input' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                                     Input Marketing
                                 </a>
                                 <a href="{{ route('marketing.dashboard', ['menu' => 'orders']) }}"
-                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'orders' ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'orders' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                                     Daftar Order
                                 </a>
                                 <a href="{{ route('marketing.dashboard', ['menu' => 'calculator']) }}"
-                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'calculator' ? 'bg-emerald-600 text-white' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'calculator' ? 'bg-emerald-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                                     Kalkulator HPP
                                 </a>
                             @endif
 
                             @if(in_array(Auth::user()->role, ['operator', 'knitting', 'dyeing', 'relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe']))
                                 <a href="{{ route('operator.logbook', ['menu' => 'orders']) }}"
-                                    class="px-3 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'orders' ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-3 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'orders' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                                     Permintaan
                                 </a>
                                 <a href="{{ route('operator.logbook', ['menu' => 'history']) }}"
-                                    class="px-3 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'history' ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-3 py-2 rounded-md text-sm font-bold transition {{ request()->query('menu') === 'history' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                                     Riwayat
                                 </a>
                             @endif
 
                             @if(in_array(auth()->user()->role, ['admin', 'super-admin']))
                                 <a href="{{ route('admin.monitoring') }}"
-                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.monitoring') ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.monitoring') ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                                     Monitoring
                                 </a>
 
                                 <a href="{{ route('admin.unit-monitoring') }}"
-                                    class="{{ request()->routeIs('admin.unit-monitoring') ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }} px-4 py-2 rounded-lg font-bold transition">
+                                    class="{{ request()->routeIs('admin.unit-monitoring') ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' }} px-4 py-2 rounded-lg font-bold transition">
                                     Unit Monitoring
                                 </a>
 
                                 <a href="{{ route('admin.activity-logs') }}"
-                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.activity-logs') ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                    class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.activity-logs') ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                                     Audit Trail
                                 </a>
 
                                 @if(auth()->user()->role === 'super-admin')
                                     <a href="{{ route('admin.users') }}"
-                                        class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.users') ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                        class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.users') ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                                         Users Management
                                     </a>
 
                                     <a href="{{ route('admin.divisions') }}"
-                                        class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.divisions') ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                        class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.divisions') ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                                         Divisions
                                     </a>
 
                                     <a href="{{ route('admin.config') }}"
-                                        class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.config') ? 'bg-indigo-600 text-white shadow-lg' : 'mkt-text-muted hover:mkt-text hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                                        class="px-4 py-2 rounded-md text-sm font-bold transition {{ request()->routeIs('admin.config') ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                                         System Config
                                     </a>
                                 @endif
@@ -261,7 +261,11 @@
                             {{-- Global Search: Hidden on mobile, shown on XL --}}
                             <div class="hidden 2xl:flex items-center ml-8 relative group">
                                 <span
-                                    class="absolute left-4 mkt-text-muted opacity-50 group-focus-within:text-indigo-600 group-focus-within:opacity-100 transition-colors">🔍</span>
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 mkt-text-muted opacity-50 group-focus-within:text-indigo-600 group-focus-within:opacity-100 transition-colors">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </span>
                                 <input wire:model.live="search" type="text" placeholder="CARI NOMOR ARTIKEL ATAU PELANGGAN..." 
                                     class="pl-12 pr-4 py-2 w-64 mkt-input border mkt-border rounded-xl text-[10px] font-black uppercase italic focus:ring-2 focus:ring-indigo-600/20 outline-none transition-all placeholder:mkt-text-muted"
                                     onkeypress="if(event.key === 'Enter') { window.location.href = '/admin/unit-monitoring?search=' + this.value; }">
@@ -273,7 +277,7 @@
                         {{-- Theme Toggle --}}
                         <div class="flex items-center">
                             <button @click="toggleTheme()"
-                                class="p-2 rounded-full mkt-surface-alt mkt-text-muted hover:mkt-text transition-all shadow-sm">
+                                class="p-2 rounded-full mkt-surface-alt text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-110 active:scale-90 transition-all shadow-sm">
                                 <template x-if="!isDark">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -313,9 +317,9 @@
                         </div>
 
                         {{-- Mobile Menu Toggle (Hamburger) --}}
-                        <div class="xl:hidden flex items-center" x-data="{ open: false }">
+                        <div class="xl:hidden flex items-center">
                             <button @click="$dispatch('open-menu')"
-                                class="p-2 rounded-xl mkt-surface-alt mkt-text-muted hover:mkt-text transition-all border mkt-border shadow-sm">
+                                class="p-2 rounded-xl mkt-surface-alt text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-105 active:scale-95 transition-all border mkt-border shadow-sm">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 6h16M4 12h16M4 18h16"></path>
@@ -331,15 +335,15 @@
                 class="fixed inset-0 z-[100] xl:hidden" x-cloak>
                 <div @click="open = false" class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity">
                 </div>
-                <div class="absolute right-0 top-0 bottom-0 w-80 mkt-surface shadow-2xl transition-transform"
+                <div class="absolute right-0 top-0 bottom-0 w-80 bg-white dark:bg-[#0b0f19] border-l border-slate-200 dark:border-white/10 shadow-2xl transition-transform"
                     x-show="open" x-transition:enter="translate-x-full" x-transition:enter-end="translate-x-0"
                     x-transition:leave="translate-x-0" x-transition:leave-end="translate-x-full">
 
                     <div class="p-6 h-full flex flex-col">
-                        <div class="flex justify-between items-center mb-10">
-                            <div class="text-lg font-black text-indigo-600 italic">MENU <span
-                                    class="mkt-text">EXPLORER</span></div>
-                            <button @click="open = false" class="p-2 rounded-xl mkt-surface-alt mkt-text-muted">
+                        <div class="flex justify-between items-center mb-8 shrink-0">
+                            <div class="text-lg font-black text-indigo-600 italic uppercase">MENU <span
+                                    class="mkt-text text-slate-800 dark:text-white">EXPLORER</span></div>
+                            <button @click="open = false" class="p-2 rounded-xl mkt-surface-alt mkt-text-muted hover:mkt-text">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M6 18L18 6M6 6l12 12"></path>
@@ -347,50 +351,94 @@
                             </button>
                         </div>
 
-                        <div class="flex-grow space-y-2 overflow-y-auto pr-2">
-                            {{-- Mobile Navigation Links --}}
-                            <a href="{{ route('dashboard') }}"
-                                class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('dashboard') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-surface-alt' }} font-bold text-sm">Dashboard</a>
+                        <div class="flex-grow space-y-2 overflow-y-auto pr-2 custom-scrollbar">
+                            {{-- Mobile Navigation Links based on Role --}}
+                            
+                            {{-- 1. Dashboard Link --}}
+                            @php
+                                $dashboardUrl = Auth::user()->role === 'marketing' ? route('marketing.dashboard', ['menu' => 'dashboard']) : route('dashboard');
+                                $isDashboardActive = (request()->query('menu') === 'dashboard' || request()->routeIs('dashboard') || request()->routeIs('marketing.dashboard')) && request()->query('menu') !== 'input' && request()->query('menu') !== 'orders';
+                            @endphp
+                            <a href="{{ $dashboardUrl }}"
+                                class="flex items-center px-4 py-3 rounded-2xl font-bold text-sm transition-all {{ $isDashboardActive ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                                Dashboard
+                            </a>
 
+                            {{-- 2. Marketing Specific Links --}}
+                            @if(Auth::user()->role === 'marketing')
+                                <a href="{{ route('marketing.dashboard', ['menu' => 'input']) }}"
+                                    class="flex items-center px-4 py-3 rounded-2xl font-bold text-sm transition-all {{ request()->query('menu') === 'input' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                                    Input Marketing
+                                </a>
+                                <a href="{{ route('marketing.dashboard', ['menu' => 'orders']) }}"
+                                    class="flex items-center px-4 py-3 rounded-2xl font-bold text-sm transition-all {{ request()->query('menu') === 'orders' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                                    Daftar Order
+                                </a>
+                                <a href="{{ route('marketing.dashboard', ['menu' => 'calculator']) }}"
+                                    class="flex items-center px-4 py-3 rounded-2xl font-bold text-sm transition-all {{ request()->query('menu') === 'calculator' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                                    Kalkulator HPP
+                                </a>
+                            @endif
+
+                            {{-- 3. Operator/Knitter/Dyeing Specific Links --}}
+                            @if(in_array(Auth::user()->role, ['operator', 'knitting', 'dyeing', 'relax-dryer', 'finishing', 'stenter', 'tumbler', 'fleece', 'pengujian', 'qe']))
+                                <a href="{{ route('operator.logbook', ['menu' => 'orders']) }}"
+                                    class="flex items-center px-4 py-3 rounded-2xl font-bold text-sm transition-all {{ request()->query('menu') === 'orders' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                                    Permintaan
+                                </a>
+                                <a href="{{ route('operator.logbook', ['menu' => 'history']) }}"
+                                    class="flex items-center px-4 py-3 rounded-2xl font-bold text-sm transition-all {{ request()->query('menu') === 'history' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                                    Riwayat
+                                </a>
+                            @endif
+
+                            {{-- 4. Admin/Super-Admin Specific Links --}}
                             @if(in_array(auth()->user()->role, ['admin', 'super-admin']))
                                 <a href="{{ route('admin.monitoring') }}"
-                                    class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('admin.monitoring') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-surface-alt' }} font-bold text-sm">Monitoring</a>
+                                    class="flex items-center px-4 py-3 rounded-2xl font-bold text-sm transition-all {{ request()->routeIs('admin.monitoring') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                                    Monitoring
+                                </a>
                                 <a href="{{ route('admin.unit-monitoring') }}"
-                                    class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('admin.unit-monitoring') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-surface-alt' }} font-bold text-sm">Unit
-                                    Monitoring</a>
+                                    class="flex items-center px-4 py-3 rounded-2xl font-bold text-sm transition-all {{ request()->routeIs('admin.unit-monitoring') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                                    Unit Monitoring
+                                </a>
                                 <a href="{{ route('admin.activity-logs') }}"
-                                    class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('admin.activity-logs') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-surface-alt' }} font-bold text-sm">Audit
-                                    Trail</a>
+                                    class="flex items-center px-4 py-3 rounded-2xl font-bold text-sm transition-all {{ request()->routeIs('admin.activity-logs') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                                    Audit Trail
+                                </a>
 
                                 @if(auth()->user()->role === 'super-admin')
                                     <a href="{{ route('admin.users') }}"
-                                        class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('admin.users') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-surface-alt' }} font-bold text-sm">Users
-                                        Management</a>
+                                        class="flex items-center px-4 py-3 rounded-2xl font-bold text-sm transition-all {{ request()->routeIs('admin.users') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                                        Users Management
+                                    </a>
                                     <a href="{{ route('admin.divisions') }}"
-                                        class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('admin.divisions') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-surface-alt' }} font-bold text-sm">Divisions</a>
+                                        class="flex items-center px-4 py-3 rounded-2xl font-bold text-sm transition-all {{ request()->routeIs('admin.divisions') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                                        Divisions
+                                    </a>
                                     <a href="{{ route('admin.config') }}"
-                                        class="flex items-center px-4 py-3 rounded-2xl {{ request()->routeIs('admin.config') ? 'bg-red-600 text-white' : 'mkt-text-muted hover:mkt-surface-alt' }} font-bold text-sm">System
-                                        Config</a>
+                                        class="flex items-center px-4 py-3 rounded-2xl font-bold text-sm transition-all {{ request()->routeIs('admin.config') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                                        System Config
+                                    </a>
                                 @endif
                             @endif
                         </div>
 
-                        <div class="mt-auto pt-6 border-t mkt-border">
+                        <div class="mt-auto pt-6 border-t mkt-border shrink-0">
                             <div class="flex items-center gap-3 mb-6">
                                 <div
-                                    class="w-10 h-10 rounded-2xl bg-red-600 flex items-center justify-center text-white font-black">
+                                    class="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black shadow-lg shadow-indigo-600/30">
                                     {{ substr(Auth::user()->name, 0, 1) }}
                                 </div>
                                 <div>
-                                    <div class="text-xs font-black mkt-text uppercase">{{ Auth::user()->name }}</div>
-                                    <div class="text-[9px] mkt-text-muted font-bold uppercase">{{ Auth::user()->role }}
-                                    </div>
+                                    <div class="text-xs font-black mkt-text uppercase tracking-tight">{{ Auth::user()->name }}</div>
+                                    <div class="text-[9px] mkt-text-muted font-bold uppercase tracking-wider">{{ Auth::user()->role }}</div>
                                 </div>
                             </div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit"
-                                    class="w-full py-4 rounded-2xl bg-red-600/10 text-red-600 font-black uppercase text-xs tracking-widest hover:bg-red-600 hover:text-white transition-all">
+                                    class="w-full py-4 rounded-2xl bg-red-600/10 text-red-600 font-black uppercase text-xs tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-md shadow-red-600/5">
                                     LOGOUT SYSTEM
                                 </button>
                             </form>
@@ -450,6 +498,40 @@
                 position: 'top-end',
                 icon: 'success',
                 title: event.detail.message,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                background: '#0f172a',
+                color: '#fff',
+                customClass: {
+                    popup: 'border border-white/10 backdrop-blur-md rounded-2xl'
+                }
+            });
+        });
+
+        window.addEventListener('show-toast', event => {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: event.detail.type || 'success',
+                title: event.detail.message || event.detail.title || event.detail[0]?.message || '',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                background: '#0f172a',
+                color: '#fff',
+                customClass: {
+                    popup: 'border border-white/10 backdrop-blur-md rounded-2xl'
+                }
+            });
+        });
+
+        window.addEventListener('show-error-toast', event => {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: event.detail.message || event.detail.title || event.detail[0]?.message || '',
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,

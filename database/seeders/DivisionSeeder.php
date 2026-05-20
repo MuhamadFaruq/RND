@@ -13,25 +13,25 @@ class DivisionSeeder extends Seeder
             [
                 'name' => 'Knitting',
                 'slug' => 'knitting',
-                'icon' => '🧶',
+                'icon' => '',
                 'description' => 'Bagian Perajutan Kain'
             ],
             [
                 'name' => 'Dyeing',
                 'slug' => 'dyeing',
-                'icon' => '🧪',
+                'icon' => '',
                 'description' => 'Bagian Pewarnaan Kain'
             ],
             [
                 'name' => 'Stenter',
                 'slug' => 'stenter',
-                'icon' => '🖼️',
+                'icon' => '',
                 'description' => 'Bagian Pengeringan & Setting Lebar'
             ],
             [
                 'name' => 'Quality Control',
                 'slug' => 'qc',
-                'icon' => '🔬',
+                'icon' => '',
                 'description' => 'Bagian Pemeriksaan Kualitas'
             ],
         ];

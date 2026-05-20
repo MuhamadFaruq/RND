@@ -16,11 +16,15 @@ class KnittingForm extends Component
     public $operator_name,$artikelNo, $sap_no, $tanggal, $no_mesin, $type_mesin, $gauge_inch, $jml_feeder, $jml_jarum, $konstruksi_greige;
     public $lebar, $gramasi, $kg, $roll;
     public $benang_1, $benang_2, $benang_3, $benang_4;
+    public $benang_1_lot, $benang_2_lot, $benang_3_lot, $benang_4_lot;
     public $benang_1_percent, $benang_2_percent, $benang_3_percent, $benang_4_percent;
     public $yl_1, $yl_2, $yl_3, $yl_4;
     public $note, $produksi_per_day;
     public $kgDeviation = false;
     public $rollDeviation = false;
+    public $rnd_gramasi_greige, $rnd_mesin_rajut, $rnd_jenis_mesin_rajut;
+
+    protected $listeners = ['submitForm'];
 
     public $order_detail = null;
     public $productionHistory = [];
@@ -58,9 +62,13 @@ class KnittingForm extends Component
                 $this->gramasi          = $tech['gramasi'] ?? '';
                 $this->note             = $tech['note'] ?? '';
                 $this->produksi_per_day = $tech['produksi_per_day'] ?? '';
+                $this->rnd_gramasi_greige = $tech['rnd_gramasi_greige'] ?? $activity->marketingOrder->rnd_gramasi_greige ?? '';
+                $this->rnd_mesin_rajut    = $tech['rnd_mesin_rajut'] ?? $activity->marketingOrder->rnd_mesin_rajut ?? '';
+                $this->rnd_jenis_mesin_rajut = $tech['rnd_jenis_mesin_rajut'] ?? $activity->marketingOrder->rnd_jenis_mesin_rajut ?? '';
                 
                 for ($i = 1; $i <= 4; $i++) {
                     $this->{'benang_' . $i} = $tech['benang_' . $i] ?? '';
+                    $this->{'benang_' . $i . '_lot'} = $tech['benang_' . $i . '_lot'] ?? '';
                     $this->{'benang_' . $i . '_percent'} = $tech['benang_' . $i . '_percent'] ?? '';
                     $this->{'yl_' . $i}     = $tech['yl_' . $i] ?? '';
                 }
@@ -118,6 +126,9 @@ class KnittingForm extends Component
             ];
 
             $this->sap_no = $order->sap_no;
+            $this->rnd_gramasi_greige = $order->rnd_gramasi_greige;
+            $this->rnd_mesin_rajut = $order->rnd_mesin_rajut;
+            $this->rnd_jenis_mesin_rajut = $order->rnd_jenis_mesin_rajut;
 
             // Load Production History for Traceability in Modal
             $this->productionHistory = ProductionActivity::with('operator')
@@ -179,6 +190,9 @@ class KnittingForm extends Component
             'gramasi'          => 'required|numeric',
             'kg'               => 'required|numeric|min:0.1',
             'roll'             => 'required|numeric|min:1',
+            'rnd_gramasi_greige' => 'required',
+            'rnd_mesin_rajut'    => 'required',
+            'rnd_jenis_mesin_rajut' => 'required',
         ]);
 
         if ($this->kgDeviation || $this->rollDeviation) {
@@ -204,6 +218,14 @@ class KnittingForm extends Component
 
         try {
             $service = app(\App\Services\ProductionService::class);
+            
+            // PENTING: Update data R&D pada MarketingOrder
+            $marketingOrder->update([
+                'rnd_gramasi_greige' => $this->rnd_gramasi_greige,
+                'rnd_mesin_rajut'    => $this->rnd_mesin_rajut,
+                'rnd_jenis_mesin_rajut' => $this->rnd_jenis_mesin_rajut,
+            ]);
+
             $service->processKnitting(
                 $marketingOrder->id,
                 auth()->id(),
@@ -219,12 +241,16 @@ class KnittingForm extends Component
                     'lebar'            => $this->lebar,
                     'gramasi'          => $this->gramasi,
                     'benang_1'         => $this->benang_1,
+                    'benang_1_lot'     => $this->benang_1_lot,
                     'benang_1_percent' => $this->benang_1_percent,
                     'benang_2'         => $this->benang_2,
+                    'benang_2_lot'     => $this->benang_2_lot,
                     'benang_2_percent' => $this->benang_2_percent,
                     'benang_3'         => $this->benang_3,
+                    'benang_3_lot'     => $this->benang_3_lot,
                     'benang_3_percent' => $this->benang_3_percent,
                     'benang_4'         => $this->benang_4,
+                    'benang_4_lot'     => $this->benang_4_lot,
                     'benang_4_percent' => $this->benang_4_percent,
                     'yl_1'             => $this->yl_1,
                     'yl_2'             => $this->yl_2,
@@ -233,6 +259,9 @@ class KnittingForm extends Component
                     'note'             => $this->note,
                     'produksi_per_day' => $this->produksi_per_day,
                     'nama_input'       => $this->operator_name,
+                    'rnd_gramasi_greige' => $this->rnd_gramasi_greige,
+                    'rnd_mesin_rajut'    => $this->rnd_mesin_rajut,
+                    'rnd_jenis_mesin_rajut' => $this->rnd_jenis_mesin_rajut,
                 ]
             );
 

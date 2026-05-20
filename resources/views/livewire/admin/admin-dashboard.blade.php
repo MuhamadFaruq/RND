@@ -66,51 +66,51 @@ new class extends Component {
             </div>
         </div>
 
-        {{-- QUICK STATS GRID --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        {{-- QUICK STATS GRID (2-COLUMN ON MOBILE FOR ELEGANT CONSOLE VIEW) --}}
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 mb-12">
             
             {{-- 1. OUTPUT --}}
-            <div class="mkt-surface p-7 rounded-[2.5rem] mkt-border border shadow-2xl relative overflow-hidden group">
-                <p class="text-[10px] font-black text-slate-500 uppercase mb-3 italic tracking-widest">Output Hari Ini</p>
-                <div class="flex items-baseline gap-2 mb-4">
-                    <h3 class="text-4xl font-black italic tracking-tighter mkt-text">{{ number_format($currentOutput, 2) }}</h3>
-                    <span class="text-xs font-bold mkt-text-muted uppercase italic">KG</span>
+            <div class="mkt-surface p-4 md:p-6 lg:p-7 rounded-2xl md:rounded-[2.5rem] mkt-border border shadow-lg relative overflow-hidden group">
+                <p class="text-[8px] md:text-[10px] font-black text-slate-500 uppercase mb-1 md:mb-3 italic tracking-wider md:tracking-widest">Output Hari Ini</p>
+                <div class="flex items-baseline gap-1 md:gap-2 mb-2 md:mb-4">
+                    <h3 class="text-lg sm:text-2xl md:text-4xl font-black italic tracking-tighter mkt-text">{{ (float)$currentOutput }}</h3>
+                    <span class="text-[8px] md:text-xs font-bold mkt-text-muted uppercase italic">KG</span>
                 </div>
-                <div class="w-full mkt-bg h-2 rounded-full overflow-hidden mkt-border border">
+                <div class="w-full mkt-bg h-1.5 rounded-full overflow-hidden mkt-border border">
                     <div class="bg-indigo-600 h-full transition-all duration-1000" style="width: {{ $percentage }}%"></div>
                 </div>
-                <p class="text-[8px] font-bold text-slate-600 mt-3 uppercase italic tracking-widest">Max: {{ number_format($maxCapacity) }} KG</p>
-                <div class="absolute left-0 top-0 w-1.5 h-full bg-indigo-600"></div>
+                <p class="text-[7px] md:text-[8px] font-bold text-slate-600 mt-2 md:mt-3 uppercase italic tracking-wider md:tracking-widest">Max: {{ number_format($maxCapacity) }} KG</p>
+                <div class="absolute left-0 top-0 w-1 h-full bg-indigo-600"></div>
             </div>
 
             {{-- 2. PERSONNEL --}}
-            <div class="mkt-surface p-7 rounded-[2.5rem] mkt-border border shadow-2xl relative overflow-hidden">
-                <p class="text-[10px] font-black text-slate-500 uppercase mb-3 italic tracking-widest">Total Personel</p>
-                <div class="flex items-baseline gap-2">
-                    <h3 class="text-4xl font-black italic tracking-tighter mkt-text">{{ $totalUsers ?? 0 }}</h3>
-                    <span class="text-xs font-bold mkt-text-muted uppercase italic">User</span>
+            <div class="mkt-surface p-4 md:p-6 lg:p-7 rounded-2xl md:rounded-[2.5rem] mkt-border border shadow-lg relative overflow-hidden">
+                <p class="text-[8px] md:text-[10px] font-black text-slate-500 uppercase mb-1 md:mb-3 italic tracking-wider md:tracking-widest">Total Personel</p>
+                <div class="flex items-baseline gap-1 md:gap-2">
+                    <h3 class="text-lg sm:text-2xl md:text-4xl font-black italic tracking-tighter mkt-text">{{ $totalUsers ?? 0 }}</h3>
+                    <span class="text-[8px] md:text-xs font-bold mkt-text-muted uppercase italic">User</span>
                 </div>
-                <div class="absolute left-0 top-0 w-1.5 h-full bg-blue-600"></div>
+                <div class="absolute left-0 top-0 w-1 h-full bg-blue-600"></div>
             </div>
 
             {{-- 3. LOGS --}}
-            <div class="mkt-surface p-7 rounded-[2.5rem] mkt-border border shadow-2xl relative overflow-hidden">
-                <p class="text-[10px] font-black text-slate-500 uppercase mb-3 italic tracking-widest">Log Aktivitas</p>
-                <div class="flex items-baseline gap-2">
-                    <h3 class="text-4xl font-black italic tracking-tighter mkt-text">{{ $totalLogsToday ?? 0 }}</h3>
-                    <span class="text-xs font-bold mkt-text-muted uppercase italic">Event</span>
+            <div class="mkt-surface p-4 md:p-6 lg:p-7 rounded-2xl md:rounded-[2.5rem] mkt-border border shadow-lg relative overflow-hidden">
+                <p class="text-[8px] md:text-[10px] font-black text-slate-500 uppercase mb-1 md:mb-3 italic tracking-wider md:tracking-widest">Log Aktivitas</p>
+                <div class="flex items-baseline gap-1 md:gap-2">
+                    <h3 class="text-lg sm:text-2xl md:text-4xl font-black italic tracking-tighter mkt-text">{{ $totalLogsToday ?? 0 }}</h3>
+                    <span class="text-[8px] md:text-xs font-bold mkt-text-muted uppercase italic">Event</span>
                 </div>
-                <div class="absolute left-0 top-0 w-1.5 h-full bg-emerald-600"></div>
+                <div class="absolute left-0 top-0 w-1 h-full bg-emerald-600"></div>
             </div>
 
             {{-- 4. DIVISIONS --}}
-            <div class="mkt-surface p-7 rounded-[2.5rem] mkt-border border shadow-2xl relative overflow-hidden">
-                <p class="text-[10px] font-black text-slate-500 uppercase mb-3 italic tracking-widest">Unit Divisi</p>
-                <div class="flex items-baseline gap-2">
-                    <h3 class="text-4xl font-black italic tracking-tighter mkt-text">{{ $totalDivisions ?? 0 }}</h3>
-                    <span class="text-xs font-bold mkt-text-muted uppercase italic">Unit</span>
+            <div class="mkt-surface p-4 md:p-6 lg:p-7 rounded-2xl md:rounded-[2.5rem] mkt-border border shadow-lg relative overflow-hidden">
+                <p class="text-[8px] md:text-[10px] font-black text-slate-500 uppercase mb-1 md:mb-3 italic tracking-wider md:tracking-widest">Unit Divisi</p>
+                <div class="flex items-baseline gap-1 md:gap-2">
+                    <h3 class="text-lg sm:text-2xl md:text-4xl font-black italic tracking-tighter mkt-text">{{ $totalDivisions ?? 0 }}</h3>
+                    <span class="text-[8px] md:text-xs font-bold mkt-text-muted uppercase italic">Unit</span>
                 </div>
-                <div class="absolute left-0 top-0 w-1.5 h-full bg-amber-600"></div>
+                <div class="absolute left-0 top-0 w-1 h-full bg-amber-600"></div>
             </div>
         </div>
 
@@ -160,17 +160,19 @@ new class extends Component {
         </div>
 
         {{-- FOOTER / MAIN CONTENT GRID --}}
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <a href="{{ route('admin.monitoring') }}" class="group mkt-surface p-10 rounded-[3rem] mkt-border border hover:border-red-600/50 transition-all shadow-2xl">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition-transform duration-500">📊</div>
-                    <h4 class="text-2xl font-black uppercase italic tracking-tighter mb-3 mkt-text">Production Monitor</h4>
-                    <p class="text-[11px] mkt-text-muted font-bold leading-relaxed uppercase tracking-widest italic">Pantau real-time output mesin harian.</p>
+        <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+            <div class="xl:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <a href="{{ route('admin.monitoring') }}" class="group mkt-surface p-8 lg:p-10 rounded-[3rem] mkt-border border hover:border-red-600/50 transition-all shadow-2xl">
+                    <h4 class="text-xl lg:text-2xl font-black uppercase italic tracking-tighter mb-3 mkt-text">Production Monitor</h4>
+                    <p class="text-[10px] lg:text-[11px] mkt-text-muted font-bold leading-relaxed uppercase tracking-widest italic">Pantau real-time output mesin harian.</p>
                 </a>
-                <a href="{{ route('admin.activity-logs') }}" class="group mkt-surface p-10 rounded-[3rem] mkt-border border hover:border-emerald-600/50 transition-all shadow-2xl">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition-transform duration-500">🛡️</div>
-                    <h4 class="text-2xl font-black uppercase italic tracking-tighter mb-3 mkt-text">Security Audit</h4>
-                    <p class="text-[11px] mkt-text-muted font-bold leading-relaxed uppercase tracking-widest italic">Lihat riwayat aktivitas operator sistem.</p>
+                <a href="{{ route('admin.activity-logs') }}" class="group mkt-surface p-8 lg:p-10 rounded-[3rem] mkt-border border hover:border-emerald-600/50 transition-all shadow-2xl">
+                    <h4 class="text-xl lg:text-2xl font-black uppercase italic tracking-tighter mb-3 mkt-text">Security Audit</h4>
+                    <p class="text-[10px] lg:text-[11px] mkt-text-muted font-bold leading-relaxed uppercase tracking-widest italic">Lihat riwayat aktivitas operator sistem.</p>
+                </a>
+                <a href="{{ route('admin.recycle-bin') }}" class="group mkt-surface p-8 lg:p-10 rounded-[3rem] mkt-border border hover:border-rose-600/50 transition-all shadow-2xl">
+                    <h4 class="text-xl lg:text-2xl font-black uppercase italic tracking-tighter mb-3 mkt-text">Cold Storage</h4>
+                    <p class="text-[10px] lg:text-[11px] mkt-text-muted font-bold leading-relaxed uppercase tracking-widest italic">Tempat sampah data (Archived Orders).</p>
                 </a>
             </div>
 

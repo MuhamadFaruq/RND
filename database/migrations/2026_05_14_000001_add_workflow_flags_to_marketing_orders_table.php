@@ -24,8 +24,8 @@ return new class extends Migration
             $table->boolean('req_fleece')->default(false)->after('req_tumbler');
 
             // Proses wajib — default true (selalu dilalui kecuali dikecualikan)
-            $table->boolean('req_pengujian')->default(true)->after('req_fleece');
-            $table->boolean('req_qe')->default(true)->after('req_pengujian');
+            $table->boolean('req_pengujian')->default(false)->after('req_fleece');
+            $table->boolean('req_qe')->default(false)->after('req_pengujian');
         });
     }
 

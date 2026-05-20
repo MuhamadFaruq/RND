@@ -25,7 +25,7 @@ use Livewire\Volt\Volt;
 Route::get('/', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 // --- MARKETING ROUTES ---
-Route::middleware(['auth', 'verified'])->prefix('marketing')->group(function () {
+Route::middleware(['auth', 'verified', 'marketing'])->prefix('marketing')->group(function () {
     Route::get('/dashboard', MarketingDashboard::class)->name('marketing.dashboard');
     Route::get('/orders', OrderList::class)->name('marketing.orders.index');
     Route::get('/orders/create', OrderForm::class)->name('marketing.orders.create');
@@ -33,9 +33,12 @@ Route::middleware(['auth', 'verified'])->prefix('marketing')->group(function () 
 });
 
 // --- ADMIN / MONITORING ROUTES ---
-Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'verified', 'role'])->prefix('admin')->group(function () {
     Volt::route('/dashboard', 'admin.admin-dashboard')->name('admin.dashboard');
     
+    // Cold Storage / Archive Bin
+    Route::get('/recycle-bin', \App\Livewire\Admin\RecycleBin::class)->name('admin.recycle-bin');
+
     // Monitoring (Global & Unit)
     Volt::route('/monitoring', 'admin.monitoring')->name('admin.monitoring');
     Volt::route('/unit-monitoring', 'admin.unit-monitoring')->name('admin.unit-monitoring');
@@ -47,8 +50,6 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/impersonate/{id}', [DashboardController::class, 'impersonate'])
         ->middleware('can:is-super-admin')
         ->name('admin.impersonate');
-
-    Route::get('/stop-impersonate', [DashboardController::class, 'stopImpersonate'])->name('admin.stop-impersonate');
 
     // Activity Logs
     Volt::route('/logs', 'admin.activity-logs')->name('admin.logs');
@@ -69,7 +70,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 });
 
 // --- OPERATOR ROUTES ---
-Route::middleware(['auth', 'verified'])->prefix('operator')
+Route::middleware(['auth', 'verified', 'operator'])->prefix('operator')
     ->group(function () {
     
     // 1. DASHBOARD UTAMA
@@ -89,6 +90,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/stop-impersonate', [DashboardController::class, 'stopImpersonate'])->name('admin.stop-impersonate');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

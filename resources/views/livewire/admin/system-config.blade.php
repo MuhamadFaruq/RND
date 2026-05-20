@@ -40,7 +40,7 @@ new class extends Component {
             'user_agent' => request()->userAgent()
         ]);
 
-        $this->dispatch('show-success-toast', message: "Parameter Produksi Berhasil Disimpan! ✅");
+        $this->dispatch('show-success-toast', message: "Parameter Produksi Berhasil Disimpan! ");
     }
 
     public function purgeOldLogs() {
@@ -89,79 +89,80 @@ new class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen mkt-bg mkt-text p-8 transition-colors duration-300 font-sans italic">
+<div class="min-h-screen mkt-bg mkt-text p-4 md:p-8 transition-colors duration-300 font-sans italic">
     <div class="max-w-6xl mx-auto">
-        <h1 class="text-5xl font-black italic uppercase tracking-tighter mkt-text mb-10">
+        <h1 class="text-3xl md:text-5xl font-black italic uppercase tracking-tighter mkt-text mb-6 md:mb-10">
             SYSTEM <span class="text-indigo-600">CONFIGURATION</span>
         </h1>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+ 
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
             {{-- Production Parameters --}}
-            <div class="lg:col-span-2 mkt-surface border mkt-border p-10 rounded-[3rem] shadow-2xl relative overflow-hidden">
-                <h3 class="text-2xl font-black italic uppercase text-indigo-600 mb-8 flex items-center gap-3">
-                    <span class="w-2 h-8 bg-indigo-600 rounded-full"></span>
-                    Production Parameters
-                </h3>
+            <div class="lg:col-span-2 mkt-surface border mkt-border p-5 md:p-10 rounded-2xl md:rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg md:text-2xl font-black italic uppercase text-indigo-600 mb-6 md:mb-8 flex items-center gap-3">
+                        <span class="w-1.5 h-6 md:w-2 md:h-8 bg-indigo-600 rounded-full"></span>
+                        Production Parameters
+                    </h3>
+                    
+                    <form wire:submit.prevent="saveParameters" class="space-y-5 md:space-y-8 relative z-10">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                            <div>
+                                <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">Durasi Shift (Jam)</label>
+                                <input type="number" wire:model="shift_duration"
+                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">Kapasitas Mesin Maksimal (KG)</label>
+                                <input type="number" wire:model="max_capacity"
+                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all outline-none">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">Target Minimal per Shift (KG)</label>
+                                <input type="number" wire:model="target_minimal"
+                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all outline-none">
+                            </div>
+                        </div>
+ 
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-black text-white py-4 md:py-6 rounded-xl md:rounded-2xl font-black uppercase italic tracking-[0.15em] md:tracking-[0.2em] text-xs md:text-sm shadow-xl shadow-indigo-900/20 transition-all transform hover:-translate-y-0.5">
+                            SAVE PRODUCTION PARAMETERS                     </button>
+                    </form>
+                </div>
                 
-                <form wire:submit.prevent="saveParameters" class="space-y-8 relative z-10">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div>
-                            <label class="block text-[10px] font-black uppercase text-slate-500 mb-3 tracking-[0.2em]">Durasi Shift (Jam)</label>
-                            <input type="number" wire:model="shift_duration"
-                                class="w-full mkt-input mkt-border rounded-2xl p-5 mkt-text font-black text-xl italic focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black uppercase text-slate-500 mb-3 tracking-[0.2em]">Kapasitas Mesin Maksimal (KG)</label>
-                            <input type="number" wire:model="max_capacity"
-                                class="w-full mkt-input mkt-border rounded-2xl p-5 mkt-text font-black text-xl italic focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all outline-none">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] font-black uppercase text-slate-500 mb-3 tracking-[0.2em]">Target Minimal per Shift (KG)</label>
-                            <input type="number" wire:model="target_minimal"
-                                class="w-full mkt-input mkt-border rounded-2xl p-5 mkt-text font-black text-xl italic focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all outline-none">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-black text-white py-6 rounded-2xl font-black uppercase italic tracking-[0.2em] shadow-xl shadow-indigo-900/20 transition-all transform hover:-translate-y-1">
-                        SAVE PRODUCTION PARAMETERS 💾
-                    </button>
-                </form>
-                
-                <div class="absolute -right-20 -bottom-20 opacity-[0.03] text-[15rem] font-black italic pointer-events-none">UNIT</div>
+                <div class="absolute -right-20 -bottom-20 opacity-[0.02] text-[15rem] font-black italic pointer-events-none hidden md:block">UNIT</div>
             </div>
-
+ 
             {{-- System Health & Actions --}}
-            <div class="space-y-8">
-                <div class="mkt-surface border mkt-border p-8 rounded-[3rem] shadow-2xl">
-                    <h3 class="text-xl font-black italic uppercase text-emerald-500 mb-6 flex items-center gap-3">
-                        <span class="w-2 h-6 bg-emerald-500 rounded-full"></span>
+            <div class="space-y-6 md:space-y-8">
+                <div class="mkt-surface border mkt-border p-5 md:p-8 rounded-2xl md:rounded-[3rem] shadow-2xl">
+                    <h3 class="text-base md:text-xl font-black italic uppercase text-emerald-500 mb-4 md:mb-6 flex items-center gap-3">
+                        <span class="w-1.5 h-5 md:w-2 md:h-6 bg-emerald-500 rounded-full"></span>
                         System Health
                     </h3>
-                    <div class="flex items-center gap-4 mkt-input p-5 rounded-2xl border mkt-border mb-6">
-                        <div class="w-3 h-3 {{ $is_maintenance ? 'bg-amber-500' : 'bg-green-500' }} rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
-                        <span class="text-[10px] font-black uppercase italic tracking-widest mkt-text">
-                            STATUS: {{ $is_maintenance ? 'MAINTENANCE MODE' : 'SYSTEM ONLINE' }}
+                    <div class="flex items-center gap-3 md:gap-4 mkt-input p-4 md:p-5 rounded-xl md:rounded-2xl border mkt-border mb-4 md:mb-6">
+                        <div class="w-2.5 h-2.5 md:w-3 md:h-3 {{ $is_maintenance ? 'bg-amber-500' : 'bg-green-500' }} rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                        <span class="text-[8px] md:text-[10px] font-black uppercase italic tracking-wider md:tracking-widest mkt-text">
+                            STATUS: {{ $is_maintenance ? 'MAINTENANCE' : 'ONLINE' }}
                         </span>
                     </div>
-
-                    <div class="space-y-3">
+ 
+                    <div class="space-y-2 md:space-y-3">
                         <button type="button" onclick="confirmMaintenance({{ $is_maintenance ? 'true' : 'false' }})" 
-                            class="w-full py-4 rounded-2xl font-black uppercase italic text-[10px] tracking-widest transition {{ $is_maintenance ? 'bg-amber-600 text-white animate-pulse' : 'mkt-surface-alt mkt-text border mkt-border hover:bg-slate-800' }}">
+                            class="w-full py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black uppercase italic text-[8px] md:text-[10px] tracking-wider md:tracking-widest transition {{ $is_maintenance ? 'bg-amber-600 text-white animate-pulse' : 'mkt-surface-alt mkt-text border mkt-border hover:bg-slate-800' }}">
                             {{ $is_maintenance ? 'DISABLE MAINTENANCE' : 'ENABLE MAINTENANCE' }}
                         </button>
                         
-                        <a href="{{ route('admin.backup') }}" class="block w-full mkt-surface-alt mkt-text border mkt-border text-center py-4 rounded-2xl font-black uppercase italic text-[10px] tracking-widest hover:bg-indigo-600 hover:text-white transition shadow-lg">
+                        <a href="{{ route('admin.backup') }}" class="block w-full mkt-surface-alt mkt-text border mkt-border text-center py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black uppercase italic text-[8px] md:text-[10px] tracking-wider md:tracking-widest hover:bg-indigo-600 hover:text-white transition shadow-lg">
                             DOWNLOAD DB BACKUP
                         </a>
-
-                        <button type="button" onclick="confirmPurgeLogs()" class="block w-full mkt-surface-alt mkt-text-muted border mkt-border py-4 rounded-2xl font-black uppercase italic text-[10px] tracking-widest hover:text-indigo-600 transition">
+ 
+                        <button type="button" onclick="confirmPurgeLogs()" class="block w-full mkt-surface-alt mkt-text-muted border mkt-border py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black uppercase italic text-[8px] md:text-[10px] tracking-wider md:tracking-widest hover:text-indigo-600 transition">
                             PURGE AUDIT LOGS
                         </button>
                     </div>
                 </div>
-
-                <div class="mkt-surface-alt p-6 rounded-[2.5rem] border mkt-border">
-                    <p class="text-[9px] text-slate-500 font-bold uppercase italic leading-relaxed">
+ 
+                <div class="mkt-surface-alt p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] border mkt-border">
+                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase italic leading-relaxed">
                         <span class="text-indigo-600 font-black italic">PRO TIP:</span> 
                         Gunakan tombol simpan setelah mengubah parameter produksi untuk memastikan seluruh dashboard operator terupdate secara serentak.
                     </p>

@@ -73,7 +73,7 @@
 
 {{-- VISUALISASI 1: PRODUCTION TREND (SVG) --}}
 <div style="margin-top: 20px; padding: 15px; border: 1px solid #eee; border-radius: 10px;">
-    <p style="font-size: 11px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">📈 Production Trend Line (KG)</p>
+    <p style="font-size: 11px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">Production Trend Line (KG)</p>
     @php
         $maxVal = collect($trends)->max('total') ?: 1;
         $width = 700; $height = 100;
@@ -105,7 +105,7 @@
 
 {{-- VISUALISASI 2: HOURLY HEATMAP --}}
 <div style="margin-top: 20px;">
-    <p style="font-size: 11px; font-weight: bold; text-transform: uppercase;">🕒 Hourly Activity Heatmap (Kepadatan Input)</p>
+    <p style="font-size: 11px; font-weight: bold; text-transform: uppercase;">Hourly Activity Heatmap (Kepadatan Input)</p>
     <table class="heatmap-box">
         <tr>
             @php $maxHourly = collect($hourlyActivity)->max() ?: 1; @endphp
@@ -150,8 +150,8 @@
                     <tr>
                         <td style="font-weight: bold;">{{ $act->marketingOrder->art_no ?? '-' }}</td>
                         <td class="opacity-60">{{ $act->marketingOrder->sap_no ?? '-' }}</td>
-                        <td>{{ $act->technical_data['benang_1'] ?? '-' }} ({{ $act->technical_data['yl_1'] ?? 0 }})</td>
-                        <td>{{ $act->technical_data['benang_2'] ?? '-' }} ({{ $act->technical_data['yl_2'] ?? 0 }})</td>
+                        <td>{{ $act->technical_data['benang_1'] ?? '-' }} @if(!empty($act->technical_data['benang_1_lot'])) | LOT: {{ $act->technical_data['benang_1_lot'] }} @endif (YL: {{ $act->technical_data['yl_1'] ?? 0 }})</td>
+                        <td>{{ $act->technical_data['benang_2'] ?? '-' }} @if(!empty($act->technical_data['benang_2_lot'])) | LOT: {{ $act->technical_data['benang_2_lot'] }} @endif (YL: {{ $act->technical_data['yl_2'] ?? 0 }})</td>
                         <td style="font-weight: bold;">{{ number_format($act->kg, 2) }}</td>
                     </tr>
                 @empty
@@ -252,10 +252,10 @@
                     <span style="color: #666;">{{ $act->marketingOrder->pelanggan ?? '-' }}</span>
                 </td>
                 {{-- Mengambil data dari JSON technical_data --}}
-                <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_1'] ?? '-' }} <br> (YL: {{ $act->technical_data['yl_1'] ?? 0 }})</td>
-                <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_2'] ?? '-' }} <br> (YL: {{ $act->technical_data['yl_2'] ?? 0 }})</td>
-                <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_3'] ?? '-' }} <br> (YL: {{ $act->technical_data['yl_3'] ?? 0 }})</td>
-                <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_4'] ?? '-' }} <br> (YL: {{ $act->technical_data['yl_4'] ?? 0 }})</td>
+                <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_1'] ?? '-' }} @if(!empty($act->technical_data['benang_1_lot'])) <br> LOT: {{ $act->technical_data['benang_1_lot'] }} @endif <br> (YL: {{ $act->technical_data['yl_1'] ?? 0 }})</td>
+                <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_2'] ?? '-' }} @if(!empty($act->technical_data['benang_2_lot'])) <br> LOT: {{ $act->technical_data['benang_2_lot'] }} @endif <br> (YL: {{ $act->technical_data['yl_2'] ?? 0 }})</td>
+                <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_3'] ?? '-' }} @if(!empty($act->technical_data['benang_3_lot'])) <br> LOT: {{ $act->technical_data['benang_3_lot'] }} @endif <br> (YL: {{ $act->technical_data['yl_3'] ?? 0 }})</td>
+                <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_4'] ?? '-' }} @if(!empty($act->technical_data['benang_4_lot'])) <br> LOT: {{ $act->technical_data['benang_4_lot'] }} @endif <br> (YL: {{ $act->technical_data['yl_4'] ?? 0 }})</td>
                 <td style="border: 1px solid #eee; padding: 6px; font-weight: bold;">{{ $act->kg }} KG / {{ $act->roll }} Roll</td>
             </tr>
             @empty

@@ -1,16 +1,15 @@
 {{-- resources/views/livewire/operator/qe-form.blade.php --}}
 
 <div x-data="{ showSpec: false }">
-    <div class="py-12 mkt-bg min-h-screen font-sans italic tracking-tighter text-left mkt-text">
-        <div class="max-w-4xl mx-auto px-4">
-            <div class="mkt-surface p-8 rounded-[2.5rem] shadow-sm border mkt-border">
+    <div class="py-4 md:py-8 mkt-bg min-h-screen font-sans italic tracking-tighter text-left mkt-text">
+        <div class="w-full max-w-[1600px] mx-auto px-3 sm:px-4 md:px-6">
+            <div class="mkt-surface p-4 md:p-6 rounded-2xl shadow-sm border mkt-border">
 
-                <div class="flex items-center gap-4 mb-8">
+                <div class="flex items-center gap-3 mb-6">
                     <div class="bg-violet-600/80 p-3 rounded-2xl text-white shadow-lg shadow-violet-600/20">
-                        🛡️
-                    </div>
+                                            </div>
                     <div>
-                        <h2 class="text-xl font-black uppercase tracking-tighter mkt-text">QE (Final Description)</h2>
+                        <h2 class="text-base md:text-lg font-black uppercase tracking-tighter mkt-text">QE (Final Description)</h2>
                         <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-widest">Quality Engineering & Validation #{{ $order->art_no }}</p>
                     </div>
                 </div>
@@ -34,7 +33,7 @@
                                 </div>
                                 <div class="text-right">
                                     <p class="text-[9px] font-black text-violet-400 italic tabular-nums leading-none">
-                                        {{ number_format($hist->kg, 1) }} KG</p>
+                                        {{ (float)$hist->kg }} KG</p>
                                     <p class="text-[7px] mkt-text-muted uppercase mt-0.5">
                                         {{ $hist->created_at->format('d/m H:i') }}</p>
                                 </div>
@@ -49,7 +48,7 @@
                 @if(!empty($pipelineErrors))
                     <div class="mb-6 bg-amber-950/50 backdrop-blur-md border-2 border-amber-500 rounded-2xl p-5 space-y-2">
                         <div class="flex items-center gap-2 mb-3">
-                            <span class="text-amber-400 text-lg">⚠️</span>
+                            <span class="text-amber-400 text-lg"></span>
                             <p class="text-amber-400 font-black uppercase text-xs tracking-widest">Pipeline Produksi Belum Lengkap</p>
                         </div>
                         @foreach($pipelineErrors as $err)
@@ -62,48 +61,60 @@
                     </div>
                 @endif
 
-                <form wire:submit.prevent="submit" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Operator QE</label>
-                            <input type="text" wire:model="operator" placeholder="MASUKKAN Nama Operator QE"
-                                class="w-full mkt-surface-alt border mkt-border rounded-xl px-4 py-3 font-bold mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Fabric Name</label>
-                            <input type="text" wire:model="fabric_name" placeholder="MASUKKAN Nama Kain (Fabric)"
-                                class="w-full mkt-surface-alt border mkt-border rounded-xl px-4 py-3 font-bold mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t mkt-border">
-                        <div>
-                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Lebar (Int)</label>
-                            <input type="number" wire:model="lebar" placeholder="MASUKKAN Lebar"
-                                class="w-full mkt-surface-alt border mkt-border rounded-xl px-4 py-3 font-bold text-violet-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Gramasi (Int)</label>
-                            <input type="number" wire:model="gramasi" placeholder="MASUKKAN Gramasi"
-                                class="w-full mkt-surface-alt border mkt-border rounded-xl px-4 py-3 font-bold text-violet-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Shrinkage (Int)</label>
-                            <input type="number" wire:model="shrinkage" placeholder="MASUKKAN Shrinkage"
-                                class="w-full mkt-surface-alt border mkt-border rounded-xl px-4 py-3 font-bold mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none placeholder-slate-400">
+                 <form wire:submit.prevent="submit" class="space-y-5">
+                    {{-- I. IDENTITAS KAIN & OPERATOR --}}
+                    <div class="space-y-4">
+                        <p class="text-[9px] font-black text-indigo-500 uppercase tracking-[0.3em] border-l-4 border-indigo-500 pl-3">I. IDENTITAS KAIN & OPERATOR</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/5 p-6 rounded-3xl border mkt-border">
+                            <div>
+                                <label class="block text-[10px] font-black text-indigo-600 italic uppercase mb-2 ml-1">Operator QE</label>
+                                <input type="text" wire:model="operator" placeholder="NAMA OPERATOR QE..."
+                                    class="w-full mkt-surface border mkt-border rounded-xl px-4 py-3 font-black text-xs mkt-text placeholder-slate-500 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none italic uppercase">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-indigo-600 italic uppercase mb-2 ml-1">Fabric Name</label>
+                                <input type="text" wire:model="fabric_name" placeholder="FABRIC NAME (NAMA KAIN)..."
+                                    class="w-full mkt-surface border mkt-border rounded-xl px-4 py-3 font-black text-xs mkt-text placeholder-slate-500 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none italic uppercase">
+                            </div>
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Note (Catatan Final)</label>
-                        <textarea wire:model="note" rows="4"
-                            class="w-full mkt-surface-alt border mkt-border rounded-2xl px-4 py-3 font-bold mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none italic placeholder-slate-400"
-                            placeholder="Tuliskan keterangan akhir kain di sini..."></textarea>
+                    {{-- II. HASIL VALIDASI FISIK --}}
+                    <div class="space-y-4">
+                        <p class="text-[9px] font-black text-cyan-500 uppercase tracking-[0.3em] border-l-4 border-cyan-500 pl-3">II. HASIL VALIDASI FISIK</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white/5 p-6 rounded-3xl border mkt-border">
+                            <div>
+                                <label class="block text-[10px] font-black text-cyan-500 italic uppercase mb-2 ml-1">Lebar (cm)</label>
+                                <input type="number" step="any" wire:model="lebar" placeholder="LEBAR..."
+                                    class="w-full mkt-surface border mkt-border rounded-xl px-4 py-3 font-black text-xs text-cyan-400 placeholder-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all outline-none italic uppercase">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-cyan-500 italic uppercase mb-2 ml-1">Gramasi (gsm)</label>
+                                <input type="number" step="any" wire:model="gramasi" placeholder="GRAMASI..."
+                                    class="w-full mkt-surface border mkt-border rounded-xl px-4 py-3 font-black text-xs text-cyan-400 placeholder-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all outline-none italic uppercase">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-cyan-500 italic uppercase mb-2 ml-1">Shrinkage (%)</label>
+                                <input type="number" step="any" wire:model="shrinkage" placeholder="SHRINKAGE..."
+                                    class="w-full mkt-surface border mkt-border rounded-xl px-4 py-3 font-black text-xs text-cyan-400 placeholder-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all outline-none italic uppercase">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- III. REKOMENDASI & CATATAN --}}
+                    <div class="space-y-4">
+                        <p class="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em] border-l-4 border-emerald-500 pl-3">III. REKOMENDASI & CATATAN (NOTE)</p>
+                        <div class="bg-white/5 p-6 rounded-3xl border mkt-border">
+                            <label class="block text-[10px] font-black text-emerald-500 italic uppercase mb-2 ml-1">Note (Catatan Final)</label>
+                            <textarea wire:model="note" rows="4"
+                                class="w-full mkt-surface border mkt-border rounded-xl px-4 py-3 font-black text-xs mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none italic placeholder-slate-500"
+                                placeholder="TULISKAN KETERANGAN AKHIR KAIN DI SINI..."></textarea>
+                        </div>
                     </div>
 
                     <button type="submit"
-                        class="w-full bg-violet-600/80 backdrop-blur-md text-white py-5 rounded-2xl font-black uppercase text-xs shadow-lg transition-all hover:bg-violet-600 hover:scale-105 group">
-                        Simpan Deskripsi Final QE <span class="group-hover:ml-2 transition-all">🚀</span>
+                        class="w-full bg-violet-600/80 backdrop-blur-md text-white py-4 rounded-xl font-black uppercase text-[10px] shadow-lg transition-all hover:bg-violet-600 hover:scale-[1.01] group">
+                        Simpan Deskripsi Final QE <span class="group-hover:ml-2 transition-all"></span>
                     </button>
                 </form>
             </div>
@@ -121,11 +132,11 @@
          @click.away="showSpec = false"
          style="display: none;">
         
-        <div class="mkt-surface w-full max-w-3xl rounded-[3rem] border mkt-border shadow-2xl relative overflow-hidden italic flex flex-col max-h-[85vh]">
+        <div class="mkt-surface w-full max-w-3xl rounded-2xl md:rounded-3xl border mkt-border shadow-2xl relative overflow-hidden italic flex flex-col max-h-[85vh]">
             {{-- Header Modal --}}
-            <div class="px-10 pt-10 pb-6 border-b mkt-border mkt-surface-alt sticky top-0 z-10 flex items-center justify-between">
+            <div class="px-5 md:px-8 pt-6 pb-4 border-b mkt-border mkt-surface-alt sticky top-0 z-10 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-indigo-600/80 rounded-2xl flex items-center justify-center text-white text-xl shadow-lg shadow-indigo-500/20">🛡️</div>
+                    <div class="w-12 h-12 bg-indigo-600/80 rounded-2xl flex items-center justify-center text-white text-xl shadow-lg shadow-indigo-500/20"></div>
                     <div>
                         <h3 class="text-lg font-black uppercase mkt-text leading-none">Order Tracking Detail</h3>
                         <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-widest mt-1">Artikel #{{ $order->art_no }} • Full Technical Specification</p>
@@ -149,12 +160,12 @@
             </div>
             
             {{-- Content Area --}}
-            <div class="overflow-y-auto flex-1 p-10 custom-scrollbar bg-transparent">
+            <div class="overflow-y-auto flex-1 p-5 md:p-8 custom-scrollbar bg-transparent">
                 {{-- TAB: MARKETING --}}
                 @if($activeDetailTab === 'marketing')
                     <div class="space-y-6 animate-in fade-in slide-in-from-bottom-2">
                         <div class="flex items-center gap-4 mb-4">
-                            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-lg">🛡️</div>
+                            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-lg"></div>
                             <div>
                                 <h3 class="text-sm font-black uppercase mkt-text leading-none">Order Specification</h3>
                                 <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-widest mt-1">Final Validation Specs #{{ $order->art_no }}</p>
@@ -182,7 +193,7 @@
                             <div>
                                 <p class="text-[8px] font-black uppercase mkt-text-muted mb-1 tracking-widest">Target Produksi</p>
                                 <p class="text-sm font-black text-indigo-600 italic">
-                                    {{ number_format($order->kg_target, 1) }} KG
+                                    {{ (float)$order->kg_target }} KG
                                 </p>
                                 <p class="text-[9px] mkt-text-muted uppercase font-bold">{{ $order->roll_target }} ROLL</p>
                             </div>
@@ -220,7 +231,7 @@
 
                         <div class="p-6 mkt-surface-alt border mkt-border rounded-3xl">
                             <p class="text-[9px] font-black uppercase text-indigo-600 mb-3 tracking-widest border-b mkt-border pb-2 flex items-center gap-2">
-                                <span class="text-lg">🧪</span> R&D RECOMMENDATION
+                                <span class="text-lg"></span> R&D RECOMMENDATION
                             </p>
                             <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 <div>
@@ -263,7 +274,7 @@
                         <div class="space-y-6 animate-in fade-in slide-in-from-bottom-2">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white text-lg">⚙️</div>
+                                    <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white text-lg"></div>
                                     <div>
                                         <h3 class="text-sm font-black uppercase mkt-text leading-none">{{ $history['division_name'] }} Technical Data</h3>
                                         <p class="text-[9px] font-bold mkt-text-muted uppercase tracking-widest mt-1">
@@ -273,7 +284,7 @@
                                 </div>
                                 <div class="text-right">
                                     <p class="text-[9px] font-black mkt-text-muted uppercase mb-1">Output</p>
-                                    <p class="text-xl font-black text-emerald-500 leading-none">{{ number_format($history['kg'], 1) }} KG</p>
+                                    <p class="text-xl font-black text-emerald-500 leading-none">{{ (float)$history['kg'] }} KG</p>
                                 </div>
                             </div>
 
@@ -295,8 +306,8 @@
             </div>
 
             {{-- Footer Modal --}}
-            <div class="px-10 py-8 mkt-surface border-t mkt-border flex justify-end">
-                <button @click="showSpec = false" class="px-12 py-4 bg-slate-800 text-white rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-indigo-600 hover:shadow-xl transition-all active:scale-95 border border-white/5">
+            <div class="px-5 md:px-8 py-5 mkt-surface border-t mkt-border flex justify-end">
+                <button @click="showSpec = false" class="px-8 py-3 bg-slate-800 text-white rounded-xl font-black uppercase text-[10px] tracking-wider hover:bg-indigo-600 hover:shadow-xl transition-all active:scale-95 border border-white/5">
                     Tutup Detail
                 </button>
             </div>

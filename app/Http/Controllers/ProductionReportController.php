@@ -41,6 +41,12 @@ class ProductionReportController extends Controller
 
         // 3. LOGIKA PEMISAH FORMAT
         if ($format === 'excel') {
+            if ($mode === 'master') {
+                return Excel::download(
+                    new \App\Exports\MasterProductionExport($start, $end, $unit), 
+                    "RND_MASTER_PIPELINE_" . date('Ymd') . ".xlsx"
+                );
+            }
             // Kirim $unit ke dalam constructor Excel
             return Excel::download(
                 new ProductionExport($start, $end, $mode, $unit), 

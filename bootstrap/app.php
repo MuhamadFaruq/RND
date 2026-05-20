@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.division' => \App\Http\Middleware\CheckDivision::class,
             'role'           => \App\Http\Middleware\CheckRole::class,
             'marketing'      => \App\Http\Middleware\EnsureUserIsMarketing::class,
+            'operator'       => \App\Http\Middleware\EnsureUserIsOperator::class,
             'no-back'        => \App\Http\Middleware\PreventBackHistory::class,
         ]);
 
