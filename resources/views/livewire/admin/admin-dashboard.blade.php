@@ -42,7 +42,7 @@ new class extends Component {
         <div class="mb-10 border-b border-white/5 pb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
                 <h1 class="text-5xl md:text-7xl font-black italic tracking-tighter uppercase mkt-text leading-none">
-                    System <span class="text-indigo-600">Control</span>
+                    System <span class="text-brand-600">Control</span>
                 </h1>
                 <p class="mkt-text-muted font-bold tracking-widest uppercase text-[10px] mt-3 italic">
                     Logistik & Produksi System <span class="mkt-text mx-2">|</span> User: <span class="text-emerald-500">{{ auth()->user()->name }}</span>
@@ -62,7 +62,7 @@ new class extends Component {
             x-init="updateTime(); setInterval(() => updateTime(), 1000)"
             class="mkt-surface px-8 py-5 rounded-[2rem] mkt-border border shadow-2xl text-right min-w-[180px]">
                 <span class="text-[9px] font-black text-slate-500 uppercase block tracking-[0.4em] mb-1 opacity-60">Server Time</span>
-                <span class="text-3xl font-mono font-bold text-indigo-600 tabular-nums" x-text="time"></span>
+                <span class="text-3xl font-mono font-bold text-brand-600 tabular-nums" x-text="time"></span>
             </div>
         </div>
 
@@ -77,10 +77,10 @@ new class extends Component {
                     <span class="text-[8px] md:text-xs font-bold mkt-text-muted uppercase italic">KG</span>
                 </div>
                 <div class="w-full mkt-bg h-1.5 rounded-full overflow-hidden mkt-border border">
-                    <div class="bg-indigo-600 h-full transition-all duration-1000" style="width: {{ $percentage }}%"></div>
+                    <div class="bg-brand-600 h-full transition-all duration-1000" style="width: {{ $percentage }}%"></div>
                 </div>
                 <p class="text-[7px] md:text-[8px] font-bold text-slate-600 mt-2 md:mt-3 uppercase italic tracking-wider md:tracking-widest">Max: {{ number_format($maxCapacity) }} KG</p>
-                <div class="absolute left-0 top-0 w-1 h-full bg-indigo-600"></div>
+                <div class="absolute left-0 top-0 w-1 h-full bg-brand-600"></div>
             </div>
 
             {{-- 2. PERSONNEL --}}
@@ -90,7 +90,7 @@ new class extends Component {
                     <h3 class="text-lg sm:text-2xl md:text-4xl font-black italic tracking-tighter mkt-text">{{ $totalUsers ?? 0 }}</h3>
                     <span class="text-[8px] md:text-xs font-bold mkt-text-muted uppercase italic">User</span>
                 </div>
-                <div class="absolute left-0 top-0 w-1 h-full bg-blue-600"></div>
+                <div class="absolute left-0 top-0 w-1 h-full bg-brand"></div>
             </div>
 
             {{-- 3. LOGS --}}
@@ -121,7 +121,7 @@ new class extends Component {
         {{-- NEW: MACHINE MONITORING GRID --}}
         <div class="mb-12 mt-8">
             <div class="flex items-center gap-3 mb-8">
-                <div class="w-10 h-1 bg-indigo-600 rounded-full"></div>
+                <div class="w-10 h-1 bg-brand-600 rounded-full"></div>
                 <h3 class="text-sm font-black uppercase italic mkt-text tracking-[0.2em]">Real-Time Production Monitoring</h3>
             </div>
             
@@ -135,13 +135,13 @@ new class extends Component {
                         $bgColor = match($status) {
                             'running' => 'bg-green-600/10 border-green-500/30',
                             'downtime' => 'bg-amber-600/10 border-amber-500/30',
-                            'maintenance' => 'bg-indigo-600/10 border-indigo-500/30',
+                            'maintenance' => 'bg-orange-600/10 border-orange-500/30',
                             default => 'mkt-surface border mkt-border'
                         };
                         $dotColor = match($status) {
                             'running' => 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]',
                             'downtime' => 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]',
-                            'maintenance' => 'bg-indigo-600 shadow-[0_0_10px_rgba(79,70,229,0.5)]',
+                            'maintenance' => 'bg-orange-600 shadow-[0_0_10px_rgba(234,88,12,0.5)]',
                             default => 'bg-slate-500'
                         };
                     @endphp
@@ -149,7 +149,7 @@ new class extends Component {
                         <div class="flex flex-col items-center gap-2 relative z-10">
                             <div class="w-2 h-2 rounded-full {{ $dotColor }} {{ $status === 'running' ? 'animate-pulse' : '' }}"></div>
                             <p class="text-[9px] font-black uppercase italic mkt-text">{{ $div }}</p>
-                            <p class="text-[7px] font-bold uppercase {{ $status === 'running' ? 'text-green-500' : ($status === 'downtime' ? 'text-amber-500' : ($status === 'maintenance' ? 'text-indigo-600' : 'text-slate-500')) }} italic">
+                            <p class="text-[7px] font-bold uppercase {{ $status === 'running' ? 'text-green-500' : ($status === 'downtime' ? 'text-amber-500' : ($status === 'maintenance' ? 'text-orange-600' : 'text-slate-500')) }} italic">
                                 {{ strtoupper($status) }}
                             </p>
                         </div>
@@ -178,7 +178,7 @@ new class extends Component {
 
             {{-- RECENT FEED --}}
             <div class="mkt-surface rounded-[3rem] p-8 mkt-border border shadow-2xl">
-                <h4 class="text-lg font-black uppercase italic tracking-tighter mb-8 text-indigo-600 border-b mkt-border pb-5">Recent Feed</h4>
+                <h4 class="text-lg font-black uppercase italic tracking-tighter mb-8 text-brand-600 border-b mkt-border pb-5">Recent Feed</h4>
                 <div class="space-y-7">
                     @forelse($recentActivities ?? [] as $log)
                     <div class="flex gap-5 items-start">

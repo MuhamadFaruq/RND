@@ -54,7 +54,7 @@ new class extends Component {
         {{-- HEADER --}}
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 border-b mkt-border pb-8 gap-6">
             <div>
-                <h1 class="text-4xl md:text-5xl font-black italic tracking-tighter uppercase text-indigo-600 leading-none">
+                <h1 class="text-4xl md:text-5xl font-black italic tracking-tighter uppercase text-brand-600 leading-none">
                     Audit <span class="mkt-text">Trail</span>
                 </h1>
                 <p class="mkt-text-muted font-bold tracking-widest uppercase text-[10px] md:text-xs mt-3 italic">Duniatex Group - Security & Activity Logs</p>
@@ -62,17 +62,17 @@ new class extends Component {
             <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
                 {{-- Search Bar --}}
                 <div class="relative group">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 mkt-text-muted opacity-40 group-focus-within:text-indigo-600 group-focus-within:opacity-100 transition-all">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 mkt-text-muted opacity-40 group-focus-within:text-brand-600 group-focus-within:opacity-100 transition-all">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </span>
                     <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari ARTIKEL / SAP / Admin / Aksi..." 
-                        class="w-full md:w-64 pl-12 pr-4 py-3 mkt-input border mkt-border rounded-2xl text-[10px] font-black uppercase italic focus:ring-2 focus:ring-indigo-600/20 outline-none transition-all">
+                        class="w-full md:w-64 pl-12 pr-4 py-3 mkt-input border mkt-border rounded-2xl text-[10px] font-black uppercase italic focus:ring-2 focus:ring-brand-600/20 outline-none transition-all">
                 </div>
 
                 {{-- Action Filter --}}
-                <select wire:model.live="actionFilter" class="mkt-input border mkt-border rounded-2xl px-6 py-3 text-[10px] font-black uppercase italic outline-none focus:ring-2 focus:ring-indigo-600/20 transition-all">
+                <select wire:model.live="actionFilter" class="mkt-input border mkt-border rounded-2xl px-6 py-3 text-[10px] font-black uppercase italic outline-none focus:ring-2 focus:ring-brand-600/20 transition-all">
                     <option value="">Semua Aksi</option>
                     <option value="LOGIN">LOGIN</option>
                     <option value="LOGOUT">LOGOUT</option>
@@ -82,10 +82,10 @@ new class extends Component {
                 </select>
 
                 {{-- Date Filter --}}
-                <input type="date" wire:model.live="dateFilter" class="mkt-input border mkt-border rounded-2xl px-6 py-3 text-[10px] font-black uppercase italic outline-none focus:ring-2 focus:ring-indigo-600/20 transition-all">
+                <input type="date" wire:model.live="dateFilter" class="mkt-input border mkt-border rounded-2xl px-6 py-3 text-[10px] font-black uppercase italic outline-none focus:ring-2 focus:ring-brand-600/20 transition-all">
                 
                 @if($search || $actionFilter || $dateFilter)
-                    <button wire:click="$set('search', ''); $set('actionFilter', ''); $set('dateFilter', '');" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase italic hover:bg-black transition-all">
+                    <button wire:click="$set('search', ''); $set('actionFilter', ''); $set('dateFilter', '');" class="bg-brand-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase italic hover:bg-black transition-all">
                         Reset
                     </button>
                 @endif
@@ -129,7 +129,7 @@ new class extends Component {
                         <div class="flex justify-between items-center mt-0.5">
                             <span class="text-[8px] font-black text-slate-500 uppercase italic">Artikel / SAP</span>
                             <div class="text-right">
-                                <span class="text-indigo-600 dark:text-indigo-500 font-black text-xs tracking-tighter uppercase italic leading-none">
+                                <span class="mkt-text font-black text-xs tracking-tighter uppercase italic leading-none">
                                     {{ $log->art_no ?? '#' . ($log->sap_no ?? ($log->model ?? 'SYSTEM')) }}
                                 </span>
                                 @if($log->art_no && $log->sap_no)
@@ -184,7 +184,7 @@ new class extends Component {
                             {{-- Operator --}}
                             <td class="px-8 py-7">
                                 <div class="flex flex-col">
-                                    <span class="text-blue-600 dark:text-blue-400 font-black text-sm tracking-tight italic">{{ $log->user->name ?? 'SYSTEM' }}</span>
+                                    <span class="mkt-text font-black text-sm tracking-tight italic">{{ $log->user->name ?? 'SYSTEM' }}</span>
                                     <span class="text-[9px] mkt-text-muted font-bold opacity-60 tracking-widest mt-1">IP: {{ $log->ip_address ?? '0.0.0.0' }}</span>
                                 </div>
                             </td>
@@ -210,7 +210,7 @@ new class extends Component {
                             {{-- Identitas Artikel --}}
                             <td class="px-8 py-7 text-center">
                                 <div class="flex flex-col">
-                                    <span class="text-indigo-600 dark:text-indigo-500 font-black text-sm tracking-tighter uppercase italic">
+                                    <span class="mkt-text font-black text-sm tracking-tighter uppercase italic">
                                         {{ $log->art_no ?? '#' . ($log->sap_no ?? ($log->model ?? 'SYSTEM')) }}
                                     </span>
                                     @if($log->art_no && $log->sap_no)

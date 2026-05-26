@@ -14,9 +14,9 @@
         </thead>
         <tbody class="divide-y mkt-border">
             @forelse($workQueue as $job)
-                <tr class="hover:bg-indigo-600/5 transition-colors duration-300">
+                <tr class="hover:bg-brand-600/5 transition-colors duration-300">
                     <td class="px-4 lg:px-5 py-3">
-                        <span class="text-[10px] font-black text-indigo-400 uppercase italic">#{{ $job->art_no }}</span>
+                        <span class="text-[10px] font-black mkt-text uppercase italic">#{{ $job->art_no }}</span>
                         @if($job->is_urgent)
                             <span class="ml-1 bg-red-600 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase animate-pulse">URGENT</span>
                         @endif
@@ -48,12 +48,12 @@
                             </button>
                         @elseif($job->processing_by === auth()->id())
                             <button wire:click="startProcessAndRedirect({{ $job->id }})" 
-                                    class="bg-indigo-600 text-white px-4 py-1.5 rounded-xl text-[9px] font-black uppercase hover:bg-indigo-700 transition-all shadow-sm animate-pulse">
+                                    class="bg-brand-600 text-white px-4 py-1.5 rounded-xl text-[9px] font-black uppercase hover:bg-brand-700 transition-all shadow-sm animate-pulse">
                                 LANJUTKAN
                             </button>
                         @else
                             <button wire:click="showOrderDetail({{ $job->id }})" 
-                                class="mkt-surface-alt border mkt-border mkt-text px-4 py-1.5 rounded-xl font-black text-[9px] uppercase hover:bg-indigo-600 hover:border-transparent hover:text-white transition-all shadow-sm">
+                                class="mkt-surface-alt border mkt-border mkt-text px-4 py-1.5 rounded-xl font-black text-[9px] uppercase hover:bg-brand-600 hover:border-transparent hover:text-white transition-all shadow-sm">
                                 DETAIL & TERIMA
                             </button>
                         @endif
@@ -74,9 +74,9 @@
         <div class="mkt-surface p-4 rounded-2xl shadow-sm border mkt-border italic">
             <div class="flex items-start justify-between mb-3">
                 <div class="flex items-center gap-3">
-                    <div class="bg-indigo-600/15 text-indigo-400 w-10 h-10 rounded-xl flex items-center justify-center font-black text-[10px] border border-indigo-500/20 shrink-0">KN</div>
+                    <div class="bg-brand-600/15 mkt-text w-10 h-10 rounded-xl flex items-center justify-center font-black text-[10px] border border-brand-500/20 shrink-0">KN</div>
                     <div>
-                        <span class="text-[9px] font-black text-indigo-400 uppercase">#{{ $job->art_no }}</span>
+                        <span class="text-[9px] font-black mkt-text uppercase">#{{ $job->art_no }}</span>
                         @if($job->is_urgent)
                             <span class="ml-1 bg-red-600 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase animate-pulse">URGENT</span>
                         @endif
@@ -96,10 +96,10 @@
                             class="bg-amber-500 text-white px-3 py-1.5 rounded-xl text-[8px] font-black uppercase">AMBIL ALIH</button>
                 @elseif($job->processing_by === auth()->id())
                     <button wire:click="startProcessAndRedirect({{ $job->id }})" 
-                            class="bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-[8px] font-black uppercase animate-pulse">LANJUTKAN</button>
+                            class="bg-brand-600 text-white px-3 py-1.5 rounded-xl text-[8px] font-black uppercase animate-pulse">LANJUTKAN</button>
                 @else
                     <button wire:click="showOrderDetail({{ $job->id }})" 
-                        class="mkt-surface-alt border mkt-border mkt-text px-3 py-1.5 rounded-xl font-black text-[8px] uppercase hover:bg-indigo-600 hover:text-white transition-all">DETAIL & TERIMA</button>
+                        class="mkt-surface-alt border mkt-border mkt-text px-3 py-1.5 rounded-xl font-black text-[8px] uppercase hover:bg-brand-600 hover:text-white transition-all">DETAIL & TERIMA</button>
                 @endif
             </div>
         </div>

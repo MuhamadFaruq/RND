@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Sedang Maintenance | Duniatex RND</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; overflow: hidden; }
+        body { overflow: hidden; }
         .glow { filter: drop-shadow(0 0 20px rgba(220, 38, 38, 0.4)); }
     </style>
 </head>
@@ -76,16 +76,18 @@
     <script>
         function checkSystemStatus() {
             fetch('{{ route('api.maintenance-check') }}')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return null;
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    if (!data.is_maintenance) {
-                        // Jika sistem sudah ONLINE, otomatis refresh halaman
+                    if (data && !data.is_maintenance) {
                         window.location.reload();
                     }
                 })
-                .catch(err => {
-                    // Jika server mati total, abaikan agar tidak spam error di console
-                });
+                .catch(() => {});
         }
         // Cek setiap 15 detik untuk respon yang lebih cepat
         setInterval(checkSystemStatus, 15000);

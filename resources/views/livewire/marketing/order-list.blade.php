@@ -38,7 +38,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-2 md:gap-4 mb-6 md:mb-8">
             <div class="mkt-surface p-3 md:p-6 rounded-xl md:rounded-2xl shadow-sm border mkt-border flex flex-col justify-center">
                 <p class="text-[7px] md:text-[10px] font-black mkt-text-muted uppercase">Total Pesanan</p>
-                <h4 wire:key="counter-{{ $totalOrder }}" class="text-lg md:text-4xl font-black text-blue-600 italic mt-0.5 md:mt-1 leading-none">
+                <h4 wire:key="counter-{{ $totalOrder }}" class="text-lg md:text-4xl font-black mkt-text italic mt-0.5 md:mt-1 leading-none">
                     {{ $totalOrder }}
                 </h4>
             </div>
@@ -102,7 +102,7 @@
             @forelse($orders as $order)
                 @php
                     $statusMap = [
-                        'knitting' => ['bg' => 'bg-blue-500/10', 'text' => 'text-blue-600', 'border' => 'border-blue-500'],
+                        'knitting' => ['bg' => 'bg-brand/10', 'text' => 'text-brand', 'border' => 'border-brand'],
                         'dyeing' => ['bg' => 'bg-amber-500/10', 'text' => 'text-amber-600', 'border' => 'border-amber-500'],
                         'relax-dryer' => ['bg' => 'bg-cyan-500/10', 'text' => 'text-cyan-600', 'border' => 'border-cyan-500'],
                         'finished' => ['bg' => 'bg-green-500/10', 'text' => 'text-green-600', 'border' => 'border-green-500'],
@@ -112,7 +112,7 @@
                 <div class="mkt-surface p-3.5 rounded-xl border mkt-border shadow-sm relative overflow-hidden {{ $order->status == 'knitting' && $order->created_at->diffInDays(now()) >= 2 ? 'border-l-4 border-l-red-500' : 'border-l-4 ' . $cur['border'] }}">
                     <div class="flex justify-between items-start mb-2">
                         <div>
-                            <span class="text-xs font-black text-blue-600 italic tracking-tight">#{{ $order->art_no }}</span>
+                            <span class="text-xs font-black mkt-text italic tracking-tight">#{{ $order->art_no }}</span>
                             @if($order->status == 'knitting' && $order->created_at->diffInDays(now()) >= 2)
                                 <span class="text-[7px] font-black text-red-600 uppercase ml-1 animate-pulse">⚠ {{ $order->created_at->diffInDays(now()) }}D</span>
                             @endif
@@ -183,7 +183,7 @@
                                 
                                 <td class="p-6 relative">
                                     <div class="flex flex-col">
-                                        <span class="italic text-blue-600 tracking-tighter underline underline-offset-4 font-black">
+                                        <span class="italic mkt-text tracking-tighter underline underline-offset-4 font-black">
                                             {{ $order->art_no }}
                                         </span>
                                         
@@ -213,11 +213,11 @@
                                 <td class="p-6 text-center whitespace-nowrap">
                                     @php
                                         $statusMap = [
-                                            'knitting'    => ['bg' => 'bg-blue-100', 'text' => 'text-blue-600', 'icon' => ''],
+                                            'knitting'    => ['bg' => 'bg-brand-100', 'text' => 'text-brand', 'icon' => ''],
                                             'dyeing'      => ['bg' => 'bg-amber-100', 'text' => 'text-amber-600', 'icon' => ''],
                                             'relax-dryer' => ['bg' => 'bg-cyan-100', 'text' => 'text-cyan-600', 'icon' => ''],
-                                            'finishing'   => ['bg' => 'bg-indigo-100', 'text' => 'text-indigo-600', 'icon' => ''],
-                                            'stenter'     => ['bg' => 'bg-violet-100', 'text' => 'text-violet-600', 'icon' => ''],
+                                            'finishing'   => ['bg' => 'bg-brand-100', 'text' => 'text-brand-600', 'icon' => ''],
+                                            'stenter'     => ['bg' => 'bg-brand-100', 'text' => 'text-brand-600', 'icon' => ''],
                                             'tumbler'     => ['bg' => 'bg-orange-100', 'text' => 'text-orange-600', 'icon' => ''],
                                             'fleece'      => ['bg' => 'bg-rose-100', 'text' => 'text-rose-600', 'icon' => ''],
                                             'pengujian'   => ['bg' => 'bg-emerald-100', 'text' => 'text-emerald-600', 'icon' => ''],
@@ -271,25 +271,25 @@
              x-show="openDetail"
              @click="$wire.closeDetail()"></div>
 
-        <div class="fixed inset-y-0 right-0 pl-0 md:pl-10 max-w-full flex">
+        <div class="fixed inset-0 sm:inset-y-0 sm:right-0 sm:left-auto pl-0 sm:pl-6 md:pl-10 max-w-full flex w-full sm:w-auto">
             <div x-show="openDetail" 
-                 class="w-screen max-w-7xl text-left">
+                 class="w-full sm:max-w-2xl md:max-w-5xl lg:max-w-7xl text-left h-full">
                 
-                <div id="print-area" class="h-full flex flex-col mkt-surface shadow-2xl rounded-l-none md:rounded-l-[3rem] overflow-hidden border-l mkt-border">
-                    <div class="flex-1 overflow-y-auto custom-scrollbar">
+                <div id="print-area" class="h-full flex flex-col mkt-surface shadow-2xl rounded-none sm:rounded-l-[2rem] md:rounded-l-[3rem] overflow-hidden border-0 sm:border-l mkt-border">
+                    <div class="flex-1 overflow-y-auto custom-scrollbar min-h-0">
                         @if($showDetail && $selectedOrder)
                             <livewire:order-tracking-detail :order-id="$selectedOrder['id']" :key="$selectedOrder['id']" />
                         @endif
                     </div>
 
                     {{-- Footer Modal --}}
-                    <div class="p-3 md:p-8 mkt-surface-alt border-t mkt-border flex flex-col md:flex-row justify-between items-stretch md:items-center gap-2 md:gap-4 no-print-bg">
-                        <button onclick="window.print()" class="bg-blue-600 text-white px-4 md:px-8 py-2.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[9px] md:text-xs uppercase tracking-wider md:tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-100">
+                    <div class="p-3 sm:p-4 md:p-8 pb-[max(0.75rem,env(safe-area-inset-bottom))] mkt-surface-alt border-t mkt-border flex flex-col gap-2 sm:gap-3 shrink-0 no-print-bg">
+                        <button onclick="window.print()" class="w-full bg-brand text-white px-4 py-3 sm:py-3.5 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand/20">
                             <span>PRINT SURAT JALAN</span>
                         </button>
 
-                        <div class="flex gap-2 md:gap-4">
-                            <a :href="'/marketing/orders/' + selected?.id + '/edit'" class="flex-1 md:flex-none mkt-surface mkt-text border mkt-border px-3 md:px-8 py-2.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[9px] md:text-xs uppercase tracking-wider md:tracking-widest hover:bg-indigo-600 hover:text-white transition-all flex items-center justify-center gap-2">
+                        <div class="grid grid-cols-2 gap-2 sm:gap-4">
+                            <a :href="'/marketing/orders/' + selected?.id + '/edit'" class="mkt-surface mkt-text border mkt-border px-3 py-3 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider hover:bg-brand-600 hover:text-white transition-all flex items-center justify-center">
                                 <span>EDIT</span>
                             </a>
                             <button type="button" @click="Swal.fire({
@@ -303,7 +303,7 @@
                                 background: '#0f172a',
                                 color: '#fff',
                                 customClass: { popup: 'rounded-[2rem] border border-white/10 backdrop-blur-xl', title: 'font-black italic uppercase tracking-tighter', confirmButton: 'rounded-xl font-bold uppercase text-xs px-6 py-3', cancelButton: 'rounded-xl font-bold uppercase text-xs px-6 py-3' }
-                            }).then((result) => { if (result.isConfirmed) { $wire.deleteOrder(selected.id) } })" class="flex-1 md:flex-none bg-red-500/10 text-red-600 border border-red-500/20 px-3 md:px-8 py-2.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[9px] md:text-xs uppercase tracking-wider md:tracking-widest hover:bg-red-600 hover:text-white transition-all">
+                            }).then((result) => { if (result.isConfirmed) { $wire.deleteOrder(selected.id) } })" class="bg-red-500/10 text-red-600 border border-red-500/20 px-3 py-3 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider hover:bg-red-600 hover:text-white transition-all flex items-center justify-center">
                                 <span>HAPUS</span>
                             </button>
                         </div>

@@ -92,15 +92,15 @@ new class extends Component {
 <div class="min-h-screen mkt-bg mkt-text p-4 md:p-8 transition-colors duration-300 font-sans italic">
     <div class="max-w-6xl mx-auto">
         <h1 class="text-3xl md:text-5xl font-black italic uppercase tracking-tighter mkt-text mb-6 md:mb-10">
-            SYSTEM <span class="text-indigo-600">CONFIGURATION</span>
+            SYSTEM <span class="text-brand-600">CONFIGURATION</span>
         </h1>
  
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
             {{-- Production Parameters --}}
             <div class="lg:col-span-2 mkt-surface border mkt-border p-5 md:p-10 rounded-2xl md:rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col justify-between">
                 <div>
-                    <h3 class="text-lg md:text-2xl font-black italic uppercase text-indigo-600 mb-6 md:mb-8 flex items-center gap-3">
-                        <span class="w-1.5 h-6 md:w-2 md:h-8 bg-indigo-600 rounded-full"></span>
+                    <h3 class="text-lg md:text-2xl font-black italic uppercase text-brand-600 mb-6 md:mb-8 flex items-center gap-3">
+                        <span class="w-1.5 h-6 md:w-2 md:h-8 bg-brand-600 rounded-full"></span>
                         Production Parameters
                     </h3>
                     
@@ -109,21 +109,21 @@ new class extends Component {
                             <div>
                                 <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">Durasi Shift (Jam)</label>
                                 <input type="number" wire:model="shift_duration"
-                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all outline-none">
+                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 transition-all outline-none">
                             </div>
                             <div>
                                 <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">Kapasitas Mesin Maksimal (KG)</label>
                                 <input type="number" wire:model="max_capacity"
-                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all outline-none">
+                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 transition-all outline-none">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">Target Minimal per Shift (KG)</label>
                                 <input type="number" wire:model="target_minimal"
-                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all outline-none">
+                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 transition-all outline-none">
                             </div>
                         </div>
  
-                        <button type="submit" class="w-full bg-indigo-600 hover:bg-black text-white py-4 md:py-6 rounded-xl md:rounded-2xl font-black uppercase italic tracking-[0.15em] md:tracking-[0.2em] text-xs md:text-sm shadow-xl shadow-indigo-900/20 transition-all transform hover:-translate-y-0.5">
+                        <button type="submit" class="w-full bg-brand-600 hover:bg-black text-white py-4 md:py-6 rounded-xl md:rounded-2xl font-black uppercase italic tracking-[0.15em] md:tracking-[0.2em] text-xs md:text-sm shadow-xl shadow-brand-900/20 transition-all transform hover:-translate-y-0.5">
                             SAVE PRODUCTION PARAMETERS                     </button>
                     </form>
                 </div>
@@ -151,11 +151,11 @@ new class extends Component {
                             {{ $is_maintenance ? 'DISABLE MAINTENANCE' : 'ENABLE MAINTENANCE' }}
                         </button>
                         
-                        <a href="{{ route('admin.backup') }}" class="block w-full mkt-surface-alt mkt-text border mkt-border text-center py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black uppercase italic text-[8px] md:text-[10px] tracking-wider md:tracking-widest hover:bg-indigo-600 hover:text-white transition shadow-lg">
+                        <a href="{{ route('admin.backup') }}" class="block w-full mkt-surface-alt mkt-text border mkt-border text-center py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black uppercase italic text-[8px] md:text-[10px] tracking-wider md:tracking-widest hover:bg-brand-600 hover:text-white transition shadow-lg">
                             DOWNLOAD DB BACKUP
                         </a>
  
-                        <button type="button" onclick="confirmPurgeLogs()" class="block w-full mkt-surface-alt mkt-text-muted border mkt-border py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black uppercase italic text-[8px] md:text-[10px] tracking-wider md:tracking-widest hover:text-indigo-600 transition">
+                        <button type="button" onclick="confirmPurgeLogs()" class="block w-full mkt-surface-alt mkt-text-muted border mkt-border py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black uppercase italic text-[8px] md:text-[10px] tracking-wider md:tracking-widest hover:text-brand-600 transition">
                             PURGE AUDIT LOGS
                         </button>
                     </div>
@@ -163,7 +163,7 @@ new class extends Component {
  
                 <div class="mkt-surface-alt p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] border mkt-border">
                     <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase italic leading-relaxed">
-                        <span class="text-indigo-600 font-black italic">PRO TIP:</span> 
+                        <span class="text-brand-600 font-black italic">PRO TIP:</span> 
                         Gunakan tombol simpan setelah mengubah parameter produksi untuk memastikan seluruh dashboard operator terupdate secara serentak.
                     </p>
                 </div>
@@ -190,7 +190,7 @@ new class extends Component {
             title: '<span style="color: #fff; font-style: italic; font-weight: 900; text-transform: uppercase;">BERSIHKAN LOG?</span>',
             background: '#0f172a',
             showCancelButton: true,
-            confirmButtonColor: '#4f46e5',
+            confirmButtonColor: '#ED1C24',
             confirmButtonText: 'YA, HAPUS'
         }).then((result) => { if (result.isConfirmed) { $wire.dispatch('purge-logs-confirmed'); } })
     }

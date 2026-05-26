@@ -85,9 +85,8 @@ Route::middleware(['auth', 'verified', 'operator'])->prefix('operator')
 });
 
 // --- API / SYSTEM ROUTES ---
-Route::middleware(['auth'])->group(function () {
-    Route::get('/api/maintenance-check', [DashboardController::class, 'checkMaintenanceStatus'])->name('api.maintenance-check');
-});
+// Public: must work during maintenance mode (see bootstrap/app.php except list)
+Route::get('/api/maintenance-check', [DashboardController::class, 'checkMaintenanceStatus'])->name('api.maintenance-check');
 
 Route::middleware('auth')->group(function () {
     Route::get('/stop-impersonate', [DashboardController::class, 'stopImpersonate'])->name('admin.stop-impersonate');

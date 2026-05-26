@@ -416,7 +416,7 @@ new class extends Component
                             </h2>
                             <div class="mt-2 flex items-center gap-2">
                                 <div class="mkt-surface-alt backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg border mkt-border">
-                                    <p class="real-time-clock text-xs font-black tracking-widest leading-none text-indigo-400 drop-shadow-[0_0_5px_rgba(99,102,241,0.5)]">00:00:00</p>
+                                    <p class="real-time-clock text-xs font-black tracking-widest leading-none mkt-text drop-shadow-[0_0_5px_rgba(237, 28, 36,0.5)]">00:00:00</p>
                                 </div>
                                 <p class="real-time-date text-[10px] font-bold text-slate-400 uppercase tracking-widest italic"></p>
                             </div>
@@ -425,13 +425,13 @@ new class extends Component
                         <div class="mkt-surface-alt backdrop-blur-md px-4 py-2 rounded-xl shadow-sm border mkt-border flex items-center gap-3">
                             <div class="text-right italic">
                                 <p class="text-[9px] font-black text-slate-400 uppercase leading-none">Status Mesin</p>
-                                <p class="text-xs font-black {{ $machineStatus === 'running' ? 'text-green-500' : ($machineStatus === 'downtime' ? 'text-amber-500' : 'text-indigo-600') }} uppercase mt-1">
+                                <p class="text-xs font-black {{ $machineStatus === 'running' ? 'text-green-500' : ($machineStatus === 'downtime' ? 'text-amber-500' : 'text-orange-600') }} uppercase mt-1">
                                     {{ $machineStatus === 'running' ? 'Optimal Performance' : ($machineStatus === 'downtime' ? 'Machine Downtime' : 'Under Maintenance') }}
                                 </p>
                             </div>
                             <div class="relative flex">
-                                <span class="animate-ping absolute inline-flex h-3 w-3 rounded-full {{ $machineStatus === 'running' ? 'bg-green-400' : ($machineStatus === 'downtime' ? 'bg-amber-400' : 'bg-indigo-400') }} opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-3 w-3 {{ $machineStatus === 'running' ? 'bg-green-500' : ($machineStatus === 'downtime' ? 'bg-amber-500' : 'bg-indigo-600') }}"></span>
+                                <span class="animate-ping absolute inline-flex h-3 w-3 rounded-full {{ $machineStatus === 'running' ? 'bg-green-400' : ($machineStatus === 'downtime' ? 'bg-amber-400' : 'bg-orange-400') }} opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 {{ $machineStatus === 'running' ? 'bg-green-500' : ($machineStatus === 'downtime' ? 'bg-amber-500' : 'bg-orange-600') }}"></span>
                             </div>
                         </div>
                     </div>
@@ -446,7 +446,7 @@ new class extends Component
                                      <h4 class="text-3xl md:text-4xl font-black leading-none italic mkt-text">{{ (float)$progress }}%</h4>
                                     <div class="text-right leading-none">
                                         <p class="text-[10px] mkt-text-muted uppercase mb-1">Target: {{ $targetShift }} KG</p>
-                                        <p class="text-sm md:text-base font-black text-red-500 italic">{{ (float)$totalKgToday }} / {{ $targetShift }}</p>
+                                        <p class="text-sm md:text-base font-black mkt-text italic">{{ (float)$totalKgToday }} / {{ $targetShift }}</p>
                                     </div>
                                 </div>
                                 <div class="relative flex items-center justify-center mt-4 group">
@@ -457,7 +457,7 @@ new class extends Component
                                         
                                         {{-- Progress Path with Glow --}}
                                         <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" 
-                                            stroke="{{ $progress < 100 ? '#4f46e5' : '#10b981' }}" 
+                                            stroke="{{ $progress < 100 ? '#ED1C24' : '#10b981' }}" 
                                             stroke-width="8" stroke-linecap="round" 
                                             stroke-dasharray="{{ $progress * 1.25 }}, 125" 
                                             class="transition-all duration-1000" />
@@ -480,7 +480,7 @@ new class extends Component
                                         <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">Actual Output</p>
                                         <p class="text-xl md:text-2xl font-black mkt-text italic leading-none mt-1 drop-shadow-lg">
                                             {{ (float)$totalKgToday }} 
-                                            <span class="text-[10px] text-red-600 block mt-1">KILOGRAM</span>
+                                            <span class="text-[10px] mkt-text-muted block mt-1">KILOGRAM</span>
                                         </p>
                                     </div>
                                 </div>
@@ -491,7 +491,7 @@ new class extends Component
                         <div class="space-y-4">
                             <div class="mkt-surface-alt backdrop-blur-md p-4 rounded-xl border mkt-border shadow-md text-left hover:scale-[1.02] transition-transform duration-300">
                                 <p class="text-[9px] font-black text-slate-400 uppercase italic">Antrean Masuk</p>
-                                <h4 class="text-2xl md:text-3xl font-black text-indigo-500 italic">{{ $totalKnitting }}</h4>
+                                <h4 class="text-2xl md:text-3xl font-black mkt-text-muted italic">{{ $totalKnitting }}</h4>
                             </div>
                             <div class="mkt-surface-alt backdrop-blur-md p-4 rounded-xl border mkt-border shadow-md text-left hover:scale-[1.02] transition-transform duration-300">
                                 <p class="text-[9px] font-black text-slate-400 uppercase italic">Total Selesai</p>
@@ -529,8 +529,8 @@ new class extends Component
                             </button>
                             
                             <button wire:click="setMachineStatus('maintenance')" 
-                                class="flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-all duration-300 min-w-[80px] md:min-w-[100px] {{ $machineStatus === 'maintenance' ? 'bg-gradient-to-br from-indigo-600/30 to-violet-600/5 border-indigo-500 shadow-[0_0_15px_rgba(79,70,229,0.3)] scale-105' : 'mkt-surface-alt mkt-border hover:opacity-80' }} border">
-                                <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center {{ $machineStatus === 'maintenance' ? 'bg-indigo-600 text-white' : 'mkt-surface text-slate-500' }}">
+                                class="flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-all duration-300 min-w-[80px] md:min-w-[100px] {{ $machineStatus === 'maintenance' ? 'bg-gradient-to-br from-orange-600/30 to-orange-600/5 border-orange-500 shadow-[0_0_15px_rgba(234,88,12,0.3)] scale-105' : 'mkt-surface-alt mkt-border hover:opacity-80' }} border">
+                                <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center {{ $machineStatus === 'maintenance' ? 'bg-orange-600 text-white' : 'mkt-surface text-slate-500' }}">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.67 2.67 0 1121 17.25l-5.83-5.83m-3.75 3.75a3.75 3.75 0 11-5.3-5.3 3.75 3.75 0 015.3 5.3z" />
                                     </svg>
@@ -545,7 +545,7 @@ new class extends Component
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
                         <div class="lg:col-span-2 mkt-surface p-4 md:p-5 rounded-2xl border mkt-border shadow-lg">
                             <h3 class="text-xs font-black uppercase italic mkt-text mb-4 flex items-center gap-2">
-                                <span class="w-2 h-4 bg-indigo-600 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]"></span>
+                                <span class="w-2 h-4 bg-brand-600 rounded-full shadow-[0_0_10px_rgba(237, 28, 36,0.5)]"></span>
                                 Pesan Antar Shift / Kendala
                             </h3>
                             <div class="space-y-3 mb-4">
@@ -568,22 +568,22 @@ new class extends Component
                             
                             <form wire:submit.prevent="sendMessage" class="relative group">
                                 <input wire:model="messageText" type="text" placeholder="Tulis pesan atau laporkan kendala..." 
-                                    class="w-full mkt-surface-alt border mkt-border rounded-xl px-4 py-3 text-[11px] font-bold pr-28 focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all italic mkt-text placeholder-slate-400">
-                                <button type="submit" class="absolute right-2 top-2 bg-indigo-600 text-white px-5 py-2 rounded-xl text-[9px] font-black uppercase italic shadow-lg hover:bg-indigo-700 hover:shadow-indigo-500/30 transition-all">
+                                    class="w-full mkt-surface-alt border mkt-border rounded-xl px-4 py-3 text-[11px] font-bold pr-28 focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-all italic mkt-text placeholder-slate-400">
+                                <button type="submit" class="absolute right-2 top-2 bg-brand-600 text-white px-5 py-2 rounded-xl text-[9px] font-black uppercase italic shadow-lg hover:bg-brand-700 hover:shadow-brand-500/30 transition-all">
                                     KIRIM PESAN                                 </button>
                             </form>
                             @error('messageText') <p class="text-[9px] text-red-500 font-bold mt-2 uppercase italic">{{ $message }}</p> @enderror
                         </div>
 
                         <div class="mkt-surface p-4 md:p-5 rounded-2xl border mkt-border shadow-lg flex flex-col justify-center items-center text-center group">
-                            <div class="w-12 h-12 rounded-2xl bg-indigo-600/10 text-indigo-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <div class="w-12 h-12 rounded-2xl bg-brand-600/10 text-brand-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
                                 </svg>
                             </div>
                             <h4 class="text-sm font-black uppercase italic mkt-text mb-2">Arsip Pesan</h4>
                             <p class="text-[9px] font-bold mkt-text-muted uppercase mb-6">Lihat seluruh riwayat komunikasi antar shift</p>
-                            <button wire:click="setMenu('notes')" class="w-full mkt-surface-alt border mkt-border py-3 rounded-2xl text-[10px] font-black uppercase italic mkt-text hover:bg-indigo-600 hover:text-white hover:border-transparent transition-all duration-300 shadow-md">
+                            <button wire:click="setMenu('notes')" class="w-full mkt-surface-alt border mkt-border py-3 rounded-2xl text-[10px] font-black uppercase italic mkt-text hover:bg-brand-600 hover:text-white hover:border-transparent transition-all duration-300 shadow-md">
                                 BUKA ARSIP
                             </button>
                         </div>
@@ -606,7 +606,7 @@ new class extends Component
                         <div class="mb-5 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
                             <div>
                                 <h2 class="text-xl md:text-2xl font-black uppercase tracking-tighter mkt-text leading-none">
-                                    DUNIATEX <span class="text-indigo-600">Execution</span>
+                                    DUNIATEX <span class="text-brand-600">Execution</span>
                                 </h2>
                                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">
                                     Divisi: {{ auth()->user()->role }}
@@ -758,8 +758,8 @@ new class extends Component
                                     </div>
                                     
                                     <div>
-                                        <h4 class="text-lg mkt-text font-black leading-none italic">{{ $item->marketingOrder->art_no ?? 'UNKNOWN' }} <span class="text-[10px] text-indigo-500 uppercase font-black ml-2 px-2 py-1 bg-indigo-500/10 rounded-lg">{{ str_replace('-', ' ', $item->division_name) }}</span></h4>
-                                        <p class="text-[9px] text-indigo-600 font-bold mt-1 uppercase italic tracking-widest">ARTIKEL NO: {{ $item->marketingOrder->art_no ?? 'N/A' }}</p>
+                                        <h4 class="text-lg mkt-text font-black leading-none italic">{{ $item->marketingOrder->art_no ?? 'UNKNOWN' }} <span class="text-[10px] mkt-text-muted uppercase font-black ml-2 px-2 py-1 bg-brand-500/10 rounded-lg">{{ str_replace('-', ' ', $item->division_name) }}</span></h4>
+                                        <p class="text-[9px] text-brand-600 font-bold mt-1 uppercase italic tracking-widest">ARTIKEL NO: {{ $item->marketingOrder->art_no ?? 'N/A' }}</p>
                                         {{-- Info Operator --}}
                                         <p class="text-[8px] text-slate-400 mt-1 uppercase">
                                             PIC: {{ $item->technical_data['nama_input'] ?? 'OPERATOR' }}
@@ -770,7 +770,7 @@ new class extends Component
                                 <div class="flex gap-4 border-l mkt-border pl-10 items-center">
                                     <div class="text-right mr-4">
                                         <p class="text-[9px] text-slate-400 mb-1 italic">Output</p>
-                                        <p class="text-xl text-red-600 leading-none italic">
+                                        <p class="text-xl mkt-text leading-none italic">
                                             {{ (float)$item->kg ?? 0 }} KG
                                         </p>
                                     </div>
@@ -780,7 +780,7 @@ new class extends Component
                                         {{-- Tombol Detail --}}
                                         <button wire:click="viewLogDetail({{ $item->id }})" 
                                                 title="Lihat Detail Data"
-                                                class="w-10 h-10 mkt-surface-alt text-slate-400 border mkt-border rounded-xl hover:mkt-surface hover:text-indigo-500 transition-all flex items-center justify-center shadow-sm">
+                                                class="w-10 h-10 mkt-surface-alt text-slate-400 border mkt-border rounded-xl hover:mkt-surface hover:mkt-text-muted transition-all flex items-center justify-center shadow-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -794,7 +794,7 @@ new class extends Component
                                         {{-- Tombol Edit --}}
                                         <button wire:click="editLog({{ $item->id }})" 
                                                 title="{{ $isPastGrace ? 'Batas Waktu Revisi Habis (15 Menit)' : 'Edit Log Data' }}"
-                                                class="w-10 h-10 {{ $isPastGrace ? 'bg-slate-100 dark:bg-slate-900 text-slate-400 border border-slate-200 dark:border-slate-800 opacity-60 cursor-not-allowed' : 'bg-blue-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/50 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600' }} rounded-xl transition-all flex items-center justify-center shadow-sm">
+                                                class="w-10 h-10 {{ $isPastGrace ? 'bg-slate-100 dark:bg-slate-900 text-slate-400 border border-slate-200 dark:border-slate-800 opacity-60 cursor-not-allowed' : 'bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 border border-brand-100 dark:border-brand-900/50 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600' }} rounded-xl transition-all flex items-center justify-center shadow-sm">
                                             @if($isPastGrace)
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
@@ -851,7 +851,7 @@ new class extends Component
                     <div class="mb-5 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3">
                         <div>
                             <h2 class="text-xl md:text-2xl font-black uppercase tracking-tighter mkt-text leading-none">
-                                Message <span class="text-indigo-600">Archive</span>
+                                Message <span class="text-brand-600">Archive</span>
                             </h2>
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Seluruh riwayat pesan dan handover</p>
                         </div>
@@ -907,7 +907,7 @@ new class extends Component
             <div>
                 <h3 class="mkt-text text-base md:text-lg font-black uppercase tracking-tighter leading-none">
                     @if($showInputForm) INPUT HASIL PRODUKSI @else DETAIL ORDER MARKETING @endif 
-                    <span class="text-indigo-500">#{{ $selectedOrder->art_no }}</span>
+                    <span class="mkt-text-muted">#{{ $selectedOrder->art_no }}</span>
                 </h3>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Internal Tracking ID: {{ $selectedOrder->id }}</p>
             </div>
@@ -921,8 +921,8 @@ new class extends Component
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="mkt-surface-alt backdrop-blur-md p-6 rounded-[2rem] border mkt-border shadow-sm italic">
-                            <h3 class="text-indigo-500 font-black mb-4 border-b mkt-border pb-2 uppercase text-xs flex items-center">
-                                <span class="w-2 h-4 bg-indigo-600 mr-2 rounded-full"></span>I. Identity & Sales
+                            <h3 class="mkt-text-muted font-black mb-4 border-b mkt-border pb-2 uppercase text-xs flex items-center">
+                                <span class="w-2 h-4 bg-brand-600 mr-2 rounded-full"></span>I. Identity & Sales
                             </h3>
                             <div class="space-y-3 font-bold text-xs">
                                 <div class="flex justify-between border-b mkt-border pb-1">
@@ -945,8 +945,8 @@ new class extends Component
                         </div>
 
                         <div class="mkt-surface-alt backdrop-blur-md p-6 rounded-[2rem] border mkt-border shadow-sm italic">
-                            <h3 class="text-indigo-500 font-black mb-4 border-b mkt-border pb-2 uppercase text-xs flex items-center">
-                                <span class="w-2 h-4 bg-indigo-600 mr-2 rounded-full"></span>II. Technical Specs
+                            <h3 class="mkt-text-muted font-black mb-4 border-b mkt-border pb-2 uppercase text-xs flex items-center">
+                                <span class="w-2 h-4 bg-brand-600 mr-2 rounded-full"></span>II. Technical Specs
                             </h3>
                             <div class="space-y-3 font-bold text-xs">
                                 <div class="flex justify-between border-b mkt-border pb-1">
@@ -962,15 +962,15 @@ new class extends Component
                                     <span class="mkt-text italic uppercase">{{ $selectedOrder->konstruksi_greige }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-indigo-500 uppercase">Warna Finishing</span>
-                                    <span class="text-indigo-500 uppercase font-black italic">{{ $selectedOrder->warna }}</span>
+                                    <span class="mkt-text-muted uppercase">Warna Finishing</span>
+                                    <span class="mkt-text-muted uppercase font-black italic">{{ $selectedOrder->warna }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="mkt-surface-alt p-4 md:p-6 rounded-2xl shadow-lg border mkt-border">
-                        <h3 class="text-indigo-500 font-black mb-4 uppercase italic tracking-tighter text-center underline underline-offset-4 text-sm">Production Spec</h3>
+                        <h3 class="mkt-text-muted font-black mb-4 uppercase italic tracking-tighter text-center underline underline-offset-4 text-sm">Production Spec</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center font-bold">
                             <div class="border-r mkt-border italic">
                                 <p class="text-[9px] text-slate-400 uppercase mb-1">Kelompok Kain</p>
@@ -992,7 +992,7 @@ new class extends Component
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 italic font-black">
-                        <div class="bg-indigo-600 text-white p-4 md:p-6 rounded-2xl shadow-lg flex justify-between items-center">
+                        <div class="bg-brand-600 text-white p-4 md:p-6 rounded-2xl shadow-lg flex justify-between items-center">
                             <p class="text-[10px] uppercase tracking-wider">Total Roll Target</p>
                             <h4 class="text-2xl md:text-3xl underline decoration-2 underline-offset-4">{{ $selectedOrder->roll_target ?? '0' }}</h4>
                         </div>
@@ -1018,7 +1018,7 @@ new class extends Component
                     @if(count($productionHistory) > 0)
                     <div class="space-y-4">
                         <h3 class="mkt-text font-black uppercase italic tracking-tighter text-lg flex items-center gap-2">
-                            <span class="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs">III</span>
+                            <span class="w-8 h-8 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs">III</span>
                             JEJAK PRODUKSI <span class="text-red-600">(HISTORY)</span>
                         </h3>
                         
@@ -1026,14 +1026,14 @@ new class extends Component
                             @foreach($productionHistory as $history)
                                 <div class="relative pl-12">
                                     {{-- DOT INDICATOR --}}
-                                    <div class="absolute left-0 top-1 w-10 h-10 rounded-full {{ $history->division_name === 'knitting' ? 'bg-indigo-600' : 'bg-emerald-600' }} flex items-center justify-center z-10 shadow-sm font-black text-[10px] text-white">
+                                    <div class="absolute left-0 top-1 w-10 h-10 rounded-full {{ $history->division_name === 'knitting' ? 'bg-brand-600' : 'bg-emerald-600' }} flex items-center justify-center z-10 shadow-sm font-black text-[10px] text-white">
                                         {{ substr(strtoupper($history->division_name), 0, 1) }}
                                     </div>
                                     
                                     <div class="mkt-surface backdrop-blur-md p-6 rounded-[2rem] border mkt-border shadow-sm group hover:border-red-600 transition-all">
                                         <div class="flex justify-between items-start mb-3">
                                             <div>
-                                                <span class="text-[9px] font-black {{ $history->division_name === 'knitting' ? 'text-indigo-600 bg-blue-50' : 'text-emerald-600 bg-emerald-50' }} px-3 py-1 rounded-full uppercase tracking-widest">
+                                                <span class="text-[9px] font-black {{ $history->division_name === 'knitting' ? 'text-brand-600 bg-brand-50' : 'text-emerald-600 bg-emerald-50' }} px-3 py-1 rounded-full uppercase tracking-widest">
                                                     DIVISI: {{ strtoupper($history->division_name) }}
                                                 </span>
                                                 <h4 class="text-sm font-black mkt-text mt-2 uppercase italic tracking-tight">
@@ -1049,7 +1049,7 @@ new class extends Component
                                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 pt-3 border-t mkt-border">
                                             <div class="italic">
                                                 <p class="text-[8px] text-slate-400 uppercase mb-1">Hasil (KG)</p>
-                                                <p class="text-sm font-black text-red-600">{{ (float)$history->kg }} KG</p>
+                                                <p class="text-sm font-black mkt-text">{{ (float)$history->kg }} KG</p>
                                             </div>
                                             <div class="italic">
                                                 <p class="text-[8px] text-slate-400 uppercase mb-1">Roll</p>
@@ -1077,8 +1077,8 @@ new class extends Component
 
                    <div class="pt-4">@if($selectedLog)
                              @php $techData = $selectedLog->technical_data ?? []; @endphp
-                             <div class="mkt-surface-alt backdrop-blur-md p-8 rounded-2xl md:rounded-[3rem] border-t-8 border-indigo-600 shadow-xl mt-4">
-                                 <h3 class="text-indigo-600 font-black mb-6 uppercase italic tracking-tighter text-lg flex items-center">
+                             <div class="mkt-surface-alt backdrop-blur-md p-8 rounded-2xl md:rounded-[3rem] border-t-8 border-brand-600 shadow-xl mt-4">
+                                 <h3 class="text-brand-600 font-black mb-6 uppercase italic tracking-tighter text-lg flex items-center">
                                      <span class="mr-2"></span> Data Input Operator Tersimpan ({{ strtoupper(str_replace('-', ' ', $selectedLog->division_name)) }})
                                  </h3>
                                  
@@ -1087,7 +1087,7 @@ new class extends Component
                                      <div class="space-y-8 text-left">
                                          {{-- I. IDENTITAS & SPESIFIKASI MESIN --}}
                                          <div class="space-y-4">
-                                             <p class="text-[9px] font-black text-indigo-500 uppercase tracking-[0.3em] border-l-4 border-indigo-500 pl-3">I. IDENTITAS & SPESIFIKASI MESIN</p>
+                                             <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">I. IDENTITAS & SPESIFIKASI MESIN</p>
                                              <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                       <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TGL PRODUKSI</p>
@@ -1095,7 +1095,7 @@ new class extends Component
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">NO MESIN / TYPE</p>
-                                                     <p class="text-[11px] font-black text-red-500 uppercase italic">{{ $techData['no_mesin'] ?? '-' }} / {{ $techData['type_mesin'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['no_mesin'] ?? '-' }} / {{ $techData['type_mesin'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">GAUGE / INCH</p>
@@ -1103,7 +1103,7 @@ new class extends Component
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">FEEDER / JARUM</p>
-                                                     <p class="text-[11px] font-black text-blue-500 uppercase">{{ $techData['jml_feeder'] ?? '0' }} FDR / {{ $techData['jml_jarum'] ?? '0' }} JRM</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $techData['jml_feeder'] ?? '0' }} FDR / {{ $techData['jml_jarum'] ?? '0' }} JRM</p>
                                                  </div>
                                              </div>
                                          </div>
@@ -1120,10 +1120,10 @@ new class extends Component
                                                       <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TOTAL OUTPUT</p>
                                                       <p class="text-[11px] font-black text-emerald-500 uppercase">{{ $selectedLog->roll ?? '0' }} ROLL</p>
                                                   </div>
-                                                  <div class="col-span-2 mkt-surface-alt p-4 rounded-xl border border-indigo-600/10 flex justify-between items-center">
+                                                  <div class="col-span-2 mkt-surface-alt p-4 rounded-xl border border-brand-600/10 flex justify-between items-center">
                                                       <div>
                                                           <p class="text-[7px] text-slate-400 font-black uppercase mb-1 italic">ACTUAL WEIGHT</p>
-                                                          <p class="text-2xl font-black text-indigo-600 italic">{{ (float)$selectedLog->kg ?? 0 }} <span class="text-[10px] text-slate-400">KG</span></p>
+                                                          <p class="text-2xl font-black text-brand-600 italic">{{ (float)$selectedLog->kg ?? 0 }} <span class="text-[10px] text-slate-400">KG</span></p>
                                                       </div>
                                                       @if(isset($techData['produksi_per_day']))
                                                       <div class="text-right">
@@ -1137,11 +1137,11 @@ new class extends Component
 
                                          {{-- III. PENGGUNAAN BENANG & YL --}}
                                          <div class="space-y-4">
-                                              <p class="text-[9px] font-black text-red-500 uppercase tracking-[0.3em] border-l-4 border-red-500 pl-3">III. PENGGUNAAN BENANG & YL</p>
+                                              <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">III. PENGGUNAAN BENANG & YL</p>
                                               <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                   @foreach(range(1, 4) as $i)
                                                       @if(!empty($techData['benang_'.$i]))
-                                                          <div class="space-y-2 border-l border-indigo-600/20 pl-4 bg-white/5 p-3 rounded-xl transition-all">
+                                                          <div class="space-y-2 border-l border-brand-600/20 pl-4 bg-white/5 p-3 rounded-xl transition-all">
                                                               <p class="text-[7px] text-slate-400 font-black uppercase mb-0.5">SLOT {{ $i }}</p>
                                                               <p class="text-[10px] font-black mkt-text uppercase leading-tight truncate">
                                                                   {{ $techData['benang_'.$i] }}
@@ -1150,11 +1150,11 @@ new class extends Component
                                                                   <p class="text-[9px] font-black text-slate-500 uppercase leading-none">LOT: {{ $techData['benang_'.$i.'_lot'] }}</p>
                                                               @endif
                                                               @if(!empty($techData['benang_'.$i.'_percent']))
-                                                                  <p class="text-[11px] font-black text-red-500 tracking-tighter">{{ $techData['benang_'.$i.'_percent'] }}%</p>
+                                                                  <p class="text-[11px] font-black mkt-text tracking-tighter">{{ $techData['benang_'.$i.'_percent'] }}%</p>
                                                               @endif
                                                               <div class="pt-2 border-t border-black/5">
                                                                   <p class="text-[7px] text-slate-400 font-bold uppercase">YL</p>
-                                                                  <p class="text-[11px] font-bold text-blue-500 tracking-tighter">{{ $techData['yl_'.$i] ?? '-' }}</p>
+                                                                  <p class="text-[11px] font-bold mkt-text tracking-tighter">{{ $techData['yl_'.$i] ?? '-' }}</p>
                                                                 </div>
                                                           </div>
                                                       @endif
@@ -1182,22 +1182,22 @@ new class extends Component
                                              <div class="grid grid-cols-3 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">CEK GREIGE</p>
-                                                     <p class="text-[11px] font-black text-indigo-600 uppercase italic">{{ $techData['cek_greige'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black text-brand-600 uppercase italic">{{ $techData['cek_greige'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">LEBAR</p>
-                                                     <p class="text-[11px] font-black text-indigo-600 italic">{{ $techData['lebar'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black text-brand-600 italic">{{ $techData['lebar'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">GRAMASI</p>
-                                                     <p class="text-[11px] font-black text-indigo-600 italic">{{ $techData['gramasi'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black text-brand-600 italic">{{ $techData['gramasi'] ?? '-' }}</p>
                                                  </div>
                                              </div>
                                          </div>
 
                                          {{-- II. PARAMETER TEKNIS --}}
                                          <div class="space-y-4">
-                                             <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">II. PARAMETER LAINNYA</p>
+                                             <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. PARAMETER LAINNYA</p>
                                              <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OPERATOR</p>
@@ -1209,7 +1209,7 @@ new class extends Component
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">JENIS MESIN / NO MESIN</p>
-                                                     <p class="text-[11px] font-black text-red-500 uppercase italic">{{ $techData['jenis_mesin'] ?? '-' }} / {{ $techData['no_mesin'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['jenis_mesin'] ?? '-' }} / {{ $techData['no_mesin'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">WARNA / KODE</p>
@@ -1246,7 +1246,7 @@ new class extends Component
 
                                          {{-- II. PARAMETER TEKNIS & HASIL FISIK --}}
                                          <div class="space-y-4">
-                                             <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">II. PARAMETER TEKNIS & HASIL FISIK</p>
+                                             <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. PARAMETER TEKNIS & HASIL FISIK</p>
                                              <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">CHEMICAL</p>
@@ -1258,19 +1258,19 @@ new class extends Component
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">MESIN</p>
-                                                     <p class="text-[11px] font-black text-red-500 uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OVERFEED</p>
-                                                     <p class="text-[11px] text-indigo-500 font-black">{{ $techData['overfeed'] ?? '-' }}</p>
+                                                     <p class="text-[11px] mkt-text-muted font-black">{{ $techData['overfeed'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TEMPERATUR</p>
-                                                     <p class="text-[11px] text-indigo-500 font-black">{{ $techData['suhu'] ?? '-' }}°C</p>
+                                                     <p class="text-[11px] mkt-text-muted font-black">{{ $techData['suhu'] ?? '-' }}°C</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">SPEED</p>
-                                                     <p class="text-[11px] text-indigo-500 font-black">{{ $techData['speed'] ?? '-' }} m/min</p>
+                                                     <p class="text-[11px] mkt-text-muted font-black">{{ $techData['speed'] ?? '-' }} m/min</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">HASIL LEBAR</p>
@@ -1304,7 +1304,7 @@ new class extends Component
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">NO MESIN</p>
-                                                     <p class="text-[11px] font-black text-red-500 uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">RANGKA</p>
@@ -1315,19 +1315,19 @@ new class extends Component
 
                                          {{-- II. PARAMETER MESIN --}}
                                          <div class="space-y-4">
-                                             <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">II. PARAMETER MESIN & DRIVE SETTING</p>
+                                             <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. PARAMETER MESIN & DRIVE SETTING</p>
                                              <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TEMPERATURE</p>
-                                                     <p class="text-[11px] font-black text-indigo-500">{{ $techData['suhu'] ?? '-' }}°C</p>
+                                                     <p class="text-[11px] font-black mkt-text-muted">{{ $techData['suhu'] ?? '-' }}°C</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">SPEED</p>
-                                                     <p class="text-[11px] font-black text-indigo-500">{{ $techData['speed'] ?? '-' }} m/min</p>
+                                                     <p class="text-[11px] font-black mkt-text-muted">{{ $techData['speed'] ?? '-' }} m/min</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OVERFEED</p>
-                                                     <p class="text-[11px] font-black text-indigo-500">{{ $techData['overfeed'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text-muted">{{ $techData['overfeed'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">FELT</p>
@@ -1380,7 +1380,7 @@ new class extends Component
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">NO MESIN</p>
-                                                     <p class="text-[11px] font-black text-red-500 uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">RANGKA</p>
@@ -1391,19 +1391,19 @@ new class extends Component
 
                                          {{-- II. PARAMETER MESIN --}}
                                          <div class="space-y-4">
-                                             <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">II. PARAMETER MESIN & DRIVE SETTING</p>
+                                             <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. PARAMETER MESIN & DRIVE SETTING</p>
                                              <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TEMPERATUR</p>
-                                                     <p class="text-[11px] font-black text-indigo-500">{{ $techData['suhu'] ?? '-' }}°C</p>
+                                                     <p class="text-[11px] font-black mkt-text-muted">{{ $techData['suhu'] ?? '-' }}°C</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">SPEED</p>
-                                                     <p class="text-[11px] font-black text-indigo-500">{{ $techData['speed'] ?? '-' }} m/min</p>
+                                                     <p class="text-[11px] font-black mkt-text-muted">{{ $techData['speed'] ?? '-' }} m/min</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OVERFEED</p>
-                                                     <p class="text-[11px] font-black text-indigo-500">{{ $techData['overfeed'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text-muted">{{ $techData['overfeed'] ?? '-' }}</p>
                                                  </div>
                                                  <div class="col-span-2 md:col-span-3"></div>
                                                  <div>
@@ -1445,7 +1445,7 @@ new class extends Component
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">NO MESIN</p>
-                                                     <p class="text-[11px] font-black text-red-500 uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TANGGAL SUBMIT</p>
@@ -1458,13 +1458,13 @@ new class extends Component
                                          <div class="space-y-6">
                                              <div class="flex gap-2 p-1 mkt-surface rounded-2xl w-fit border mkt-border">
                                                  <button type="button" @click="subPhase = 'preset'"
-                                                     :class="subPhase === 'preset' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'"
+                                                     :class="subPhase === 'preset' ? 'bg-brand-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'"
                                                      class="px-5 py-3 rounded-xl text-[10px] font-black uppercase transition-all">PRESET PHASE</button>
                                                  <button type="button" @click="subPhase = 'drying'"
-                                                     :class="subPhase === 'drying' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'"
+                                                     :class="subPhase === 'drying' ? 'bg-brand-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'"
                                                      class="px-5 py-3 rounded-xl text-[10px] font-black uppercase transition-all">DRYING PHASE</button>
                                                  <button type="button" @click="subPhase = 'finishing'"
-                                                     :class="subPhase === 'finishing' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'"
+                                                     :class="subPhase === 'finishing' ? 'bg-brand-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'"
                                                      class="px-5 py-3 rounded-xl text-[10px] font-black uppercase transition-all">FINISHING PHASE</button>
                                              </div>
 
@@ -1483,11 +1483,11 @@ new class extends Component
                                                      </div>
                                                      <div>
                                                          <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TEMPERATURE</p>
-                                                         <p class="text-[11px] font-black text-indigo-500">{{ $preset['suhu'] ?? '-' }} °C</p>
+                                                         <p class="text-[11px] font-black mkt-text-muted">{{ $preset['suhu'] ?? '-' }} °C</p>
                                                      </div>
                                                      <div>
                                                          <p class="text-[7px] text-slate-400 font-black uppercase mb-1">SPEED</p>
-                                                         <p class="text-[11px] font-black text-indigo-500">{{ $preset['speed'] ?? '-' }} m/min</p>
+                                                         <p class="text-[11px] font-black mkt-text-muted">{{ $preset['speed'] ?? '-' }} m/min</p>
                                                      </div>
                                                      <div>
                                                          <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OVERFEED (A/B)</p>
@@ -1507,7 +1507,7 @@ new class extends Component
                                                      </div>
                                                      <div class="col-span-4 border-t mkt-border pt-4">
                                                          <p class="text-[7px] text-slate-400 font-black uppercase mb-1">HASIL FISIK (LEBAR / GRAMASI / SHRINKAGE)</p>
-                                                         <p class="text-[11px] font-black text-indigo-500 uppercase italic">{{ $preset['lebar'] ?? '-' }} cm / {{ $preset['gramasi'] ?? '-' }} gsm / {{ $preset['shrinkage'] ?? '-' }} %</p>
+                                                         <p class="text-[11px] font-black mkt-text-muted uppercase italic">{{ $preset['lebar'] ?? '-' }} cm / {{ $preset['gramasi'] ?? '-' }} gsm / {{ $preset['shrinkage'] ?? '-' }} %</p>
                                                      </div>
                                                  </div>
                                              </div>
@@ -1521,11 +1521,11 @@ new class extends Component
                                                      </div>
                                                      <div>
                                                          <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TEMPERATURE</p>
-                                                         <p class="text-[11px] font-black text-indigo-500">{{ $drying['suhu'] ?? '-' }} °C</p>
+                                                         <p class="text-[11px] font-black mkt-text-muted">{{ $drying['suhu'] ?? '-' }} °C</p>
                                                      </div>
                                                      <div>
                                                          <p class="text-[7px] text-slate-400 font-black uppercase mb-1">SPEED</p>
-                                                         <p class="text-[11px] font-black text-indigo-500">{{ $drying['speed'] ?? '-' }} m/min</p>
+                                                         <p class="text-[11px] font-black mkt-text-muted">{{ $drying['speed'] ?? '-' }} m/min</p>
                                                      </div>
                                                      <div>
                                                          <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OVERFEED (A/B)</p>
@@ -1545,7 +1545,7 @@ new class extends Component
                                                      </div>
                                                      <div class="col-span-4 border-t mkt-border pt-4">
                                                          <p class="text-[7px] text-slate-400 font-black uppercase mb-1">HASIL FISIK (LEBAR / GRAMASI / SHRINKAGE)</p>
-                                                         <p class="text-[11px] font-black text-indigo-500 uppercase italic">{{ $drying['lebar'] ?? '-' }} cm / {{ $drying['gramasi'] ?? '-' }} gsm / {{ $drying['shrinkage'] ?? '-' }} %</p>
+                                                         <p class="text-[11px] font-black mkt-text-muted uppercase italic">{{ $drying['lebar'] ?? '-' }} cm / {{ $drying['gramasi'] ?? '-' }} gsm / {{ $drying['shrinkage'] ?? '-' }} %</p>
                                                      </div>
                                                  </div>
                                              </div>
@@ -1559,11 +1559,11 @@ new class extends Component
                                                      </div>
                                                      <div>
                                                          <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TEMPERATURE</p>
-                                                         <p class="text-[11px] font-black text-indigo-500">{{ $finishing['suhu'] ?? '-' }} °C</p>
+                                                         <p class="text-[11px] font-black mkt-text-muted">{{ $finishing['suhu'] ?? '-' }} °C</p>
                                                      </div>
                                                      <div>
                                                          <p class="text-[7px] text-slate-400 font-black uppercase mb-1">SPEED</p>
-                                                         <p class="text-[11px] font-black text-indigo-500">{{ $finishing['speed'] ?? '-' }} m/min</p>
+                                                         <p class="text-[11px] font-black mkt-text-muted">{{ $finishing['speed'] ?? '-' }} m/min</p>
                                                      </div>
                                                      <div>
                                                          <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OVERFEED (A/B)</p>
@@ -1583,7 +1583,7 @@ new class extends Component
                                                      </div>
                                                      <div class="col-span-4 border-t mkt-border pt-4">
                                                          <p class="text-[7px] text-slate-400 font-black uppercase mb-1">HASIL FISIK (LEBAR / GRAMASI / SHRINKAGE)</p>
-                                                         <p class="text-[11px] font-black text-indigo-500 uppercase italic">{{ $finishing['lebar'] ?? '-' }} cm / {{ $finishing['gramasi'] ?? '-' }} gsm / {{ $finishing['shrinkage'] ?? '-' }} %</p>
+                                                         <p class="text-[11px] font-black mkt-text-muted uppercase italic">{{ $finishing['lebar'] ?? '-' }} cm / {{ $finishing['gramasi'] ?? '-' }} gsm / {{ $finishing['shrinkage'] ?? '-' }} %</p>
                                                      </div>
                                                  </div>
                                              </div>
@@ -1606,30 +1606,30 @@ new class extends Component
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">NO MESIN</p>
-                                                     <p class="text-[11px] font-black text-red-500 uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
                                                  </div>
                                              </div>
                                          </div>
 
                                          {{-- II. PARAMETER MESIN --}}
                                          <div class="space-y-4">
-                                             <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">II. PARAMETER SETTING MESIN</p>
+                                             <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. PARAMETER SETTING MESIN</p>
                                              <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TEMPERATURE</p>
-                                                     <p class="text-[11px] font-black text-indigo-500">{{ $techData['suhu'] ?? '-' }}°C</p>
+                                                     <p class="text-[11px] font-black mkt-text-muted">{{ $techData['suhu'] ?? '-' }}°C</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">STEAM INJECT</p>
-                                                     <p class="text-[11px] font-black text-indigo-500">{{ $techData['steam_inject'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text-muted">{{ $techData['steam_inject'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">HOTWIND</p>
-                                                     <p class="text-[11px] font-black text-indigo-500">{{ $techData['hotwind'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text-muted">{{ $techData['hotwind'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">COLDWIND</p>
-                                                     <p class="text-[11px] font-black text-indigo-500">{{ $techData['coldwind'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text-muted">{{ $techData['coldwind'] ?? '-' }}</p>
                                                  </div>
                                              </div>
                                          </div>
@@ -1661,13 +1661,13 @@ new class extends Component
                                              <p class="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em] border-l-4 border-emerald-500 pl-3">I. IDENTITAS MESIN (FLEECE)</p>
                                              <div class="mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <p class="text-[7px] text-slate-400 font-black uppercase mb-1">NO MESIN</p>
-                                                 <p class="text-[11px] font-black text-red-500 uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
+                                                 <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
                                              </div>
                                          </div>
 
                                          {{-- II. DETIL PROSES SIDE-BY-SIDE --}}
                                          <div class="space-y-4">
-                                             <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">II. DETAIL PARAMETER PROSES</p>
+                                             <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. DETAIL PARAMETER PROSES</p>
                                              <div class="overflow-x-auto">
                                                  <div class="min-w-[700px] space-y-4">
                                                      <div class="grid grid-cols-12 gap-4 bg-white/5 px-6 py-4 rounded-2xl items-center text-[9px] font-black uppercase tracking-widest text-slate-400 text-center">
@@ -1742,15 +1742,15 @@ new class extends Component
 
                                          {{-- II. HASIL PENGUJIAN FISIK --}}
                                          <div class="space-y-4">
-                                             <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">II. HASIL PENGUJIAN FISIK</p>
+                                             <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. HASIL PENGUJIAN FISIK</p>
                                              <div class="grid grid-cols-2 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">HASIL LEBAR</p>
-                                                     <p class="text-[11px] font-black text-indigo-500 italic">{{ $techData['lebar'] ?? '-' }} cm</p>
+                                                     <p class="text-[11px] font-black mkt-text-muted italic">{{ $techData['lebar'] ?? '-' }} cm</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">HASIL GRAMASI</p>
-                                                     <p class="text-[11px] font-black text-indigo-500 italic">{{ $techData['gramasi'] ?? '-' }} gsm</p>
+                                                     <p class="text-[11px] font-black mkt-text-muted italic">{{ $techData['gramasi'] ?? '-' }} gsm</p>
                                                  </div>
                                              </div>
                                          </div>
@@ -1779,7 +1779,7 @@ new class extends Component
                                      <div class="space-y-8 text-left">
                                          {{-- I. IDENTITAS & OPERATOR --}}
                                          <div class="space-y-4">
-                                             <p class="text-[9px] font-black text-indigo-500 uppercase tracking-[0.3em] border-l-4 border-indigo-500 pl-3">I. IDENTITAS KAIN & OPERATOR (QE)</p>
+                                             <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">I. IDENTITAS KAIN & OPERATOR (QE)</p>
                                              <div class="grid grid-cols-2 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OPERATOR QE</p>
@@ -1837,7 +1837,7 @@ new class extends Component
 
                             {{-- Mengubah dari <a> tag menjadi button wire:click agar WIP status bisa diupdate sebelum redirect --}}
                             <button wire:click="startProcessAndRedirect({{ $selectedOrder->id }})" 
-                                class="w-full bg-indigo-600 text-white py-6 rounded-[2rem] font-black uppercase text-sm flex items-center justify-center gap-3 hover:bg-indigo-500 transition-all shadow-xl tracking-[0.2em]">
+                                class="w-full bg-brand-600 text-white py-6 rounded-[2rem] font-black uppercase text-sm flex items-center justify-center gap-3 hover:bg-brand-500 transition-all shadow-xl tracking-[0.2em]">
                                 
                                 {{-- Nama tombol otomatis berubah sesuai divisi --}}
                                 TERIMA & KERJAKAN {{ strtoupper(auth()->user()->role) }}
@@ -1850,22 +1850,22 @@ new class extends Component
                 {{-- TAMPILAN 2: FORM INPUT HASIL --}}
                 <form wire:submit.prevent="submitProduction" class="italic text-left font-black">
                     <div class="grid grid-cols-2 gap-6 mb-6">
-                        <div class="col-span-2 bg-indigo-50 dark:bg-indigo-950 p-4 rounded-2xl flex justify-between items-center border border-indigo-100 dark:border-indigo-900">
-                            <p class="text-xs text-indigo-800 dark:text-indigo-200 uppercase italic">Shift Kerja Aktif:</p>
-                            <span class="bg-indigo-600 text-white px-4 py-1 rounded-full text-xs italic tracking-widest uppercase font-black">Shift {{ $shift }}</span>
+                        <div class="col-span-2 bg-brand-50 dark:bg-brand-950 p-4 rounded-2xl flex justify-between items-center border border-brand-100 dark:border-brand-900">
+                            <p class="text-xs text-brand-800 dark:text-brand-200 uppercase italic">Shift Kerja Aktif:</p>
+                            <span class="bg-brand-600 text-white px-4 py-1 rounded-full text-xs italic tracking-widest uppercase font-black">Shift {{ $shift }}</span>
                         </div>
 
                         <div>
                             <label class="text-[10px] text-slate-400 uppercase ml-2">Total Berat (KG)</label>
                             <input type="number" step="0.1" wire:model="qty_kg" 
-                                class="w-full mkt-surface border mkt-border rounded-2xl p-4 text-xl font-black mkt-text focus:ring-4 focus:ring-indigo-500/20 {{ $errors->has('qty_kg') ? 'ring-2 ring-red-500' : '' }}">
+                                class="w-full mkt-surface border mkt-border rounded-2xl p-4 text-xl font-black mkt-text focus:ring-4 focus:ring-brand-500/20 {{ $errors->has('qty_kg') ? 'ring-2 ring-red-500' : '' }}">
                             @error('qty_kg') <p class="text-[9px] text-red-500 mt-1 ml-2 font-bold uppercase italic">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
                             <label class="text-[10px] text-slate-400 uppercase ml-2">Jumlah Roll</label>
                             <input type="number" wire:model="qty_roll" required
-                                class="w-full mkt-surface border mkt-border rounded-2xl p-4 text-xl font-black mkt-text focus:ring-4 focus:ring-indigo-500/20 italic" placeholder="0">
+                                class="w-full mkt-surface border mkt-border rounded-2xl p-4 text-xl font-black mkt-text focus:ring-4 focus:ring-brand-500/20 italic" placeholder="0">
                         </div>
                     </div>
 

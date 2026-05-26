@@ -16,7 +16,7 @@
             Calculator
         </button>
         <button wire:click="setTab('history')" 
-            class="flex-1 md:flex-none px-4 md:px-6 py-2.5 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all {{ $activeTab === 'history' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'mkt-text-muted hover:mkt-text' }}">
+            class="flex-1 md:flex-none px-4 md:px-6 py-2.5 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all {{ $activeTab === 'history' ? 'bg-brand text-white shadow-lg shadow-brand/20' : 'mkt-text-muted hover:mkt-text' }}">
             Riwayat Quotation
         </button>
     </div>
@@ -107,17 +107,17 @@
                     {{-- II. OVERHEAD & FAKTOR SUSUT --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4">
                         <div class="space-y-6">
-                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] mb-4 border-l-4 border-blue-500 pl-3">II. Overhead & Energi</p>
+                            <p class="text-[10px] font-black mkt-text-muted uppercase tracking-[0.3em] mb-4 border-l-4 border-mkt-border pl-3">II. Overhead & Energi</p>
                             <div>
                                 <label class="block text-[10px] font-black mkt-text-muted uppercase mb-2 ml-1">Biaya Overhead (Rp/kg)</label>
                                 <div class="relative group">
-                                    <span class="absolute left-5 top-3.5 text-xs font-black text-blue-500">Rp</span>
+                                    <span class="absolute left-5 top-3.5 text-xs font-black mkt-text-muted">Rp</span>
                                     <input type="text" 
                                         x-data="{ display: $wire.entangle('overhead') }"
                                         x-init="$watch('display', v => display = formatIDR(v))"
                                         x-on:input="display = formatIDR($event.target.value); $wire.set('overhead', stripFormatting($event.target.value))"
                                         x-bind:value="formatIDR(display)"
-                                        class="w-full mkt-surface border-2 mkt-border rounded-xl pl-12 pr-5 py-3 font-bold text-sm mkt-text focus:border-blue-500 outline-none transition-all"
+                                        class="w-full mkt-surface border-2 mkt-border rounded-xl pl-12 pr-5 py-3 font-bold text-sm mkt-text focus:border-brand outline-none transition-all"
                                         placeholder="0">
                                 </div>
                             </div>
@@ -218,7 +218,7 @@
         <div class="animate-in fade-in slide-in-from-right-4 duration-500">
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-4 mb-6 md:mb-8 pb-4 md:pb-6 border-b mkt-border">
                 <div class="flex items-center gap-3 md:gap-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white text-xl md:text-2xl shadow-lg shadow-blue-600/20 shrink-0">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-brand rounded-xl md:rounded-2xl flex items-center justify-center text-white text-xl md:text-2xl shadow-lg shadow-brand/20 shrink-0">
                                             </div>
                     <div>
                         <h3 class="text-base md:text-xl font-black uppercase tracking-tighter mkt-text leading-tight italic">Saved Quotations</h3>
@@ -232,7 +232,7 @@
                     <div class="mkt-surface border mkt-border rounded-[2rem] p-6 shadow-sm hover:shadow-xl transition-all relative overflow-hidden group">
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <p class="text-[9px] font-black text-blue-600 uppercase tracking-widest leading-none mb-1">{{ $q->customer_name }}</p>
+                                <p class="text-[9px] font-black mkt-text uppercase tracking-widest leading-none mb-1">{{ $q->customer_name }}</p>
                                 <h4 class="text-lg font-black mkt-text italic uppercase leading-tight">{{ $q->article_name }}</h4>
                             </div>
                             <div class="text-right">
@@ -252,7 +252,7 @@
                         </div>
 
                         <div class="flex items-center gap-2">
-                            <button wire:click="loadQuotation({{ $q->id }})" class="flex-1 bg-slate-900 text-white py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
+                            <button wire:click="loadQuotation({{ $q->id }})" class="flex-1 bg-slate-900 text-white py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-brand transition-all flex items-center justify-center gap-2">
                                 MUAT DATA
                             </button>
                             <button wire:click="deleteQuotation({{ $q->id }})" class="w-10 h-10 bg-red-100 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all flex items-center justify-center">

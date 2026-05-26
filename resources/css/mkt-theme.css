@@ -1,0 +1,128 @@
+:root {
+    --mkt-bg: #fcfdfe;
+    --mkt-surface: #ffffff;
+    --mkt-surface-alt: #f1f4f9;
+    --mkt-border: #edf2f7;
+    --mkt-text: #1a202c;
+    --mkt-text-muted: #718096;
+    --mkt-input-bg: #f7fafc;
+    --mkt-brand: #ED1C24;
+    --mkt-brand-muted: #FFE1E2;
+    --mkt-brand-dark: #C81018;
+    --mkt-theme-duration: 0.4s;
+    --mkt-theme-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    color-scheme: light;
+}
+
+.dark {
+    --mkt-bg: #0b0f19;
+    --mkt-surface: #151c2c;
+    --mkt-surface-alt: #1e293b;
+    --mkt-border: rgba(255, 255, 255, 0.1);
+    --mkt-text: #f8fafc;
+    --mkt-text-muted: #cbd5e1;
+    --mkt-input-bg: rgba(11, 15, 25, 0.8);
+    color-scheme: dark;
+}
+
+html {
+    background-color: var(--mkt-bg);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    background-color: var(--mkt-bg);
+    color: var(--mkt-text);
+}
+
+.mkt-bg {
+    background-color: var(--mkt-bg) !important;
+}
+
+.mkt-surface {
+    background-color: var(--mkt-surface) !important;
+}
+
+.mkt-surface-alt {
+    background-color: var(--mkt-surface-alt) !important;
+}
+
+.mkt-border {
+    border-color: var(--mkt-border) !important;
+}
+
+.mkt-text {
+    color: var(--mkt-text) !important;
+}
+
+.mkt-text-muted {
+    color: var(--mkt-text-muted) !important;
+}
+
+.mkt-input {
+    background-color: var(--mkt-input-bg) !important;
+    color: var(--mkt-text) !important;
+    border-color: var(--mkt-border) !important;
+}
+
+/* Transisi halus hanya saat toggle tema (bukan permanen di semua elemen) */
+html.theme-animate {
+    transition: background-color var(--mkt-theme-duration) var(--mkt-theme-ease),
+        color-scheme var(--mkt-theme-duration) var(--mkt-theme-ease);
+}
+
+html.theme-animate body,
+html.theme-animate .mkt-bg,
+html.theme-animate .mkt-surface,
+html.theme-animate .mkt-surface-alt,
+html.theme-animate .mkt-border,
+html.theme-animate .mkt-text,
+html.theme-animate .mkt-text-muted,
+html.theme-animate .mkt-input,
+html.theme-animate nav,
+html.theme-animate main,
+html.theme-animate header,
+html.theme-animate aside,
+html.theme-animate [class*="mkt-"] {
+    transition: background-color var(--mkt-theme-duration) var(--mkt-theme-ease),
+        border-color var(--mkt-theme-duration) var(--mkt-theme-ease),
+        color var(--mkt-theme-duration) var(--mkt-theme-ease),
+        box-shadow var(--mkt-theme-duration) var(--mkt-theme-ease) !important;
+}
+
+/* Tailwind dark: utilities ikut animasi saat toggle */
+html.theme-animate [class*="bg-"],
+html.theme-animate [class*="text-"],
+html.theme-animate [class*="border-"] {
+    transition: background-color var(--mkt-theme-duration) var(--mkt-theme-ease),
+        border-color var(--mkt-theme-duration) var(--mkt-theme-ease),
+        color var(--mkt-theme-duration) var(--mkt-theme-ease) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.theme-animate,
+    html.theme-animate *,
+    html.theme-animate [class*="bg-"],
+    html.theme-animate [class*="text-"],
+    html.theme-animate [class*="border-"] {
+        transition: none !important;
+    }
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: var(--mkt-surface-alt);
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background: var(--mkt-border);
+    border-radius: 10px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: var(--mkt-brand);
+}

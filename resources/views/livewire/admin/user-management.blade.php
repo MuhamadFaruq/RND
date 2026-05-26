@@ -4,17 +4,17 @@
         {{-- HEADER: Mengikuti gaya Monitoring --}}
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 border-b mkt-border pb-8 gap-6">
             <div>
-                <h1 class="text-4xl md:text-6xl font-black italic tracking-tighter uppercase text-indigo-600 leading-none">
+                <h1 class="text-4xl md:text-6xl font-black italic tracking-tighter uppercase text-brand-600 leading-none">
                     Users <span class="mkt-text">Control</span>
                 </h1>
                 <p class="mkt-text-muted font-bold tracking-widest uppercase text-[10px] md:text-xs mt-3 italic">Duniatex Group - Access Management</p>
             </div>
-            <button wire:click="openModal" class="w-full md:w-auto bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black uppercase italic shadow-2xl hover:bg-indigo-700 transition transform hover:scale-105 tracking-tighter">
+            <button wire:click="openModal" class="w-full md:w-auto bg-brand-600 text-white px-8 py-3 rounded-2xl font-black uppercase italic shadow-2xl hover:bg-brand-700 transition transform hover:scale-105 tracking-tighter">
                 + Tambah Personel
             </button>
         </div>
 
-        <div class="mkt-surface p-1 rounded-3xl border mkt-border mb-10 shadow-lg flex items-center transition-all focus-within:ring-2 focus-within:ring-indigo-500/20">
+        <div class="mkt-surface p-1 rounded-3xl border mkt-border mb-10 shadow-lg flex items-center transition-all focus-within:ring-2 focus-within:ring-brand-500/20">
             <div class="pl-6 pr-3">
                 <svg class="w-5 h-5 mkt-text-muted opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
@@ -32,14 +32,14 @@
         <div class="block md:hidden space-y-4 mb-6">
             @foreach($users as $user)
                 <div class="mkt-surface p-4 rounded-2xl border mkt-border shadow-md relative overflow-hidden flex flex-col gap-3">
-                    <div class="absolute left-0 top-0 w-1.5 h-full bg-blue-500"></div>
+                    <div class="absolute left-0 top-0 w-1.5 h-full bg-brand"></div>
                     
                     <div class="flex justify-between items-start pl-2">
                         <div class="flex flex-col">
                             <span class="text-xs font-black mkt-text uppercase tracking-tight italic">{{ $user->name }}</span>
                             <span class="text-[8px] mkt-text-muted font-bold lowercase opacity-70">{{ $user->email }}</span>
                         </div>
-                        <span class="px-2.5 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-lg uppercase text-[8px] font-black tracking-widest inline-block shadow-sm">
+                        <span class="px-2.5 py-1 bg-brand/10 mkt-text border border-brand/20 rounded-lg uppercase text-[8px] font-black tracking-widest inline-block shadow-sm">
                             {{ $user->role }}
                         </span>
                     </div>
@@ -67,7 +67,7 @@
                                 </a>
                             @endif
                             
-                            <button wire:click="editUser({{ $user->id }})" class="p-2.5 mkt-surface-alt mkt-text rounded-xl border mkt-border hover:border-blue-500 hover:text-blue-500 transition-all shadow-sm">
+                            <button wire:click="editUser({{ $user->id }})" class="p-2.5 mkt-surface-alt mkt-text rounded-xl border mkt-border hover:border-brand hover:text-brand transition-all shadow-sm">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             </button>
 
@@ -109,7 +109,7 @@
                                 </div>
                             </td>
                             <td class="px-8 py-7 text-center">
-                                <span class="px-5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-sm inline-block min-w-[120px]">
+                                <span class="px-5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest bg-brand/10 mkt-text border border-brand/20 shadow-sm inline-block min-w-[120px]">
                                     {{ $user->role }}
                                 </span>
                             </td>
@@ -136,7 +136,7 @@
                                         </a>
                                     @endif
                                     
-                                    <button wire:click="editUser({{ $user->id }})" class="p-3 mkt-surface-alt mkt-text rounded-2xl border mkt-border hover:border-blue-500 hover:text-blue-500 transition-all shadow-sm">
+                                    <button wire:click="editUser({{ $user->id }})" class="p-3 mkt-surface-alt mkt-text rounded-2xl border mkt-border hover:border-brand hover:text-brand transition-all shadow-sm">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                     </button>
 
@@ -166,12 +166,12 @@
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
                 <div class="relative transform overflow-hidden rounded-[2.5rem] mkt-surface border mkt-border text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                     
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-600 to-transparent"></div>
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-600 to-transparent"></div>
 
                     <div class="px-8 pt-8 pb-6">
                         <div class="mb-8">
                             <h3 class="text-3xl font-black italic uppercase tracking-tighter mkt-text" id="modal-title">
-                                {{ $userId ? 'Update' : 'Register' }} <span class="text-indigo-600">Personel</span>
+                                {{ $userId ? 'Update' : 'Register' }} <span class="text-brand-600">Personel</span>
                             </h3>
                             <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-[0.2em] mt-1">
                                 Duniatex Group - Access Management System
@@ -182,7 +182,7 @@
                             <div>
                                 <label class="block text-[10px] font-black mkt-text-muted uppercase tracking-widest mb-2 ml-1">Nama Lengkap</label>
                                 <input type="text" wire:model="name" 
-                                    class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-indigo-600 focus:ring-0 transition-all placeholder:mkt-text-muted" 
+                                    class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-brand-600 focus:ring-0 transition-all placeholder:mkt-text-muted" 
                                     placeholder="Contoh: Budi Santoso">
                                 @error('name') <span class="text-red-500 text-[10px] font-bold uppercase mt-1 ml-1">{{ $message }}</span> @enderror
                             </div>
@@ -190,7 +190,7 @@
                             <div>
                                 <label class="block text-[10px] font-black mkt-text-muted uppercase tracking-widest mb-2 ml-1">Email Corporate</label>
                                 <input type="email" wire:model="email" 
-                                    class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-indigo-600 focus:ring-0 transition-all placeholder:mkt-text-muted" 
+                                    class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-brand-600 focus:ring-0 transition-all placeholder:mkt-text-muted" 
                                     placeholder="name@duniatex.com">
                                 @error('email') <span class="text-red-500 text-[10px] font-bold uppercase mt-1 ml-1">{{ $message }}</span> @enderror
                             </div>
@@ -198,7 +198,7 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <select wire:model="role" 
-                                        class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-indigo-600 focus:ring-0 transition-all uppercase text-xs">
+                                        class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-brand-600 focus:ring-0 transition-all uppercase text-xs">
                                         <option value="">Pilih Otoritas</option>
                                         @foreach($divisions as $div)
                                             <option value="{{ strtolower($div->name) }}">{{ strtoupper($div->name) }}</option>
@@ -209,7 +209,7 @@
                                 <div>
                                     <label class="block text-[10px] font-black mkt-text-muted uppercase tracking-widest mb-2 ml-1">Password</label>
                                     <input type="password" wire:model="password" 
-                                        class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-indigo-600 focus:ring-0 transition-all placeholder:mkt-text-muted" 
+                                        class="w-full mkt-input border mkt-border rounded-2xl px-5 py-4 mkt-text font-bold focus:border-brand-600 focus:ring-0 transition-all placeholder:mkt-text-muted" 
                                         placeholder="********">
                                 </div>
                             </div>
@@ -218,7 +218,7 @@
 
                     <div class="mkt-bg px-8 py-6 flex flex-row-reverse gap-3 border-t mkt-border">
                         <button type="button" wire:click="save" 
-                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-black italic uppercase tracking-widest text-xs transition-all shadow-[0_0_20px_rgba(79,70,229,0.2)]">
+                            class="bg-brand-600 hover:bg-brand-700 text-white px-8 py-3 rounded-xl font-black italic uppercase tracking-widest text-xs transition-all shadow-[0_0_20px_rgba(237, 28, 36,0.2)]">
                             {{ $userId ? 'SIMPAN PERUBAHAN' : 'DAFTARKAN PERSONEL' }}
                         </button>
                         <button type="button" wire:click="closeModal" 

@@ -32,7 +32,7 @@
                                         {{ $hist->operator->name ?? 'Operator' }}</p>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-[9px] font-black text-violet-400 italic tabular-nums leading-none">
+                                    <p class="text-[9px] font-black mkt-text italic tabular-nums leading-none">
                                         {{ (float)$hist->kg }} KG</p>
                                     <p class="text-[7px] mkt-text-muted uppercase mt-0.5">
                                         {{ $hist->created_at->format('d/m H:i') }}</p>
@@ -53,28 +53,28 @@
                         </div>
                         @foreach($pipelineErrors as $err)
                             <div class="flex items-start gap-2">
-                                <span class="text-indigo-600 mt-0.5 shrink-0">▸</span>
+                                <span class="text-brand-600 mt-0.5 shrink-0">▸</span>
                                 <p class="text-amber-300 text-xs font-bold">{{ $err }}</p>
                             </div>
                         @endforeach
-                        <p class="text-indigo-600 text-[10px] font-black uppercase mt-3 pt-3 border-t border-amber-800">Pengujian tidak dapat dilanjutkan sampai semua proses di atas selesai.</p>
+                        <p class="text-brand-600 text-[10px] font-black uppercase mt-3 pt-3 border-t border-amber-800">Pengujian tidak dapat dilanjutkan sampai semua proses di atas selesai.</p>
                     </div>
                 @endif
 
                  <form wire:submit.prevent="submit" class="space-y-5">
                     {{-- I. IDENTITAS & WAKTU --}}
                     <div class="space-y-4">
-                        <p class="text-[9px] font-black text-indigo-500 uppercase tracking-[0.3em] border-l-4 border-indigo-500 pl-3">I. IDENTITAS & WAKTU (PENGUJIAN QC & LAB)</p>
+                        <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">I. IDENTITAS & WAKTU (PENGUJIAN QC & LAB)</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/5 p-6 rounded-3xl border mkt-border">
                             <div>
-                                <label class="block text-[10px] font-black text-indigo-600 italic uppercase mb-2 ml-1">Operator Penguji</label>
+                                <label class="block text-[10px] font-black mkt-text-muted italic uppercase mb-2 ml-1">Operator Penguji</label>
                                 <input type="text" wire:model="operator" placeholder="NAMA PENGUJI..."
-                                    class="w-full mkt-surface border mkt-border rounded-xl px-4 py-3 font-black text-xs mkt-text placeholder-slate-500 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none italic uppercase">
+                                    class="w-full mkt-surface border mkt-border rounded-xl px-4 py-3 font-black text-xs mkt-text placeholder-slate-500 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all outline-none italic uppercase">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-indigo-600 italic uppercase mb-2 ml-1">Tanggal Uji</label>
+                                <label class="block text-[10px] font-black mkt-text-muted italic uppercase mb-2 ml-1">Tanggal Uji</label>
                                 <input type="date" wire:model="tanggal"
-                                    class="w-full mkt-surface border mkt-border rounded-xl px-4 py-3 font-black text-xs mkt-text focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all outline-none italic uppercase">
+                                    class="w-full mkt-surface border mkt-border rounded-xl px-4 py-3 font-black text-xs mkt-text focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all outline-none italic uppercase">
                             </div>
                         </div>
                     </div>
@@ -148,7 +148,7 @@
                         <p class="text-[10px] font-bold mkt-text-muted uppercase tracking-widest mt-1">Artikel #{{ $order->art_no }} • Full Technical Specification</p>
                     </div>
                 </div>
-                <button @click="showReq = false" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-800 text-slate-400 hover:bg-indigo-600 hover:text-white transition-all text-xl">✕</button>
+                <button @click="showReq = false" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-800 text-slate-400 hover:bg-brand-600 hover:text-white transition-all text-xl">✕</button>
             </div>
             
             {{-- Tab Navigation --}}
@@ -159,7 +159,7 @@
                 </button>
                 @foreach($productionHistory as $index => $history)
                     <button wire:click="$set('activeDetailTab', 'step_{{ $index }}')" 
-                        class="flex-none px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all {{ $activeDetailTab === 'step_'.$index ? 'bg-indigo-600 text-white shadow-xl scale-105' : 'mkt-surface mkt-text hover:bg-slate-100' }}">
+                        class="flex-none px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all {{ $activeDetailTab === 'step_'.$index ? 'bg-brand-600 text-white shadow-xl scale-105' : 'mkt-surface mkt-text hover:bg-slate-100' }}">
                         {{ $history['division_name'] }}
                     </button>
                 @endforeach
@@ -180,7 +180,7 @@
 
                         <div class="p-6 mkt-surface-alt border mkt-border rounded-3xl relative overflow-hidden">
                             @if($order->is_urgent)
-                                <div class="absolute top-0 right-0 bg-indigo-600 text-white text-[8px] font-black px-4 py-1 uppercase tracking-tighter transform rotate-12 translate-x-2 -translate-y-1 shadow-lg">URGENT</div>
+                                <div class="absolute top-0 right-0 bg-brand-600 text-white text-[8px] font-black px-4 py-1 uppercase tracking-tighter transform rotate-12 translate-x-2 -translate-y-1 shadow-lg">URGENT</div>
                             @endif
                             <p class="text-[9px] font-black uppercase text-cyan-500 mb-2 tracking-[0.2em]">Customer / Brand</p>
                             <p class="text-xl font-black mkt-text uppercase">{{ $order->pelanggan }}</p>
@@ -198,7 +198,7 @@
                             </div>
                             <div>
                                 <p class="text-[8px] font-black uppercase mkt-text-muted mb-1 tracking-widest">Target Produksi</p>
-                                <p class="text-sm font-black text-indigo-600 italic">
+                                <p class="text-sm font-black text-brand-600 italic">
                                     {{ (float)$order->kg_target }} KG
                                 </p>
                                 <p class="text-[9px] mkt-text-muted uppercase font-bold">{{ $order->roll_target }} ROLL</p>
@@ -260,7 +260,7 @@
                         <div class="space-y-6 animate-in fade-in slide-in-from-bottom-2">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-lg"></div>
+                                    <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center text-white text-lg"></div>
                                     <div>
                                         <h3 class="text-sm font-black uppercase mkt-text leading-none">{{ $history['division_name'] }} Technical Data</h3>
                                         <p class="text-[9px] font-bold mkt-text-muted uppercase tracking-widest mt-1">
@@ -293,7 +293,7 @@
 
             {{-- Footer Modal --}}
             <div class="px-5 md:px-8 py-5 mkt-surface border-t mkt-border flex justify-end">
-                <button @click="showReq = false" class="px-8 py-3 bg-slate-800 text-white rounded-xl font-black uppercase text-[10px] tracking-wider hover:bg-indigo-600 hover:shadow-xl transition-all active:scale-95 border border-white/5">
+                <button @click="showReq = false" class="px-8 py-3 bg-slate-800 text-white rounded-xl font-black uppercase text-[10px] tracking-wider hover:bg-brand-600 hover:shadow-xl transition-all active:scale-95 border border-white/5">
                     Tutup Detail
                 </button>
             </div>

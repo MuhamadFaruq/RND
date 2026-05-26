@@ -25,7 +25,7 @@
         </div>
         
         <button wire:click="showOrderDetail({{ $job->id }})" 
-            class="mkt-surface-alt border mkt-border mkt-text px-4 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-indigo-600 hover:text-white hover:border-transparent transition-all shadow-sm shrink-0">
+            class="mkt-surface-alt border mkt-border mkt-text px-4 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-brand-600 hover:text-white hover:border-transparent transition-all shadow-sm shrink-0">
             DETAIL & PROSES
         </button>
     </div>

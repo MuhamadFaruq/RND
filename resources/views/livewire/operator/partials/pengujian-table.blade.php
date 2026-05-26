@@ -36,12 +36,12 @@
                 </button>
             @elseif($job->processing_by === auth()->id())
                 <button wire:click="startProcessAndRedirect({{ $job->id }})" 
-                        class="bg-indigo-600 text-white px-4 py-1.5 rounded-xl text-[9px] font-black uppercase hover:bg-indigo-700 transition-all shadow-sm animate-pulse">
+                        class="bg-brand-600 text-white px-4 py-1.5 rounded-xl text-[9px] font-black uppercase hover:bg-brand-700 transition-all shadow-sm animate-pulse">
                     LANJUTKAN
                 </button>
             @else
                 <button wire:click="showOrderDetail({{ $job->id }})" 
-                    class="mkt-surface-alt border mkt-border mkt-text px-4 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-indigo-600 hover:text-white hover:border-transparent transition-all shadow-sm">
+                    class="mkt-surface-alt border mkt-border mkt-text px-4 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-brand-600 hover:text-white hover:border-transparent transition-all shadow-sm">
                     DETAIL & TERIMA
                 </button>
             @endif

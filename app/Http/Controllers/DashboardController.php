@@ -82,7 +82,7 @@ class DashboardController extends Controller
     public function checkMaintenanceStatus()
     {
         return response()->json([
-            'is_down' => app()->isDownForMaintenance()
+            'is_maintenance' => app()->isDownForMaintenance(),
         ]);
     }
 }

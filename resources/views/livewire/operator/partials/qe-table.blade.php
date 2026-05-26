@@ -1,9 +1,9 @@
 {{-- resources/views/livewire/operator/partials/qe-table.blade.php --}}
-<div class="mkt-surface p-4 md:p-5 rounded-2xl shadow-sm border mkt-border flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 group italic hover:border-violet-500 transition-all duration-300">
+<div class="mkt-surface p-4 md:p-5 rounded-2xl shadow-sm border mkt-border flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 group italic hover:border-brand-500 transition-all duration-300">
     <div class="flex items-center gap-3">
-        <div class="bg-violet-600/20 text-violet-400 w-10 h-10 rounded-xl flex items-center justify-center font-black text-[10px] shadow-sm border border-violet-500/30 shrink-0">QE</div>
+        <div class="bg-brand-600/20 mkt-text w-10 h-10 rounded-xl flex items-center justify-center font-black text-[10px] shadow-sm border border-brand-500/30 shrink-0">QE</div>
         <div class="text-left min-w-0">
-            <span class="text-[9px] font-black text-violet-400 uppercase tracking-wider">#{{ $job->art_no }}</span>
+            <span class="text-[9px] font-black mkt-text uppercase tracking-wider">#{{ $job->art_no }}</span>
             @if($job->is_urgent)
                 <span class="ml-1 bg-red-600 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase animate-pulse">URGENT</span>
             @endif
@@ -20,15 +20,15 @@
     <div class="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 pt-2 sm:pt-0 border-t sm:border-t-0 mkt-border">
         <div class="text-left sm:text-right sm:border-r sm:pr-6 mkt-border">
             <p class="text-[8px] font-black mkt-text-muted uppercase leading-none mb-0.5">Status</p>
-            <p class="text-[10px] font-black text-violet-400 uppercase italic">Menunggu Final QE</p>
+            <p class="text-[10px] font-black mkt-text uppercase italic">Menunggu Final QE</p>
         </div>
         <div class="shrink-0">
             @if($job->processing_by && $job->processing_by !== auth()->id())
                 <button wire:click="takeOverProcessAndRedirect({{ $job->id }})" class="bg-amber-500 text-white px-3 py-1.5 rounded-xl text-[8px] font-black uppercase hover:bg-amber-600 transition-all shadow-sm">AMBIL ALIH</button>
             @elseif($job->processing_by === auth()->id())
-                <button wire:click="startProcessAndRedirect({{ $job->id }})" class="bg-indigo-600 text-white px-4 py-1.5 rounded-xl text-[9px] font-black uppercase hover:bg-indigo-700 transition-all shadow-sm animate-pulse">LANJUTKAN</button>
+                <button wire:click="startProcessAndRedirect({{ $job->id }})" class="bg-brand-600 text-white px-4 py-1.5 rounded-xl text-[9px] font-black uppercase hover:bg-brand-700 transition-all shadow-sm animate-pulse">LANJUTKAN</button>
             @else
-                <button wire:click="showOrderDetail({{ $job->id }})" class="mkt-surface-alt border mkt-border mkt-text px-4 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-indigo-600 hover:text-white hover:border-transparent transition-all shadow-sm">DETAIL & TERIMA</button>
+                <button wire:click="showOrderDetail({{ $job->id }})" class="mkt-surface-alt border mkt-border mkt-text px-4 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-brand-600 hover:text-white hover:border-transparent transition-all shadow-sm">DETAIL & TERIMA</button>
             @endif
         </div>
     </div>

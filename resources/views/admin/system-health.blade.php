@@ -38,7 +38,7 @@
 
             <div class="bg-slate-900 border border-slate-800 rounded-[2rem] p-7">
                 <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Laravel Version</p>
-                <p class="text-4xl font-black text-blue-400">{{ $laravel_version }}</p>
+                <p class="text-4xl font-black mkt-text">{{ $laravel_version }}</p>
                 <p class="text-[9px] text-slate-500 mt-2 font-bold uppercase">Framework Version</p>
             </div>
         </div>

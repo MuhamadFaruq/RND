@@ -135,17 +135,18 @@ new class extends Component {
         {{-- HEADER & ANALYTICS CARDS --}}
         <div class="flex flex-col xl:flex-row justify-between items-start xl:items-end mb-10 border-b mkt-border pb-10 gap-8">
             <div>
-                <h1 class="text-4xl md:text-6xl font-black text-indigo-600 uppercase tracking-tighter leading-none">
+                <h1 class="text-4xl md:text-6xl font-black text-brand-600 uppercase tracking-tighter leading-none">
                     UNIT <span class="mkt-text">MONITORING</span>
                 </h1>
                 <p class="mkt-text-muted font-bold uppercase text-[10px] md:text-xs mt-3 tracking-[0.2em] italic opacity-70">
                     MODE: MONITORING {{ $viewMode }} | LIVE DUNIATEX RND
                 </p>
-                <div class="mt-3 flex items-center gap-3">
+                {{-- wire:ignore: jangan di-morph oleh wire:poll (cegah jam reset ke 00:00:00) --}}
+                <div class="mt-3 flex items-center gap-3" wire:ignore id="unit-monitoring-live-clock">
                     <div class="mkt-surface-alt mkt-text px-4 py-1.5 rounded-xl shadow-lg border mkt-border">
-                        <p class="real-time-clock text-sm font-black tracking-widest leading-none">00:00:00</p>
+                        <p class="real-time-clock text-sm font-black tracking-widest leading-none tabular-nums font-mono">{{ now()->format('H:i:s') }}</p>
                     </div>
-                    <p class="real-time-date text-[11px] font-bold mkt-text-muted uppercase tracking-widest italic"></p>
+                    <p class="real-time-date text-[11px] font-bold mkt-text-muted uppercase tracking-widest italic">{{ now()->locale('id')->translatedFormat('d M Y') }}</p>
                 </div>
             </div>
 
@@ -162,8 +163,8 @@ new class extends Component {
                 {{-- SEARCH INPUT --}}
                 <div class="relative w-full sm:w-64 group">
                     <input type="text" wire:model.live="search" placeholder="CARI ARTIKEL / SAP..." 
-                        class="w-full mkt-input border-2 mkt-border rounded-3xl pl-12 pr-6 py-4 text-[10px] font-black focus:border-indigo-600 focus:ring-0 transition-all placeholder:text-slate-400 italic uppercase">
-                    <span class="absolute left-5 top-1/2 -translate-y-1/2 mkt-text-muted opacity-50 group-focus-within:opacity-100 group-focus-within:text-indigo-600 transition-colors">
+                        class="w-full mkt-input border-2 mkt-border rounded-3xl pl-12 pr-6 py-4 text-[10px] font-black focus:border-brand-600 focus:ring-0 transition-all placeholder:text-slate-400 italic uppercase">
+                    <span class="absolute left-5 top-1/2 -translate-y-1/2 mkt-text-muted opacity-50 group-focus-within:opacity-100 group-focus-within:text-brand-600 transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
@@ -205,7 +206,7 @@ new class extends Component {
         {{-- TAB SWITCHER --}}
         <div class="flex flex-wrap gap-4 mb-10">
             <button wire:click="$set('viewMode', 'RAJUT')" 
-                class="flex-grow sm:flex-grow-0 px-12 py-5 rounded-3xl font-black uppercase italic transition-all tracking-widest text-xs {{ $viewMode === 'RAJUT' ? 'bg-indigo-600 shadow-xl shadow-indigo-900/30 text-white' : 'mkt-surface-alt mkt-text-muted border mkt-border hover:mkt-text' }}">
+                class="flex-grow sm:flex-grow-0 px-12 py-5 rounded-3xl font-black uppercase italic transition-all tracking-widest text-xs {{ $viewMode === 'RAJUT' ? 'bg-brand-600 shadow-xl shadow-brand-900/30 text-white' : 'mkt-surface-alt mkt-text-muted border mkt-border hover:mkt-text' }}">
                 MONITORING RAJUT
             </button>
             <button wire:click="$set('viewMode', 'WARNA')" 
@@ -213,7 +214,7 @@ new class extends Component {
                 MONITORING WARNA
             </button>
             <button wire:click="$set('viewMode', 'SELESAI')" 
-                class="flex-grow sm:flex-grow-0 px-12 py-5 rounded-3xl font-black uppercase italic transition-all tracking-widest text-xs {{ $viewMode === 'SELESAI' ? 'bg-blue-600 shadow-xl shadow-blue-900/30 text-white' : 'mkt-surface-alt mkt-text-muted border mkt-border hover:mkt-text' }}">
+                class="flex-grow sm:flex-grow-0 px-12 py-5 rounded-3xl font-black uppercase italic transition-all tracking-widest text-xs {{ $viewMode === 'SELESAI' ? 'bg-brand shadow-xl shadow-brand-900/30 text-white' : 'mkt-surface-alt mkt-text-muted border mkt-border hover:mkt-text' }}">
                 ORDER SELESAI
             </button>
         </div>
@@ -228,14 +229,14 @@ new class extends Component {
                     $actualKg = $latestActivity ? $latestActivity->kg : 0;
                 @endphp
                 <div class="mkt-surface p-4 rounded-2xl border mkt-border shadow-md relative overflow-hidden flex flex-col gap-3">
-                    <div class="absolute left-0 top-0 w-1.5 h-full bg-indigo-600"></div>
+                    <div class="absolute left-0 top-0 w-1.5 h-full bg-brand-600"></div>
 
                     <div class="flex justify-between items-start pl-2">
                         <div class="flex flex-col">
-                            <span class="text-indigo-600 block text-xs font-black tracking-tighter leading-none">{{ $wip->art_no }}</span>
+                            <span class="mkt-text block text-xs font-black tracking-tighter leading-none">{{ $wip->art_no }}</span>
                             <span class="mkt-text mt-1 block text-[9px] font-bold uppercase opacity-65">LEGACY #{{ $wip->sap_no }}</span>
                         </div>
-                        <button wire:click="openTracking('{{ $wip->art_no }}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-[8px] font-black uppercase transition-all shadow-sm">
+                        <button wire:click="openTracking('{{ $wip->art_no }}')" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-1.5 rounded-lg text-[8px] font-black uppercase transition-all shadow-sm">
                             DETAIL
                         </button>
                     </div>
@@ -253,7 +254,7 @@ new class extends Component {
                             @if($viewMode === 'RAJUT')
                                 <div class="text-right leading-none">
                                     <span class="mkt-text-muted text-[10px] font-bold">{{ $wip->konstruksi_greige }}</span>
-                                    <span class="text-blue-500 text-[9px] font-black uppercase ml-1">{{ $wip->rnd_gramasi_greige ?? $wip->target_gramasi }} GSM</span>
+                                    <span class="mkt-text text-[9px]] font-black uppercase ml-1">{{ $wip->rnd_gramasi_greige ?? $wip->target_gramasi }} GSM</span>
                                 </div>
                             @else
                                 <div class="text-right leading-none">
@@ -268,7 +269,7 @@ new class extends Component {
                                 @if($viewMode === 'RAJUT') MESIN @else SPECS (L/G/H) @endif
                             </span>
                             @if($viewMode === 'RAJUT')
-                                <span class="text-blue-600 dark:text-blue-400 font-black text-xs leading-none">{{ $wip->rnd_mesin_rajut ?? 'TBD' }}</span>
+                                <span class="mkt-text font-black text-xs leading-none">{{ $wip->rnd_mesin_rajut ?? 'TBD' }}</span>
                             @else
                                 <div class="text-right leading-none">
                                     <span class="text-emerald-400 font-black text-[10px]">{{ $wip->target_lebar }}" / {{ $wip->target_gramasi }}</span>
@@ -323,7 +324,7 @@ new class extends Component {
                                     @elseif($wip->status === 'finished')
                                         <span class="text-emerald-500 uppercase">COMPLETED</span>
                                     @else
-                                        <span class="text-indigo-400 uppercase">PENDING IN {{ strtoupper($wip->status) }}</span>
+                                        <span class="mkt-text uppercase">PENDING IN {{ strtoupper($wip->status) }}</span>
                                     @endif
                                 </div>
                             </div>
@@ -368,15 +369,15 @@ new class extends Component {
                     <tbody class="divide-y divide-border">
                         {{-- WIP ROWS --}}
                         @forelse($orders as $wip)
-                            <tr class="bg-indigo-500/5 border-l-4 border-indigo-600 hover:bg-indigo-500/10 transition-colors border-b mkt-border italic group">
+                            <tr class="bg-brand-500/5 border-l-4 border-brand-600 hover:bg-brand-500/10 transition-colors border-b mkt-border italic group">
                                 <td class="px-8 py-7">
                                     <div class="flex items-center gap-3">
                                         <span class="flex h-2 w-2 relative">
-                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
                                         </span>
                                         <div>
-                                            <span class="text-indigo-600 block text-sm font-black tracking-tighter">{{ $wip->art_no }}</span>
+                                            <span class="mkt-text block text-sm font-black tracking-tighter">{{ $wip->art_no }}</span>
                                             <span class="mkt-text mt-1 block text-[11px] font-bold uppercase opacity-60">LEGACY ID #{{ $wip->sap_no }}</span>
                                         </div>
                                     </div>
@@ -388,7 +389,7 @@ new class extends Component {
                                 <td class="px-8 py-7">
                                     @if($viewMode === 'RAJUT')
                                         <span class="mkt-text-muted block text-[11px] font-bold">{{ $wip->konstruksi_greige }}</span>
-                                        <span class="text-blue-500 text-[10px] font-black uppercase mt-1 block">{{ $wip->rnd_gramasi_greige ?? $wip->target_gramasi }} GSM</span>
+                                        <span class="mkt-text text-[10px]] font-black uppercase mt-1 block">{{ $wip->rnd_gramasi_greige ?? $wip->target_gramasi }} GSM</span>
                                     @else
                                         <span class="text-emerald-500 block text-xs font-black uppercase italic">{{ $wip->warna }}</span>
                                         <span class="mkt-text-muted block text-[10px] font-bold mt-1 uppercase">{{ $wip->konstruksi_greige }}</span>
@@ -396,7 +397,7 @@ new class extends Component {
                                 </td>
                                 <td class="px-8 py-7 text-center">
                                     @if($viewMode === 'RAJUT')
-                                        <span class="text-blue-600 dark:text-blue-400 block font-black text-sm tracking-tighter">{{ $wip->rnd_mesin_rajut ?? 'TBD' }}</span>
+                                        <span class="mkt-text block font-black text-sm tracking-tighter">{{ $wip->rnd_mesin_rajut ?? 'TBD' }}</span>
                                         <span class="text-[9px] mkt-text-muted font-black uppercase tracking-widest mt-1 opacity-50">{{ $wip->kelompok_kain }}</span>
                                     @else
                                         <div class="flex flex-col items-center gap-1">
@@ -459,14 +460,14 @@ new class extends Component {
                                                 SYSTEM COMPLETED
                                             </span>
                                         @else
-                                            <span class="text-[7px] text-indigo-400 font-black uppercase opacity-75 mt-1 animate-pulse">
+                                            <span class="text-[7px] mkt-text font-black uppercase opacity-75 mt-1 animate-pulse">
                                                 PENDING IN {{ strtoupper($wip->status) }}
                                             </span>
                                         @endif
                                     </div>
                                 </td>
                                 <td class="px-8 py-7 text-center">
-                                    <button wire:click="openTracking('{{ $wip->art_no }}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase transition-all shadow-lg shadow-indigo-600/20">
+                                    <button wire:click="openTracking('{{ $wip->art_no }}')" class="bg-brand-600 hover:bg-brand-700 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase transition-all shadow-lg shadow-brand-600/20">
                                         DETAIL                                     </button>
                                 </td>
                             </tr>
@@ -479,171 +480,179 @@ new class extends Component {
             {{-- Modal Tracking Artikel --}}
             @if($showTrackingModal)
                 @teleport('body')
-                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl px-4 py-6">
-                    <div class="mkt-surface border mkt-border w-full max-w-7xl rounded-[4rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in duration-500 max-h-[95vh] flex flex-col">
+                <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/90 backdrop-blur-xl p-0 sm:p-4 md:py-6">
+                    <div class="mkt-surface border mkt-border w-full sm:max-w-7xl rounded-none sm:rounded-3xl md:rounded-[4rem] overflow-hidden shadow-xl sm:shadow-[0_0_100px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in duration-500 max-h-[100dvh] sm:max-h-[95vh] flex flex-col">
 
                         {{-- HEADER MODAL --}}
-                        <div class="p-10 mkt-surface-alt flex justify-between items-center border-b mkt-border backdrop-blur-md">
-                            <div class="flex items-center gap-6">
-                                <div class="h-16 w-16 bg-indigo-600 rounded-3xl flex items-center justify-center shadow-lg shadow-indigo-600/40">
-                                    <span class="text-white text-3xl font-black italic">!</span>
+                        <div class="p-3 sm:p-6 md:p-10 mkt-surface-alt flex flex-col gap-3 border-b mkt-border backdrop-blur-md shrink-0">
+                            <div class="flex items-start gap-3 sm:gap-6 min-w-0">
+                                <div class="h-10 w-10 sm:h-14 sm:w-14 md:h-16 md:w-16 bg-brand-600 rounded-xl sm:rounded-2xl md:rounded-3xl flex items-center justify-center shrink-0 shadow-lg shadow-brand-600/40">
+                                    <span class="text-white text-lg sm:text-2xl md:text-3xl font-black italic">!</span>
                                 </div>
-                                <div>
-                                    <h2 class="mkt-text font-black italic uppercase text-4xl leading-none tracking-tighter">
-                                        MONITORING <span class="text-indigo-600">{{ $viewMode === 'WARNA' || in_array($trackingData->status, ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'finishing', 'stenter', 'tumbler', 'fleece']) ? 'WARNA' : 'RAJUT' }}</span>
+                                <div class="min-w-0 flex-1">
+                                    @php
+                                        $modalMode = $viewMode === 'WARNA' || in_array($trackingData->status, ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'finishing', 'stenter', 'tumbler', 'fleece']) ? 'WARNA' : 'RAJUT';
+                                    @endphp
+                                    <h2 class="mkt-text font-black italic uppercase text-lg sm:text-2xl md:text-4xl leading-tight sm:leading-none tracking-tighter">
+                                        MONITORING <span class="text-brand-600">{{ $modalMode }}</span>
                                     </h2>
-                                    <p class="mkt-text-muted text-[10px] mt-2 font-black uppercase tracking-[0.3em] flex items-center gap-2">
-                                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        NO ARTIKEL: {{ $trackingData->art_no }} | LEGACY SAP: {{ $trackingData->sap_no }} | INDUSTRIAL TRACEABILITY LIVE
-                                    </p>
+                                    <div class="mt-1.5 sm:mt-2 space-y-0.5">
+                                        <p class="mkt-text-muted text-[7px] sm:text-[10px] font-black uppercase tracking-wide flex items-center gap-1.5">
+                                            <span class="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                                            <span class="truncate">ART: {{ $trackingData->art_no }}</span>
+                                        </p>
+                                        <p class="mkt-text-muted text-[7px] sm:text-[10px] font-black uppercase tracking-wide truncate">
+                                            SAP: {{ $trackingData->sap_no }} · <span class="text-emerald-500">LIVE</span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                             <button wire:click="$set('showTrackingModal', false)" 
-                                class="bg-white dark:bg-indigo-600 text-slate-600 dark:text-white px-8 py-4 rounded-3xl text-[10px] font-black uppercase transition-all border mkt-border dark:border-none shadow-xl flex items-center gap-3 group">
-                                CLOSE DOCUMENT <span class="group-hover:rotate-90 transition-transform">✕</span>
+                                class="w-full sm:w-auto sm:self-end bg-white dark:bg-brand-600 text-slate-600 dark:text-white px-4 sm:px-8 py-2.5 sm:py-4 rounded-xl sm:rounded-3xl text-[8px] sm:text-[10px] font-black uppercase transition-all border mkt-border dark:border-none shadow-md sm:shadow-xl flex items-center justify-center gap-2 group">
+                                TUTUP <span class="group-hover:rotate-90 transition-transform">✕</span>
                             </button>
                         </div>
 
-                        <div class="p-10 overflow-y-auto custom-scrollbar flex-1 min-h-0">
-                            <div class="grid grid-cols-12 gap-8">
+                        <div class="p-3 sm:p-6 md:p-10 overflow-y-auto custom-scrollbar flex-1 min-h-0">
+                            <div class="grid grid-cols-12 gap-4 sm:gap-6 md:gap-8">
 
                                 {{-- COLUMN LEFT: SPECIFICATIONS (17 POINTS) --}}
-                                <div class="col-span-12 lg:col-span-8 space-y-8">
+                                <div class="col-span-12 lg:col-span-8 space-y-4 sm:space-y-6 md:space-y-8">
 
                                     {{-- CARD 1: IDENTITY & SALES --}}
-                                    <div class="grid grid-cols-3 gap-6">
-                                        <div class="col-span-1 mkt-surface-alt p-6 rounded-[2.5rem] border mkt-border shadow-inner">
-                                            <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-3">ARTIKEL NO</p>
-                                            <p class="text-xl font-black mkt-text tracking-tight uppercase leading-none">{{ $trackingData->art_no ?? '-' }}</p>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 md:gap-6">
+                                        <div class="mkt-surface-alt p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border mkt-border shadow-inner min-w-0">
+                                            <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-1 sm:mb-3">ARTIKEL NO</p>
+                                            <p class="text-sm sm:text-lg md:text-xl font-black mkt-text tracking-tight uppercase leading-tight break-all">{{ $trackingData->art_no ?? '-' }}</p>
                                         </div>
-                                        <div class="col-span-1 mkt-surface-alt p-6 rounded-[2.5rem] border mkt-border shadow-inner">
-                                            <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-3">WARNA KAIN</p>
-                                            <p class="text-xl font-black text-emerald-500 tracking-tight uppercase leading-none italic">{{ $trackingData->warna ?? '-' }}</p>
+                                        <div class="mkt-surface-alt p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border mkt-border shadow-inner min-w-0">
+                                            <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-1 sm:mb-3">WARNA KAIN</p>
+                                            <p class="text-sm sm:text-lg md:text-xl font-black text-emerald-500 tracking-tight uppercase leading-tight italic break-words">{{ $trackingData->warna ?? '-' }}</p>
                                         </div>
-                                        <div class="col-span-1 mkt-surface-alt p-6 rounded-[2.5rem] border mkt-border shadow-inner">
-                                            <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-3">PELANGGAN</p>
-                                            <p class="text-xl font-black mkt-text tracking-tight uppercase leading-none">{{ $trackingData->pelanggan ?? '-' }}</p>
+                                        <div class="mkt-surface-alt p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border mkt-border shadow-inner min-w-0 col-span-2 md:col-span-1">
+                                            <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-1 sm:mb-3">PELANGGAN</p>
+                                            <p class="text-sm sm:text-lg md:text-xl font-black mkt-text tracking-tight uppercase leading-tight break-words">{{ $trackingData->pelanggan ?? '-' }}</p>
                                         </div>
-                                        <div class="col-span-1 mkt-surface-alt p-6 rounded-[2.5rem] border mkt-border shadow-inner">
-                                            <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-3">SALES / MKT</p>
-                                            <p class="text-xl font-black text-red-500 tracking-tight uppercase leading-none italic">{{ $trackingData->mkt ?? '-' }}</p>
+                                        <div class="mkt-surface-alt p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border mkt-border shadow-inner min-w-0 col-span-2 md:col-span-1">
+                                            <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-1 sm:mb-3">SALES / MKT</p>
+                                            <p class="text-sm sm:text-lg md:text-xl font-black mkt-text tracking-tight uppercase leading-tight italic">{{ $trackingData->mkt ?? '-' }}</p>
                                         </div>
                                     </div>
 
                                     {{-- CARD 2: GREIGE & MACHINE SPECS --}}
-                                    <div class="mkt-surface p-8 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden group">
-                                        <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                                            <svg class="w-24 h-24 mkt-text" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                                    <div class="mkt-surface p-3 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[3.5rem] border mkt-border shadow-sm sm:shadow-2xl relative overflow-hidden group">
+                                        <div class="absolute top-0 right-0 p-4 sm:p-8 opacity-5 sm:opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none hidden sm:block">
+                                            <svg class="w-16 sm:w-24 h-16 sm:h-24 mkt-text" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
                                         </div>
-                                        <h4 class="text-xs font-black mkt-text italic uppercase tracking-widest mb-8 flex items-center gap-3">
-                                            <span class="w-6 h-[2px] bg-red-600"></span> GREIGE TECHNICAL SPECIFICATIONS
+                                        <h4 class="text-[9px] sm:text-xs font-black mkt-text italic uppercase tracking-widest mb-3 sm:mb-6 md:mb-8 flex items-center gap-2 relative z-10">
+                                            <span class="w-4 sm:w-6 h-[2px] bg-brand shrink-0"></span> GREIGE TECHNICAL SPECIFICATIONS
                                         </h4>
-                                        <div class="grid grid-cols-4 gap-10">
-                                            <div>
-                                                <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-2">Konstruksi Greige</p>
-                                                <p class="text-sm font-black mkt-text italic leading-tight">{{ $trackingData->konstruksi_greige ?? '-' }}</p>
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 md:gap-10 relative z-10">
+                                            <div class="col-span-2 min-w-0">
+                                                <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-1 sm:mb-2">Konstruksi Greige</p>
+                                                <p class="text-xs sm:text-sm font-black mkt-text italic leading-snug break-words">{{ $trackingData->konstruksi_greige ?? '-' }}</p>
                                             </div>
-                                            <div>
-                                                <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-2">Gramasi Greige</p>
-                                                <p class="text-2xl font-black text-blue-500 tracking-tighter leading-none">{{ $trackingData->rnd_gramasi_greige ?? '-' }} <span class="text-[10px] opacity-50 uppercase">GSM</span></p>
+                                            <div class="min-w-0">
+                                                <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-1 sm:mb-2">Gramasi Greige</p>
+                                                <p class="text-lg sm:text-2xl font-black mkt-text tracking-tighter leading-none">{{ $trackingData->rnd_gramasi_greige ?? '-' }} <span class="text-[9px] sm:text-[10px] opacity-50 uppercase">GSM</span></p>
                                             </div>
-                                            <div>
-                                                <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-2">Kelompok Mesin</p>
-                                                <p class="text-sm font-black mkt-text italic uppercase leading-tight">{{ $trackingData->kelompok_kain ?? '-' }}</p>
+                                            <div class="min-w-0">
+                                                <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-1 sm:mb-2">Kelompok Mesin</p>
+                                                <p class="text-xs sm:text-sm font-black mkt-text italic uppercase leading-tight break-words">{{ $trackingData->kelompok_kain ?? '-' }}</p>
                                             </div>
-                                            <div>
-                                                <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-2">Material Utama</p>
-                                                <p class="text-sm font-black text-emerald-400 italic uppercase leading-tight">
+                                            <div class="col-span-2 md:col-span-1 min-w-0">
+                                                <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-1 sm:mb-2">Material Utama</p>
+                                                <p class="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400 italic uppercase leading-tight break-words">
                                                     {{ $trackingData->material ?? '-' }}
                                                     @if($trackingData->benang_percent)
-                                                        <span class="text-red-500">({{ $trackingData->benang_percent }}%)</span>
+                                                        <span class="mkt-text">({{ $trackingData->benang_percent }}%)</span>
                                                     @endif
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {{-- CARD 3: FINISHING TARGETS (GRID 2x2) --}}
-                                    <div class="grid grid-cols-2 gap-8">
-                                        <div class="mkt-surface p-8 rounded-[3.5rem] border mkt-border shadow-xl">
-                                            <h4 class="text-[9px] font-black mkt-text-muted uppercase tracking-widest mb-6">Finishing Targets</h4>
-                                            <div class="grid grid-cols-2 gap-8">
-                                                <div>
-                                                    <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-1">Target Lebar</p>
-                                                    <p class="text-xl font-black mkt-text italic leading-none">{{ $trackingData->target_lebar ?? '-' }}"</p>
+                                    {{-- CARD 3: FINISHING TARGETS + KNITTING --}}
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6 md:gap-8">
+                                        <div class="mkt-surface p-3 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[3.5rem] border mkt-border shadow-sm sm:shadow-xl">
+                                            <h4 class="text-[8px] sm:text-[9px] font-black mkt-text-muted uppercase tracking-widest mb-3 sm:mb-6">Finishing Targets</h4>
+                                            <div class="grid grid-cols-2 gap-3 sm:gap-6 md:gap-8">
+                                                <div class="min-w-0">
+                                                    <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-0.5 sm:mb-1">Target Lebar</p>
+                                                    <p class="text-sm sm:text-lg md:text-xl font-black mkt-text italic leading-tight">{{ $trackingData->target_lebar ?? '-' }}"</p>
                                                 </div>
-                                                <div>
-                                                    <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-1">Target Gramasi</p>
-                                                    <p class="text-xl font-black mkt-text italic leading-none">{{ $trackingData->target_gramasi ?? '-' }} GSM</p>
+                                                <div class="min-w-0">
+                                                    <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-0.5 sm:mb-1">Target Gramasi</p>
+                                                    <p class="text-sm sm:text-lg md:text-xl font-black mkt-text italic leading-tight">{{ $trackingData->target_gramasi ?? '-' }} GSM</p>
                                                 </div>
-                                                <div>
-                                                    <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-1">Belah / Bulat</p>
-                                                    <p class="text-xl font-black text-emerald-500 italic leading-none uppercase">{{ $trackingData->belah_bulat ?? '-' }}</p>
+                                                <div class="min-w-0">
+                                                    <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-0.5 sm:mb-1">Belah / Bulat</p>
+                                                    <p class="text-sm sm:text-lg md:text-xl font-black text-emerald-500 italic leading-tight uppercase">{{ $trackingData->belah_bulat ?? '-' }}</p>
                                                 </div>
-                                                <div>
-                                                    <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-1">Handfeel</p>
-                                                    <p class="text-xl font-black text-blue-500 italic leading-none uppercase">{{ $trackingData->handfeel ?? '-' }}</p>
+                                                <div class="min-w-0">
+                                                    <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-0.5 sm:mb-1">Handfeel</p>
+                                                    <p class="text-sm sm:text-lg md:text-xl font-black mkt-text italic leading-tight uppercase">{{ $trackingData->handfeel ?? '-' }}</p>
                                                 </div>
-                                                <div class="col-span-2">
-                                                    <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-1">Treatment Khusus</p>
-                                                    <p class="text-xl font-black text-red-500 italic leading-none uppercase">{{ $trackingData->treatment_khusus ?? '-' }}</p>
+                                                <div class="col-span-2 min-w-0">
+                                                    <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-0.5 sm:mb-1">Treatment Khusus</p>
+                                                    <p class="text-sm sm:text-lg md:text-xl font-black mkt-text italic leading-tight uppercase break-words">{{ $trackingData->treatment_khusus ?? '-' }}</p>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {{-- CARD 4: ACTUAL PRODUCTION (RAJUT) --}}
                                         @php $knitLog = $trackingLogs->where('division_name', 'knitting')->first(); @endphp
-                                        <div class="mkt-surface p-8 rounded-[3.5rem] border-2 {{ $knitLog ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-slate-800' }} shadow-xl relative overflow-hidden">
+                                        <div class="mkt-surface p-3 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[3.5rem] border-2 {{ $knitLog ? 'border-emerald-500/20 bg-emerald-500/5' : 'mkt-border' }} shadow-sm sm:shadow-xl relative overflow-hidden">
                                             @if(!$knitLog)
                                                 <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-10">
-                                                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] italic">WAITING FOR PRODUCTION...</p>
+                                                    <p class="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest italic px-4 text-center">WAITING FOR PRODUCTION...</p>
                                                 </div>
                                             @endif
-                                            <h4 class="text-[9px] font-black {{ $knitLog ? 'text-emerald-500' : 'mkt-text-muted' }} uppercase tracking-widest mb-6 flex items-center justify-between">
-                                                <span>Actual Knitting Result</span>
-                                                @if($knitLog) <span class="bg-emerald-500 text-white px-2 py-0.5 rounded text-[7px]">DONE</span> @endif
+                                            <h4 class="text-[8px] sm:text-[9px] font-black {{ $knitLog ? 'text-emerald-500' : 'mkt-text-muted' }} uppercase tracking-widest mb-3 sm:mb-6 flex items-center justify-between gap-2">
+                                                <span>Actual Knitting</span>
+                                                @if($knitLog) <span class="bg-emerald-500 text-white px-2 py-0.5 rounded text-[7px] shrink-0">DONE</span> @endif
                                             </h4>
-                                            <div class="grid grid-cols-3 gap-4 text-center">
-                                                <div>
-                                                    <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">Mesin Rajut</p>
-                                                    <p class="text-xl font-black mkt-text italic leading-none">{{ $knitLog->machine_no ?? '-' }}</p>
+                                            <div class="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+                                                <div class="min-w-0">
+                                                    <p class="text-[7px] mkt-text-muted font-black uppercase mb-0.5 sm:mb-1">Mesin</p>
+                                                    <p class="text-sm sm:text-lg md:text-xl font-black mkt-text italic leading-none truncate">{{ $knitLog->machine_no ?? '-' }}</p>
                                                 </div>
                                                 <div>
-                                                    <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">ROLL</p>
-                                                    <p class="text-2xl font-black text-emerald-500 leading-none">{{ $knitLog->roll ?? '0' }}</p>
+                                                    <p class="text-[7px] mkt-text-muted font-black uppercase mb-0.5 sm:mb-1">ROLL</p>
+                                                    <p class="text-lg sm:text-2xl font-black text-emerald-500 leading-none">{{ $knitLog->roll ?? '0' }}</p>
                                                 </div>
                                                 <div>
-                                                    <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">KG</p>
-                                                    <p class="text-2xl font-black text-emerald-500 leading-none">{{ $knitLog->kg ?? '0' }}</p>
+                                                    <p class="text-[7px] mkt-text-muted font-black uppercase mb-0.5 sm:mb-1">KG</p>
+                                                    <p class="text-lg sm:text-2xl font-black text-emerald-500 leading-none">{{ $knitLog->kg ?? '0' }}</p>
                                                 </div>
                                             </div>
                                             @if($knitLog)
-                                                <div class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center text-[8px] font-bold mkt-text-muted italic uppercase">
-                                                    <span>OP: {{ $knitLog->operator->name ?? 'N/A' }}</span>
-                                                    <span class="text-emerald-500">{{ $knitLog->created_at->format('H:i | d/m') }}</span>
+                                                <div class="mt-3 sm:mt-6 pt-3 sm:pt-4 border-t mkt-border flex flex-col sm:flex-row sm:justify-between gap-1 text-[7px] sm:text-[8px] font-bold mkt-text-muted italic uppercase">
+                                                    <span class="truncate">OP: {{ $knitLog->operator->name ?? 'N/A' }}</span>
+                                                    <span class="text-emerald-500 shrink-0">{{ $knitLog->created_at->format('H:i | d/m') }}</span>
                                                 </div>
                                             @endif
                                         </div>
                                     </div>
 
                                     {{-- CARD 5: NEXT STEP & LOGISTICS --}}
-                                    <div class="grid grid-cols-3 gap-6">
-                                        <div class="col-span-1 bg-blue-600 p-8 rounded-[3rem] shadow-xl shadow-blue-900/30">
-                                            <p class="text-[8px] text-blue-200 font-black uppercase tracking-widest mb-2">KIRIM KE UNIT</p>
-                                            <h3 class="text-3xl font-black text-white italic leading-none tracking-tighter">DPF 3</h3>
+                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4 md:gap-6">
+                                        <div class="col-span-2 md:col-span-1 bg-brand p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[3rem] shadow-lg shadow-brand-900/30">
+                                            <p class="text-[7px] sm:text-[8px] text-brand-200 font-black uppercase tracking-wide mb-1 sm:mb-2">KIRIM KE UNIT</p>
+                                            <h3 class="text-2xl sm:text-3xl font-black text-white italic leading-none tracking-tighter">DPF 3</h3>
                                         </div>
-                                        <div class="col-span-2 mkt-surface p-8 rounded-[3rem] border mkt-border shadow-xl">
-                                            <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-2 italic">KETERANGAN ARTIKEL / NOTES</p>
-                                            <p class="text-xs font-black mkt-text italic uppercase leading-relaxed">{{ $trackingData->keterangan_artikel ?? 'PROSES SESUAI STANDAR PRODUKSI RND.' }}</p>
+                                        <div class="col-span-2 mkt-surface p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[3rem] border mkt-border shadow-sm sm:shadow-xl min-w-0">
+                                            <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide mb-1 sm:mb-2 italic">KETERANGAN ARTIKEL</p>
+                                            <p class="text-[10px] sm:text-xs font-black mkt-text italic uppercase leading-relaxed break-words">{{ $trackingData->keterangan_artikel ?? 'PROSES SESUAI STANDAR PRODUKSI RND.' }}</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {{-- COLUMN RIGHT: TIMELINE & MILESTONES --}}
-                                <div class="col-span-12 lg:col-span-4 flex flex-col space-y-8">
-                                    <div class="mkt-surface p-8 rounded-[4rem] border mkt-border shadow-2xl flex-1 flex flex-col">
-                                        <h3 class="text-xs font-black mkt-text italic uppercase tracking-[0.2em] mb-10 flex items-center gap-4">
-                                            <span class="w-8 h-[2px] bg-red-600"></span> TIMELINE TRACKING
+                                <div class="col-span-12 lg:col-span-4 flex flex-col space-y-4 sm:space-y-6 md:space-y-8">
+                                    <div class="mkt-surface p-3 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[4rem] border mkt-border shadow-sm sm:shadow-2xl flex-1 flex flex-col min-h-0">
+                                        <h3 class="text-[10px] sm:text-xs font-black mkt-text italic uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-4 sm:mb-6 md:mb-10 flex items-center gap-2 sm:gap-4">
+                                            <span class="w-5 sm:w-8 h-[2px] bg-red-600 shrink-0"></span> TIMELINE TRACKING
                                         </h3>
 
                                         <div class="space-y-6 relative flex-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -684,38 +693,38 @@ new class extends Component {
                                                     $operatorActual = $techData['nama_input'] ?? $techData['operator'] ?? $log->operator->name ?? 'UNKNOWN';
                                                 @endphp
 
-                                                <div class="relative pl-16 pb-12 last:pb-0 group">
+                                                <div class="relative pl-12 sm:pl-16 pb-8 sm:pb-12 last:pb-0 group">
                                                     {{-- STEP INDICATOR --}}
                                                     <div class="absolute left-0 top-0 flex flex-col items-center">
                                                         @if($isDone)
-                                                            <div class="h-10 w-10 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.4)] z-10 transition-all group-hover:scale-110">
-                                                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                            <div class="h-8 w-8 sm:h-10 sm:w-10 bg-brand-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-brand-600/30 z-10">
+                                                                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                                             </div>
                                                         @elseif($isCurrent)
-                                                            <div class="h-10 w-10 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.4)] z-10 animate-pulse border-2 border-white/20">
-                                                                <span class="text-white text-xs font-black italic">{{ $index + 1 }}</span>
+                                                            <div class="h-8 w-8 sm:h-10 sm:w-10 bg-brand-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg z-10 animate-pulse border-2 border-white/20">
+                                                                <span class="text-white text-[10px] sm:text-xs font-black italic">{{ $index + 1 }}</span>
                                                             </div>
                                                         @else
-                                                            <div class="h-10 w-10 bg-slate-800 border-2 border-slate-700 rounded-2xl flex items-center justify-center z-10 opacity-30">
-                                                                <span class="mkt-text-muted text-[10px] font-black italic">{{ $index + 1 }}</span>
+                                                            <div class="h-8 w-8 sm:h-10 sm:w-10 bg-slate-800 border-2 border-slate-700 rounded-xl sm:rounded-2xl flex items-center justify-center z-10 opacity-30">
+                                                                <span class="mkt-text-muted text-[9px] sm:text-[10px] font-black italic">{{ $index + 1 }}</span>
                                                             </div>
                                                         @endif
                                                     </div>
 
                                                     {{-- STEP CONTENT --}}
-                                                    <div class="flex items-start justify-between gap-4">
-                                                        <div class="space-y-1">
-                                                            <h4 class="text-xs font-black {{ $isDone ? 'mkt-text' : ($isCurrent ? 'text-indigo-600' : 'mkt-text-muted opacity-30') }} italic uppercase tracking-widest leading-none">
+                                                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 min-w-0">
+                                                        <div class="space-y-1 min-w-0 flex-1">
+                                                            <h4 class="text-[10px] sm:text-xs font-black {{ $isDone ? 'mkt-text' : ($isCurrent ? 'text-brand-600' : 'mkt-text-muted opacity-30') }} italic uppercase tracking-wide sm:tracking-widest leading-tight">
                                                                 {{ $step['name'] }}
                                                             </h4>
-                                                            <p class="text-[8px] font-bold {{ $isDone ? 'mkt-text-muted' : ($isCurrent ? 'text-indigo-400/50' : 'mkt-text-muted opacity-20') }} uppercase tracking-tighter">
+                                                            <p class="text-[7px] sm:text-[8px] font-bold {{ $isDone ? 'mkt-text-muted' : ($isCurrent ? 'mkt-text/50' : 'mkt-text-muted opacity-20') }} uppercase tracking-tighter">
                                                                 {{ $step['label'] }}
                                                             </p>
 
                                                             @if($log && $log->operator)
-                                                                <div class="flex items-center gap-2 mt-3 mkt-surface-alt px-3 py-1.5 rounded-lg border mkt-border">
-                                                                    <div class="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
-                                                                    <p class="text-[7px] mkt-text-muted font-black uppercase tracking-widest">
+                                                                <div class="flex items-center gap-2 mt-2 sm:mt-3 mkt-surface-alt px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border mkt-border max-w-full">
+                                                                    <div class="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0"></div>
+                                                                    <p class="text-[7px] mkt-text-muted font-black uppercase tracking-wide truncate">
                                                                         OP: <span class="mkt-text">{{ $operatorActual }}</span>
                                                                     </p>
                                                                 </div>
@@ -723,23 +732,23 @@ new class extends Component {
                                                         </div>
 
                                                         {{-- ACTIONS & TIME --}}
-                                                        <div class="flex flex-col items-end gap-2 shrink-0">
+                                                        <div class="flex flex-row sm:flex-col items-center sm:items-end gap-2 shrink-0 flex-wrap">
                                                             @if($isDone)
-                                                                <div class="bg-emerald-500/10 border border-emerald-500/10 px-3 py-2 rounded-xl text-right">
-                                                                    <p class="text-[7px] text-emerald-500 font-black uppercase tracking-widest mb-0.5 opacity-60">COMPLETED</p>
-                                                                    <p class="text-[10px] text-emerald-400 font-black italic leading-none">
-                                                                        {{ ($step['div'] === 'marketing') ? $trackingData->created_at->format('d/m/Y H:i') : $log->created_at->format('d/m/Y H:i') }}
+                                                                <div class="bg-emerald-500/10 border border-emerald-500/10 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-left sm:text-right">
+                                                                    <p class="text-[6px] sm:text-[7px] text-emerald-500 font-black uppercase tracking-wide mb-0.5 opacity-60">DONE</p>
+                                                                    <p class="text-[9px] sm:text-[10px] text-emerald-400 font-black italic leading-none whitespace-nowrap">
+                                                                        {{ ($step['div'] === 'marketing') ? $trackingData->created_at->format('d/m H:i') : $log->created_at->format('d/m H:i') }}
                                                                     </p>
                                                                 </div>
 
                                                                 <button wire:click="toggleDetail('{{ $step['div'] }}')" 
-                                                                    class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-xl border mkt-border transition-all shadow-lg group/btn shadow-indigo-600/20">
-                                                                    <span class="text-[8px] text-white font-black uppercase tracking-widest">LIHAT HASIL</span>
-                                                                    <svg class="w-3 h-3 text-white/70 group-hover/btn:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                                    class="flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all shadow-md">
+                                                                    <span class="text-[7px] sm:text-[8px] text-white font-black uppercase">HASIL</span>
+                                                                    <svg class="w-3 h-3 text-white/70 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                                                 </button>
                                                             @elseif($isCurrent)
-                                                                <div class="bg-indigo-600/10 border border-indigo-600/30 px-4 py-2 rounded-xl text-center">
-                                                                    <p class="text-[9px] text-indigo-500 font-black animate-pulse tracking-[0.2em]">ON PROGRESS</p>
+                                                                <div class="bg-brand-600/10 border border-brand-600/30 px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl">
+                                                                    <p class="text-[8px] sm:text-[9px] mkt-text-muted font-black animate-pulse tracking-wider">ON PROGRESS</p>
                                                                 </div>
                                                             @endif
                                                         </div>
@@ -752,9 +761,9 @@ new class extends Component {
 
 
                                         {{-- FINAL STATUS BADGE --}}
-                                        <div class="mt-10 p-6 bg-slate-900/50 rounded-[2.5rem] border mkt-border text-center">
-                                            <p class="text-[7px] mkt-text-muted font-black uppercase tracking-[0.4em] mb-2 italic">CURRENT PRODUCTION STATE</p>
-                                            <h5 class="text-lg font-black text-red-600 italic uppercase tracking-tighter">
+                                        <div class="mt-4 sm:mt-6 md:mt-10 p-4 sm:p-6 mkt-surface-alt rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border mkt-border text-center">
+                                            <p class="text-[7px] mkt-text-muted font-black uppercase tracking-[0.2em] sm:tracking-[0.4em] mb-1 sm:mb-2 italic">CURRENT PRODUCTION STATE</p>
+                                            <h5 class="text-sm sm:text-lg font-black mkt-text italic uppercase tracking-tighter">
                                                 @if($trackingLogs->last())
                                                     {{ strtoupper($trackingLogs->last()->division_name) }} COMPLETED
                                                 @else
@@ -773,37 +782,37 @@ new class extends Component {
     </div> 
 
     @if($expandedLog)
-        <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-md px-4 animate-in fade-in duration-300">
-            <div class="mkt-surface border mkt-border w-full max-w-2xl rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] animate-in zoom-in slide-in-from-bottom-10 duration-500 relative overflow-hidden flex flex-col max-h-[80vh]">
+        <div class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md p-0 sm:p-4 animate-in fade-in duration-300">
+            <div class="mkt-surface border mkt-border w-full sm:max-w-2xl rounded-t-2xl sm:rounded-[3rem] shadow-xl sm:shadow-[0_0_100px_rgba(0,0,0,0.8)] animate-in zoom-in slide-in-from-bottom-10 duration-500 relative overflow-hidden flex flex-col max-h-[90dvh] sm:max-h-[80vh]">
 
                 {{-- MODAL HEADER --}}
-                <div class="p-8 border-b mkt-border flex justify-between items-center bg-slate-900/50">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 {{ $expandedLog == 'marketing' ? 'bg-red-600' : 'bg-emerald-600' }} rounded-2xl flex items-center justify-center shadow-lg shadow-black/40">
-                            <span class="text-white text-lg font-black italic">{{ $expandedLog == 'marketing' ? 'MO' : 'OP' }}</span>
+                <div class="p-4 sm:p-6 md:p-8 border-b mkt-border flex justify-between items-start gap-3 mkt-surface-alt shrink-0">
+                    <div class="flex items-start gap-3 min-w-0 flex-1">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 {{ $expandedLog == 'marketing' ? 'bg-red-600' : 'bg-emerald-600' }} rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shrink-0">
+                            <span class="text-white text-sm sm:text-lg font-black italic">{{ $expandedLog == 'marketing' ? 'MO' : 'OP' }}</span>
                         </div>
-                        <div>
-                            <p class="text-[8px] mkt-text-muted font-black uppercase tracking-[0.3em]">
-                                {{ $expandedLog == 'marketing' ? 'MARKETING SPECIFICATIONS' : 'ACTUAL PRODUCTION DATA' }}
+                        <div class="min-w-0">
+                            <p class="text-[7px] sm:text-[8px] mkt-text-muted font-black uppercase tracking-wide sm:tracking-[0.3em]">
+                                {{ $expandedLog == 'marketing' ? 'MARKETING SPECS' : 'PRODUCTION DATA' }}
                             </p>
-                            <h3 class="text-xl font-black mkt-text italic uppercase">
+                            <h3 class="text-base sm:text-xl font-black mkt-text italic uppercase leading-tight">
                                 {{ strtoupper(str_replace('_', ' ', $expandedLog)) }} RESULT
                             </h3>
                         </div>
                     </div>
-                    <button wire:click="toggleDetail('{{ $expandedLog }}')" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-white hover:bg-red-600 transition-all">
+                    <button wire:click="toggleDetail('{{ $expandedLog }}')" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-800 flex items-center justify-center text-white hover:bg-red-600 transition-all shrink-0">
                         ✕
                     </button>
                 </div>
 
                 {{-- MODAL CONTENT --}}
-                <div class="p-8 overflow-y-auto custom-scrollbar">
+                <div class="p-4 sm:p-6 md:p-8 overflow-y-auto custom-scrollbar flex-1 min-h-0">
                     @if($expandedLog == 'marketing')
-                        <div class="space-y-10 custom-scrollbar pr-4">
+                        <div class="space-y-5 sm:space-y-8 md:space-y-10 custom-scrollbar sm:pr-4">
                             {{-- I. IDENTITAS ORDER --}}
-                            <div class="space-y-4">
-                                <p class="text-[9px] font-black text-red-500 uppercase tracking-[0.3em] border-l-4 border-red-500 pl-3">I. IDENTITAS ORDER</p>
-                                <div class="grid grid-cols-2 gap-6 bg-white/5 p-5 rounded-2xl">
+                            <div class="space-y-2 sm:space-y-4">
+                                <p class="text-[8px] sm:text-[9px] font-black mkt-text-muted uppercase tracking-wide sm:tracking-[0.3em] border-l-4 border-mkt-border pl-2 sm:pl-3">I. IDENTITAS ORDER</p>
+                                <div class="grid grid-cols-2 gap-3 sm:gap-6 mkt-surface-alt p-3 sm:p-5 rounded-xl sm:rounded-2xl border mkt-border">
                                     <div>
                                         <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">LEGACY SAP ID</p>
                                         <p class="text-[11px] font-black mkt-text opacity-60">{{ $trackingData->sap_no ?? '-' }}</p>
@@ -824,9 +833,9 @@ new class extends Component {
                             </div>
 
                             {{-- II. KLASIFIKASI & MATERIAL --}}
-                            <div class="space-y-4">
-                                <p class="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em] border-l-4 border-emerald-500 pl-3">II. KLASIFIKASI & MATERIAL</p>
-                                <div class="grid grid-cols-2 gap-6 bg-white/5 p-5 rounded-2xl">
+                            <div class="space-y-2 sm:space-y-4">
+                                <p class="text-[8px] sm:text-[9px] font-black text-emerald-500 uppercase tracking-wide sm:tracking-[0.3em] border-l-4 border-emerald-500 pl-2 sm:pl-3">II. KLASIFIKASI & MATERIAL</p>
+                                <div class="grid grid-cols-2 gap-3 sm:gap-6 mkt-surface-alt p-3 sm:p-5 rounded-xl sm:rounded-2xl border mkt-border">
                                     <div>
                                         <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">MKT (SALES)</p>
                                         <p class="text-[11px] font-black mkt-text uppercase">{{ $trackingData->mkt }}</p>
@@ -844,7 +853,7 @@ new class extends Component {
                                         <p class="text-[11px] font-black mkt-text uppercase">
                                             {{ $trackingData->benang ?? '-' }}
                                             @if($trackingData->benang_percent)
-                                                <span class="text-red-500">({{ $trackingData->benang_percent }}%)</span>
+                                                <span class="mkt-text">({{ $trackingData->benang_percent }}%)</span>
                                             @endif
                                         </p>
                                     </div>
@@ -852,12 +861,12 @@ new class extends Component {
                             </div>
 
                             {{-- III. SPESIFIKASI TEKNIS --}}
-                            <div class="space-y-4">
-                                <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">III. SPESIFIKASI TEKNIS</p>
-                                <div class="grid grid-cols-2 gap-6 bg-white/5 p-5 rounded-2xl">
+                            <div class="space-y-2 sm:space-y-4">
+                                <p class="text-[8px] sm:text-[9px] font-black mkt-text-muted uppercase tracking-wide sm:tracking-[0.3em] border-l-4 border-mkt-border pl-2 sm:pl-3">III. SPESIFIKASI TEKNIS</p>
+                                <div class="grid grid-cols-2 gap-3 sm:gap-6 mkt-surface-alt p-3 sm:p-5 rounded-xl sm:rounded-2xl border mkt-border">
                                     <div>
                                         <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TARGET GRAMASI</p>
-                                        <p class="text-[11px] font-black text-blue-400">{{ $trackingData->target_gramasi }} GSM</p>
+                                        <p class="text-[11px] font-black mkt-text">{{ $trackingData->target_gramasi }} GSM</p>
                                     </div>
                                     <div>
                                         <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">HANDFEEL</p>
@@ -865,11 +874,11 @@ new class extends Component {
                                     </div>
                                     <div class="col-span-2">
                                         <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TREATMENT KHUSUS</p>
-                                        <p class="text-[11px] font-black text-red-500 uppercase italic">{{ $trackingData->treatment_khusus }}</p>
+                                        <p class="text-[11px] font-black mkt-text uppercase italic">{{ $trackingData->treatment_khusus }}</p>
                                     </div>
-                                    <div class="col-span-2">
+                                    <div class="col-span-2 min-w-0">
                                         <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">KONSTRUKSI GREIGE</p>
-                                        <p class="text-[11px] font-black mkt-text italic uppercase">{{ $trackingData->konstruksi_greige }}</p>
+                                        <p class="text-[11px] font-black mkt-text italic uppercase break-words leading-snug">{{ $trackingData->konstruksi_greige }}</p>
                                     </div>
                                     <div>
                                         <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">KELOMPOK KAIN</p>
@@ -891,31 +900,31 @@ new class extends Component {
                             </div>
 
                             {{-- IV. QUANTITY & KETERANGAN --}}
-                            <div class="space-y-4">
-                                <p class="text-[9px] font-black text-orange-500 uppercase tracking-[0.3em] border-l-4 border-orange-500 pl-3">IV. QUANTITY & KETERANGAN</p>
-                                <div class="grid grid-cols-4 gap-6 bg-white/5 p-5 rounded-2xl">
-                                    <div>
-                                        <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">QUANTITY (ROLL)</p>
+                            <div class="space-y-2 sm:space-y-4">
+                                <p class="text-[8px] sm:text-[9px] font-black text-orange-500 uppercase tracking-wide sm:tracking-[0.3em] border-l-4 border-orange-500 pl-2 sm:pl-3">IV. QUANTITY & KETERANGAN</p>
+                                <div class="grid grid-cols-2 gap-3 sm:gap-6 mkt-surface-alt p-3 sm:p-5 rounded-xl sm:rounded-2xl border mkt-border">
+                                    <div class="min-w-0">
+                                        <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">ROLL</p>
                                         <p class="text-[11px] font-black mkt-text uppercase">{{ $trackingData->roll_target }} ROLL</p>
                                     </div>
-                                    <div>
-                                        <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">QUANTITY (KG)</p>
+                                    <div class="min-w-0">
+                                        <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">KG</p>
                                         <p class="text-[11px] font-black mkt-text uppercase">{{ $trackingData->kg_target }} KG</p>
                                     </div>
-                                    <div class="col-span-2">
-                                        <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">KETERANGAN ARTIKEL</p>
-                                        <p class="text-[11px] font-black mkt-text italic uppercase">{{ $trackingData->keterangan_artikel ?? '-' }}</p>
+                                    <div class="col-span-2 min-w-0">
+                                        <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">KETERANGAN</p>
+                                        <p class="text-[11px] font-black mkt-text italic uppercase break-words">{{ $trackingData->keterangan_artikel ?? '-' }}</p>
                                     </div>
                                 </div>
                             </div>
 
                             {{-- V. DATA R&D --}}
-                            <div class="space-y-4">
-                                <p class="text-[9px] font-black text-purple-500 uppercase tracking-[0.3em] border-l-4 border-purple-500 pl-3">V. DATA R&D</p>
-                                <div class="grid grid-cols-3 gap-6 bg-white/5 p-5 rounded-2xl">
+                            <div class="space-y-2 sm:space-y-4">
+                                <p class="text-[8px] sm:text-[9px] font-black mkt-text-muted uppercase tracking-wide sm:tracking-[0.3em] border-l-4 border-mkt-border pl-2 sm:pl-3">V. DATA R&D</p>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6 mkt-surface-alt p-3 sm:p-5 rounded-xl sm:rounded-2xl border mkt-border">
                                     <div>
                                         <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">GRAMASI GREIGE</p>
-                                        <p class="text-[11px] font-black text-purple-400 italic">{{ $trackingData->rnd_gramasi_greige }} GSM</p>
+                                        <p class="text-[11px] font-black mkt-text italic">{{ $trackingData->rnd_gramasi_greige }} GSM</p>
                                     </div>
                                     <div>
                                         <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">MESIN RAJUT</p>
@@ -942,12 +951,12 @@ new class extends Component {
                                                                                                                                 </div>
                                                                                                                                 <div>
                                                                                                                                     <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-1 italic">ACTUAL OPERATOR</p>
-                                                                                                                                    <p class="text-xl font-black text-red-600 italic tracking-tighter">{{ strtoupper($operatorActual) }}</p>
+                                                                                                                                    <p class="text-xl font-black mkt-text italic tracking-tighter">{{ strtoupper($operatorActual) }}</p>
                                                                                                                                 </div>
                                                                                                                             </div>
                                                                                                                             <div class="text-right">
                                                                                                                                 <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-1">MACHINE UNIT</p>
-                                                                                                                                <p class="text-3xl font-black text-red-600 italic leading-none">{{ $log->machine_no ?? 'M-01' }}</p>
+                                                                                                                                <p class="text-3xl font-black mkt-text italic leading-none">{{ $log->machine_no ?? 'M-01' }}</p>
                                                                                                                             </div>
                                                                                                                         </div>
 
@@ -957,13 +966,13 @@ new class extends Component {
 
                                                                                                                                 {{-- I. SPESIFIKASI MESIN --}}
                                                                                                                                 <div class="space-y-4">
-                                                                                                                                    <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">I. IDENTITAS & SPESIFIKASI MESIN</p>
+                                                                                                                                    <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">I. IDENTITAS & SPESIFIKASI MESIN</p>
                                                                                                                                     <div class="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl">
                                                                                                                                         <div class="col-span-2 border-r mkt-border pr-6">
                                                                                                                                             <div class="grid grid-cols-2 gap-4">
                                                                                                                                                 <div>
                                                                                                                                                     <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">LEGACY SAP ID</p>
-                                                                                                                                                    <p class="text-[11px] font-black text-blue-400 italic opacity-60">{{ $techData['sap_no'] ?? ($trackingData->sap_no ?? '-') }}</p>
+                                                                                                                                                    <p class="text-[11px] font-black mkt-text italic opacity-60">{{ $techData['sap_no'] ?? ($trackingData->sap_no ?? '-') }}</p>
                                                                                                                                                 </div>
                                                                                                                                                 <div>
                                                                                                                                                     <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TGL PRODUKSI</p>
@@ -983,11 +992,11 @@ new class extends Component {
                                                                                                                                         </div>
                                                                                                                                         <div>
                                                                                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">JML FEEDER</p>
-                                                                                                                                            <p class="text-[11px] font-black mkt-text uppercase text-blue-400">{{ $techData['jml_feeder'] ?? '0' }} <span class="text-[8px] mkt-text-muted">FDR</span></p>
+                                                                                                                                            <p class="text-[11px] font-black mkt-text uppercase mkt-text">{{ $techData['jml_feeder'] ?? '0' }} <span class="text-[8px] mkt-text-muted">FDR</span></p>
                                                                                                                                         </div>
                                                                                                                                         <div>
                                                                                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">JML JARUM</p>
-                                                                                                                                            <p class="text-[11px] font-black mkt-text uppercase text-blue-400">{{ $techData['jml_jarum'] ?? '0' }} <span class="text-[8px] mkt-text-muted">JRM</span></p>
+                                                                                                                                            <p class="text-[11px] font-black mkt-text uppercase mkt-text">{{ $techData['jml_jarum'] ?? '0' }} <span class="text-[8px] mkt-text-muted">JRM</span></p>
                                                                                                                                         </div>
                                                                                                                                     </div>
                                                                                                                                 </div>
@@ -1013,7 +1022,7 @@ new class extends Component {
 
                                                                                                                                 {{-- III. PENGGUNAAN BENANG & YL --}}
                                                                                                                                 <div class="space-y-4">
-                                                                                                                                    <p class="text-[9px] font-black text-red-500 uppercase tracking-[0.3em] border-l-4 border-red-500 pl-3">III. PENGGUNAAN BENANG & YL</p>
+                                                                                                                                    <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">III. PENGGUNAAN BENANG & YL</p>
                                                                                                                                     <div class="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl">
                                                                                                                                         @foreach(range(1, 4) as $i)
                                                                                                                                             @if(!empty($techData['benang_' . $i]))
@@ -1026,11 +1035,11 @@ new class extends Component {
                                                                                                                                                         <p class="text-[9px] font-black text-slate-500 uppercase leading-none">LOT: {{ $techData['benang_' . $i . '_lot'] }}</p>
                                                                                                                                                     @endif
                                                                                                                                                     @if(!empty($techData['benang_' . $i . '_percent']))
-                                                                                                                                                        <p class="text-[11px] font-black text-red-500 tracking-tighter">{{ $techData['benang_' . $i . '_percent'] }}</p>
+                                                                                                                                                        <p class="text-[11px] font-black mkt-text tracking-tighter">{{ $techData['benang_' . $i . '_percent'] }}</p>
                                                                                                                                                     @endif
                                                                                                                                                     <div class="pt-2 border-t border-white/5">
                                                                                                                                                         <p class="text-[7px] mkt-text-muted font-bold uppercase">YL</p>
-                                                                                                                                                        <p class="text-[11px] font-bold text-blue-400 tracking-tighter">{{ $techData['yl_' . $i] ?? '-' }}</p>
+                                                                                                                                                        <p class="text-[11px] font-bold mkt-text tracking-tighter">{{ $techData['yl_' . $i] ?? '-' }}</p>
                                                                                                                                                     </div>
                                                                                                                                                 </div>
                                                                                                                                             @endif
@@ -1090,7 +1099,7 @@ new class extends Component {
                                                                         </div>
                                                                         <div>
                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">NO MESIN</p>
-                                                                            <p class="text-[11px] font-black text-indigo-400 uppercase italic">{{ $techData['no_mesin'] ?? $log->machine_no ?? '-' }}</p>
+                                                                            <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['no_mesin'] ?? $log->machine_no ?? '-' }}</p>
                                                                         </div>
                                                                         <div>
                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TANGGAL SUBMIT</p>
@@ -1101,7 +1110,7 @@ new class extends Component {
 
                                                                 {{-- II. TECHNICAL PARAMETERS LIST --}}
                                                                 <div class="space-y-6">
-                                                                    <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">II. TECHNICAL PARAMETERS LOG</p>
+                                                                    <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. TECHNICAL PARAMETERS LOG</p>
 
                                                                     <!-- Table Header -->
                                                                     <div class="bg-white/5 p-6 rounded-[2rem] border border-white/5 shadow-md">
@@ -1135,12 +1144,12 @@ new class extends Component {
                                                                                 }
                                                                             @endphp
 
-                                                                            <div class="bg-white/5 border border-white/5 p-6 rounded-[2rem] shadow-sm hover:border-violet-500/50 transition-all duration-300">
+                                                                            <div class="bg-white/5 border border-white/5 p-6 rounded-[2rem] shadow-sm hover:border-brand-500/50 transition-all duration-300">
                                                                                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                                                                                     <!-- Parameter Title -->
                                                                                     <div class="col-span-3 flex items-center gap-3">
-                                                                                        <div class="w-2 h-2 rounded-full bg-violet-500"></div>
-                                                                                        <span class="text-xs font-black uppercase text-violet-400 tracking-wider font-semibold">
+                                                                                        <div class="w-2 h-2 rounded-full bg-brand-500"></div>
+                                                                                        <span class="text-xs font-black uppercase mkt-text tracking-wider font-semibold">
                                                                                             {{ $param['label'] }}
                                                                                         </span>
                                                                                     </div>
@@ -1197,23 +1206,23 @@ new class extends Component {
 
                                                                                                                 {{-- II. PARAMETER MESIN --}}
                                                                                                                 <div class="space-y-4">
-                                                                                                                    <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">II. PARAMETER SETTING MESIN</p>
+                                                                                                                    <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. PARAMETER SETTING MESIN</p>
                                                                                                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 bg-white/5 p-6 rounded-2xl">
                                                                                                                         <div>
                                                                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TEMPERATURE</p>
-                                                                                                                            <p class="text-[11px] font-black text-indigo-400">{{ $techData['suhu'] ?? '-' }}°C</p>
+                                                                                                                            <p class="text-[11px] font-black mkt-text">{{ $techData['suhu'] ?? '-' }}°C</p>
                                                                                                                         </div>
                                                                                                                         <div>
                                                                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">STEAM INJECT</p>
-                                                                                                                            <p class="text-[11px] font-black text-indigo-400">{{ $techData['steam_inject'] ?? '-' }}</p>
+                                                                                                                            <p class="text-[11px] font-black mkt-text">{{ $techData['steam_inject'] ?? '-' }}</p>
                                                                                                                         </div>
                                                                                                                         <div>
                                                                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">HOTWIND</p>
-                                                                                                                            <p class="text-[11px] font-black text-indigo-400">{{ $techData['hotwind'] ?? '-' }}</p>
+                                                                                                                            <p class="text-[11px] font-black mkt-text">{{ $techData['hotwind'] ?? '-' }}</p>
                                                                                                                         </div>
                                                                                                                         <div>
                                                                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">COLDWIND</p>
-                                                                                                                            <p class="text-[11px] font-black text-indigo-400">{{ $techData['coldwind'] ?? '-' }}</p>
+                                                                                                                            <p class="text-[11px] font-black mkt-text">{{ $techData['coldwind'] ?? '-' }}</p>
                                                                                                                         </div>
                                                                                                                     </div>
                                                                                                                 </div>
@@ -1250,7 +1259,7 @@ new class extends Component {
 
                                                                                                                 {{-- II. DETIL PROSES SIDE-BY-SIDE --}}
                                                                                                                 <div class="space-y-4">
-                                                                                                                    <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">II. DETAIL PARAMETER PROSES (SIDE-BY-SIDE)</p>
+                                                                                                                    <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. DETAIL PARAMETER PROSES (SIDE-BY-SIDE)</p>
                                                                                                                     <div class="overflow-x-auto">
                                                                                                                         <div class="min-w-[800px] space-y-4">
                                                                                                                             {{-- TABLE HEADER --}}
@@ -1287,7 +1296,7 @@ new class extends Component {
 
                                                                                                                             <div class="space-y-3">
                                                                                                                                 @foreach($fleeceParams as $param)
-                                                                                                                                    <div class="grid grid-cols-12 gap-6 bg-white/[0.02] border border-white/5 hover:border-violet-500/30 px-6 py-5 rounded-[1.5rem] items-center transition-all duration-300">
+                                                                                                                                    <div class="grid grid-cols-12 gap-6 bg-white/[0.02] border border-white/5 hover:border-brand-500/30 px-6 py-5 rounded-[1.5rem] items-center transition-all duration-300">
                                                                                                                                         <div class="col-span-3">
                                                                                                                                             <span class="text-xs font-black text-slate-300 tracking-wider">
                                                                                                                                                 {{ $param['label'] }}
@@ -1334,15 +1343,15 @@ new class extends Component {
 
                                                                                                                 {{-- II. HASIL PENGUJIAN FISIK --}}
                                                                                                                 <div class="space-y-4">
-                                                                                                                    <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">II. HASIL PENGUJIAN FISIK</p>
+                                                                                                                    <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. HASIL PENGUJIAN FISIK</p>
                                                                                                                     <div class="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl">
                                                                                                                         <div>
                                                                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">HASIL LEBAR</p>
-                                                                                                                            <p class="text-[11px] font-black text-indigo-400 italic">{{ $techData['lebar'] ?? '-' }} cm</p>
+                                                                                                                            <p class="text-[11px] font-black mkt-text italic">{{ $techData['lebar'] ?? '-' }} cm</p>
                                                                                                                         </div>
                                                                                                                         <div>
                                                                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">HASIL GRAMASI</p>
-                                                                                                                            <p class="text-[11px] font-black text-indigo-400 italic">{{ $techData['gramasi'] ?? '-' }} gsm</p>
+                                                                                                                            <p class="text-[11px] font-black mkt-text italic">{{ $techData['gramasi'] ?? '-' }} gsm</p>
                                                                                                                         </div>
                                                                                                                     </div>
                                                                                                                 </div>
@@ -1370,7 +1379,7 @@ new class extends Component {
                                                                                                             <div class="space-y-10 animate-in fade-in duration-700">
                                                                                                                 {{-- I. IDENTITAS & OPERATOR --}}
                                                                                                                 <div class="space-y-4">
-                                                                                                                    <p class="text-[9px] font-black text-indigo-500 uppercase tracking-[0.3em] border-l-4 border-indigo-500 pl-3">I. IDENTITAS KAIN & OPERATOR (QE)</p>
+                                                                                                                    <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">I. IDENTITAS KAIN & OPERATOR (QE)</p>
                                                                                                                     <div class="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl">
                                                                                                                         <div>
                                                                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">OPERATOR QE</p>
@@ -1426,11 +1435,11 @@ new class extends Component {
                                                                                                                                     </div>
                                                                                                                                     <div>
                                                                                                                                         <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">MACHINE NO</p>
-                                                                                                                                        <p class="text-[11px] font-black text-red-500 italic">{{ $log->machine_no ?? 'M-01' }}</p>
+                                                                                                                                        <p class="text-[11px] font-black mkt-text italic">{{ $log->machine_no ?? 'M-01' }}</p>
                                                                                                                                     </div>
                                                                                                                                 </div>
 
-                                                                                                                                <p class="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] border-l-4 border-blue-500 pl-3">II. TECHNICAL DATA</p>
+                                                                                                                                <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. TECHNICAL DATA</p>
                                                                                                                                 <div class="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl">
                                                                                                                                     @foreach($techData as $key => $value)
                                                                                                                                         @if(!in_array($key, ['kg', 'roll', 'machine_no', 'operator', 'nama_input', 'updated_at', 'created_at', 'preset', 'drying', 'finishing', 'raising', 'brushing', 'shearing']))
