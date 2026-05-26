@@ -37,7 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
             '/marketing/*',
             '/profile/*',           // Izinkan akses profil
             '/livewire/*', 
-            '/livewire-6bae9f88/*', // Hash spesifik Livewire update
+            '/livewire-*/*',        // Menggunakan wildcard agar tidak terikat hash spesifik
             'livewire/update',      // Endpoint standar update
             '/api/maintenance-check', // Heartbeat maintenance (503 auto-recovery)
             'rnd-duniatex-2026',    // secret key Anda
