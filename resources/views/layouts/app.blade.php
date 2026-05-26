@@ -169,17 +169,17 @@
                                 <div class="text-[8px] mkt-text-muted font-bold uppercase">{{ Auth::user()->role }}
                                 </div>
                             </div>
-                            <form method="POST" action="{{ route('logout') }}">
+                            <form id="logout-form-desktop" method="POST" action="{{ route('logout') }}" class="hidden">
                                 @csrf
-                                <button type="submit"
-                                    class="p-2 rounded-full mkt-surface-alt text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                                        </path>
-                                    </svg>
-                                </button>
                             </form>
+                            <button type="button" onclick="confirmLogout('logout-form-desktop')"
+                                class="p-2 rounded-full mkt-surface-alt text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                    </path>
+                                </svg>
+                            </button>
                         </div>
 
                         {{-- Mobile Menu Toggle (Hamburger) --}}
@@ -301,13 +301,13 @@
                                     <div class="text-[9px] mkt-text-muted font-bold uppercase tracking-wider">{{ Auth::user()->role }}</div>
                                 </div>
                             </div>
-                            <form method="POST" action="{{ route('logout') }}">
+                            <form id="logout-form-mobile" method="POST" action="{{ route('logout') }}" class="hidden">
                                 @csrf
-                                <button type="submit"
-                                    class="w-full py-4 rounded-2xl bg-red-600/10 text-red-600 font-black uppercase text-xs tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-md shadow-red-600/5">
-                                    LOGOUT SYSTEM
-                                </button>
                             </form>
+                            <button type="button" onclick="confirmLogout('logout-form-mobile')"
+                                class="w-full py-4 rounded-2xl bg-red-600/10 text-red-600 font-black uppercase text-xs tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-md shadow-red-600/5">
+                                LOGOUT SYSTEM
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -512,7 +512,34 @@
             setInterval(checkMaintenance, 30000); // Ticker 30 detik
         @endif
 
-        // F. Global Real-time Clock (tahan Livewire morph / wire:poll)
+        // G. Konfirmasi Logout
+        function confirmLogout(formId) {
+            Swal.fire({
+                title: 'KONFIRMASI LOGOUT',
+                text: "Apakah Anda yakin ingin keluar dari sistem DUNIATEX RND?",
+                icon: 'warning',
+                iconColor: '#ED1C24',
+                showCancelButton: true,
+                confirmButtonColor: '#ED1C24',
+                cancelButtonColor: '#334155',
+                confirmButtonText: 'YA, KELUAR',
+                cancelButtonText: 'BATAL',
+                background: '#0f172a',
+                color: '#fff',
+                customClass: {
+                    popup: 'border border-white/10 backdrop-blur-xl rounded-3xl',
+                    title: 'font-black italic uppercase tracking-tighter',
+                    confirmButton: 'rounded-xl font-bold italic tracking-widest uppercase text-xs px-6 py-3 mx-2',
+                    cancelButton: 'rounded-xl font-bold italic tracking-widest uppercase text-xs px-6 py-3 mx-2'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(formId).submit();
+                }
+            });
+        }
+
+        // H. Global Real-time Clock (tahan Livewire morph / wire:poll)
         (function () {
             let clockTimer = null;
 

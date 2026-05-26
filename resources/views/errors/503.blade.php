@@ -77,15 +77,16 @@
 
             {{-- 3. LOGOUT / BACK TO LOGIN --}}
             @if(auth()->check())
-                <form method="POST" action="{{ route('logout') }}" class="w-full sm:w-auto">
+                <form id="logout-form-maintenance" method="POST" action="{{ route('logout') }}" class="hidden">
                     @csrf
-                    <button type="submit" class="w-full group flex items-center justify-center gap-3 px-8 py-4 rounded-2xl md:rounded-3xl bg-brand-600 text-white font-black uppercase italic tracking-widest text-[10px] md:text-xs hover:bg-black transition-all duration-500 shadow-2xl shadow-brand-900/40">
-                        <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                        </svg>
-                        Logout Sesi
-                    </button>
                 </form>
+                <button type="button" onclick="confirmLogout()"
+                    class="w-full sm:w-auto group flex items-center justify-center gap-3 px-8 py-4 rounded-2xl md:rounded-3xl bg-brand-600 text-white font-black uppercase italic tracking-widest text-[10px] md:text-xs hover:bg-black transition-all duration-500 shadow-2xl shadow-brand-900/40">
+                    <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    Logout Sesi
+                </button>
             @else
                 <a href="{{ route('login') }}" class="w-full sm:w-auto group flex items-center justify-center gap-3 px-8 py-4 rounded-2xl md:rounded-3xl bg-brand-600 text-white font-black uppercase italic tracking-widest text-[10px] md:text-xs hover:bg-black transition-all duration-500 shadow-2xl shadow-brand-900/40">
                     <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,8 +107,37 @@
         </div>
     </div>
 
+    {{-- SweetAlert2 --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     {{-- Auto Recovery Script --}}
     <script>
+        function confirmLogout() {
+            Swal.fire({
+                title: 'KONFIRMASI LOGOUT',
+                text: "Apakah Anda yakin ingin keluar?",
+                icon: 'warning',
+                iconColor: '#ED1C24',
+                showCancelButton: true,
+                confirmButtonColor: '#ED1C24',
+                cancelButtonColor: '#334155',
+                confirmButtonText: 'YA, KELUAR',
+                cancelButtonText: 'BATAL',
+                background: '#0b0f19',
+                color: '#fff',
+                customClass: {
+                    popup: 'border border-white/10 backdrop-blur-xl rounded-3xl',
+                    title: 'font-black italic uppercase tracking-tighter',
+                    confirmButton: 'rounded-xl font-bold italic tracking-widest uppercase text-xs px-6 py-3 mx-2',
+                    cancelButton: 'rounded-xl font-bold italic tracking-widest uppercase text-xs px-6 py-3 mx-2'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('logout-form-maintenance').submit();
+                }
+            });
+        }
+
         function checkSystemStatus() {
             fetch('{{ route('api.maintenance-check') }}')
                 .then(response => {
