@@ -55,7 +55,27 @@
         </div>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 md:mb-20">
-            {{-- Logout/Back to Login Button --}}
+            {{-- 1. STOP IMPERSONATING (If active) --}}
+            @if(session()->has('impersonator_id'))
+                <a href="{{ route('admin.stop-impersonate') }}" class="w-full sm:w-auto group flex items-center justify-center gap-3 px-8 py-4 rounded-2xl md:rounded-3xl bg-amber-600 text-white font-black uppercase italic tracking-widest text-[10px] md:text-xs hover:bg-black transition-all duration-500 shadow-2xl shadow-amber-900/40">
+                    <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path>
+                    </svg>
+                    Stop Impersonate
+                </a>
+            @endif
+
+            {{-- 2. USER MANAGEMENT (Only for Super Admin to access Impersonate feature) --}}
+            @if(auth()->check() && (auth()->user()->isSuperAdmin() || session()->has('impersonator_id')))
+                <a href="{{ route('admin.users') }}" class="w-full sm:w-auto group flex items-center justify-center gap-3 px-8 py-4 rounded-2xl md:rounded-3xl bg-emerald-600 text-white font-black uppercase italic tracking-widest text-[10px] md:text-xs hover:bg-black transition-all duration-500 shadow-2xl shadow-emerald-900/40">
+                    <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    User Management
+                </a>
+            @endif
+
+            {{-- 3. LOGOUT / BACK TO LOGIN --}}
             @if(auth()->check())
                 <form method="POST" action="{{ route('logout') }}" class="w-full sm:w-auto">
                     @csrf
@@ -63,7 +83,7 @@
                         <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                         </svg>
-                        Kembali Ke Login
+                        Logout Sesi
                     </button>
                 </form>
             @else
