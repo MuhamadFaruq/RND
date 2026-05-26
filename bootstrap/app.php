@@ -26,14 +26,16 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // TAMBAHKAN INI: Mengecualikan Super Admin dari Maintenance Mode
         $middleware->preventRequestsDuringMaintenance(except: [
+            '/',                    // Halaman utama / redirector
             '/login',
             '/logout',
             '/dashboard',
-            '/stop-impersonating',
+            '/stop-impersonate',    // Memperbaiki typo dari /stop-impersonating
             '/admin/*',
             '/super-admin/*',
             '/operator/*',
             '/marketing/*',
+            '/profile/*',           // Izinkan akses profil
             '/livewire/*', 
             '/livewire-6bae9f88/*', // Hash spesifik Livewire update
             'livewire/update',      // Endpoint standar update
