@@ -57,7 +57,7 @@ class OrderRepository
      */
     public function getQueue(string $role, ?string $search = null): LengthAwarePaginator
     {
-        $query = MarketingOrder::query();
+        $query = MarketingOrder::with('processingBy');
 
         if ($role === 'knitting') {
             $query->where('status', 'knitting');
