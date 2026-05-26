@@ -8,48 +8,56 @@
     <div class="max-w-[1600px] mx-auto">
         
         {{-- SECTION 1: COMPACT HEADER --}}
-        <div class="mb-4 md:mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4 mkt-surface mkt-border p-3 md:p-5 rounded-2xl md:rounded-[2.5rem] border shadow-sm">
-            <div class="flex items-center gap-2 md:gap-3">
-                <div class="w-1.5 md:w-2 h-6 md:h-8 bg-red-600 rounded-full"></div>
-                <h3 class="font-black uppercase mkt-text italic text-sm md:text-base">Order Pipeline <span class="text-red-600">Control</span></h3>
-            </div>
-
-            <div class="flex flex-wrap gap-2 md:gap-3 items-center w-full md:w-auto">
-                {{-- Date Filter --}}
-                <div class="flex items-center mkt-surface-alt border mkt-border rounded-xl md:rounded-2xl px-2 md:px-4 py-1.5 md:py-2 gap-1 md:gap-2 flex-1 md:flex-none min-w-0">
-                    <input type="date" wire:model.live="startDate" class="text-[8px] md:text-[10px] font-black mkt-text-muted uppercase border-none focus:ring-0 bg-transparent w-full md:w-auto min-w-0">
-                    <span class="mkt-text-muted font-black text-[8px] md:text-[10px] shrink-0">TO</span>
-                    <input type="date" wire:model.live="endDate" class="text-[8px] md:text-[10px] font-black mkt-text-muted uppercase border-none focus:ring-0 bg-transparent w-full md:w-auto min-w-0">
+        <div class="mb-5 md:mb-8 flex flex-col gap-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mkt-surface mkt-border p-5 md:p-6 rounded-[1.5rem] md:rounded-[3rem] border shadow-xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-8 md:h-10 bg-red-600 rounded-full"></div>
+                    <div>
+                        <h3 class="font-black uppercase mkt-text italic text-lg md:text-2xl tracking-tighter">Order <span class="text-red-600">Pipeline</span></h3>
+                        <p class="text-[8px] md:text-[10px] font-bold mkt-text-muted uppercase tracking-widest italic">Marketing Control Center</p>
+                    </div>
                 </div>
 
-                {{-- Action Buttons --}}
-                <button wire:click="exportExcel" wire:loading.attr="disabled" class="bg-slate-900 text-white px-3 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl font-black text-[8px] md:text-[10px] uppercase hover:bg-red-600 transition-all shadow-md flex items-center gap-1 md:gap-2 shrink-0">
-                    <span wire:loading.remove>Export Excel</span>
-                    <span wire:loading>Processing...</span>
-                </button>
-                
-                <a href="{{ route('marketing.dashboard', ['menu' => 'input']) }}" 
-                class="bg-red-600 hover:bg-black text-white px-3 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl text-[8px] md:text-[10px] font-black uppercase tracking-wider md:tracking-widest transition-all shadow-lg shadow-red-600/20 shrink-0">
-                + New Order
-                </a>
-            </div>
-        </div>
-        
-        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-2 md:gap-4 mb-6 md:mb-8">
-            <div class="mkt-surface p-3 md:p-6 rounded-xl md:rounded-2xl shadow-sm border mkt-border flex flex-col justify-center">
-                <p class="text-[7px] md:text-[10px] font-black mkt-text-muted uppercase">Total Pesanan</p>
-                <h4 wire:key="counter-{{ $totalOrder }}" class="text-lg md:text-4xl font-black mkt-text italic mt-0.5 md:mt-1 leading-none">
-                    {{ $totalOrder }}
-                </h4>
-            </div>
-            <div class="bg-red-600 p-3 md:p-6 rounded-xl md:rounded-[2rem] shadow-lg md:shadow-xl shadow-red-600/20 border-b-2 md:border-b-4 border-black relative overflow-hidden group flex flex-col justify-center">
-                <div class="absolute -right-4 -top-4 text-white/10 group-hover:scale-110 transition-transform hidden md:block">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1 6h2v8h-2v-8zm1 12.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
+                <div class="flex flex-wrap gap-2 md:gap-4 items-center w-full md:w-auto">
+                    {{-- Date Filter --}}
+                    <div class="flex items-center mkt-surface-alt border mkt-border rounded-2xl px-4 py-2 gap-2 flex-1 md:flex-none">
+                        <input type="date" wire:model.live="startDate" class="text-[9px] md:text-[11px] font-black mkt-text-muted uppercase border-none focus:ring-0 bg-transparent w-full md:w-auto p-0">
+                        <span class="mkt-text-muted font-black text-[9px] md:text-[11px]">TO</span>
+                        <input type="date" wire:model.live="endDate" class="text-[9px] md:text-[11px] font-black mkt-text-muted uppercase border-none focus:ring-0 bg-transparent w-full md:w-auto p-0">
+                    </div>
+
+                    {{-- Action Buttons --}}
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button wire:click="exportExcel" wire:loading.attr="disabled" class="flex-1 sm:flex-none bg-slate-900 text-white px-5 md:px-8 py-3 rounded-xl font-black text-[9px] md:text-[11px] uppercase hover:bg-red-600 transition-all shadow-lg flex items-center justify-center gap-2">
+                            <span wire:loading.remove>Export XLS</span>
+                            <span wire:loading>...</span>
+                        </button>
+                        
+                        <a href="{{ route('marketing.dashboard', ['menu' => 'input']) }}" 
+                        class="flex-1 sm:flex-none bg-red-600 hover:bg-black text-white px-5 md:px-8 py-3 rounded-xl text-[9px] md:text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-red-600/20 text-center">
+                        + New Order
+                        </a>
+                    </div>
                 </div>
-                <p class="text-[7px] md:text-[10px] font-black text-red-100 uppercase mb-0.5 md:mb-1 tracking-wider md:tracking-widest">Stuck Orders</p>
-                <h4 class="text-lg md:text-3xl font-black text-white leading-none">
-                    {{ \App\Models\MarketingOrder::where('status', 'knitting')->where('created_at', '<=', now()->subDays(2))->count() }}
-                </h4>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-6">
+                <div class="mkt-surface p-4 md:p-7 rounded-[1.5rem] md:rounded-[2.5rem] shadow-lg border mkt-border flex flex-col justify-center relative overflow-hidden">
+                    <p class="text-[8px] md:text-[10px] font-black mkt-text-muted uppercase tracking-widest italic z-10 leading-none">Total Pesanan</p>
+                    <h4 wire:key="counter-{{ $totalOrder }}" class="text-2xl md:text-5xl font-black mkt-text italic mt-2 z-10 leading-none">
+                        {{ $totalOrder }}
+                    </h4>
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-5 font-black italic select-none">ALL</div>
+                </div>
+                <div class="bg-red-600 p-4 md:p-7 rounded-[1.5rem] md:rounded-[2.5rem] shadow-xl shadow-red-600/20 border-b-4 border-black/20 relative overflow-hidden group flex flex-col justify-center">
+                    <div class="absolute -right-2 -top-2 text-white/10 group-hover:scale-110 transition-transform hidden md:block">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1 6h2v8h-2v-8zm1 12.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
+                    </div>
+                    <p class="text-[8px] md:text-[10px] font-black text-red-100 uppercase tracking-widest italic z-10 leading-none">Stuck Orders</p>
+                    <h4 class="text-2xl md:text-4xl font-black text-white mt-2 z-10 leading-none">
+                        {{ \App\Models\MarketingOrder::where('status', 'knitting')->where('created_at', '<=', now()->subDays(2))->count() }}
+                    </h4>
+                </div>
             </div>
         </div>
 

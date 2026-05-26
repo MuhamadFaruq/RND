@@ -388,9 +388,9 @@ new class extends Component
             @if($currentMenu === 'dashboard')
                 <div class="animate-in fade-in duration-500">
                     {{-- HEADER --}}
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-5 gap-3">
+                    <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-end mb-6 md:mb-8 gap-4">
                         <div class="text-left">
-                            <h2 class="text-xl md:text-2xl font-black uppercase tracking-tighter mkt-text leading-none italic">
+                            <h2 class="text-2xl md:text-4xl font-black uppercase tracking-tighter mkt-text leading-tight italic">
                                 @if(auth()->user()->role === 'knitting') 
                                     Knitting
                                 @elseif(auth()->user()->role === 'dyeing') 
@@ -398,7 +398,7 @@ new class extends Component
                                 @elseif(auth()->user()->role === 'relax-dryer') 
                                     Relax Dryer 
                                 @elseif(auth()->user()->role === 'finishing') 
-                                    Compactor / Heat Setting 
+                                    Compactor / HT 
                                 @elseif(auth()->user()->role === 'stenter') 
                                     Stenter
                                 @elseif(auth()->user()->role === 'tumbler') 
@@ -414,131 +414,118 @@ new class extends Component
                                 @endif
                                 <span class="text-red-600">Production</span>
                             </h2>
-                            <div class="mt-2 flex items-center gap-2">
-                                <div class="mkt-surface-alt backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg border mkt-border">
-                                    <p class="real-time-clock text-xs font-black tracking-widest leading-none mkt-text drop-shadow-[0_0_5px_rgba(237, 28, 36,0.5)]">00:00:00</p>
+                            <div class="mt-3 flex flex-wrap items-center gap-2 md:gap-3">
+                                <div class="mkt-surface-alt backdrop-blur-md px-4 py-2 rounded-xl shadow-lg border mkt-border">
+                                    <p class="real-time-clock text-xs md:text-sm font-black tracking-[0.2em] leading-none mkt-text drop-shadow-[0_0_8px_rgba(237,28,36,0.3)]">00:00:00</p>
                                 </div>
-                                <p class="real-time-date text-[10px] font-bold text-slate-400 uppercase tracking-widest italic"></p>
+                                <p class="real-time-date text-[9px] md:text-[11px] font-bold text-slate-500 uppercase tracking-widest italic"></p>
                             </div>
                         </div>
                         
-                        <div class="mkt-surface-alt backdrop-blur-md px-4 py-2 rounded-xl shadow-sm border mkt-border flex items-center gap-3">
-                            <div class="text-right italic">
-                                <p class="text-[9px] font-black text-slate-400 uppercase leading-none">Status Mesin</p>
-                                <p class="text-xs font-black {{ $machineStatus === 'running' ? 'text-green-500' : ($machineStatus === 'downtime' ? 'text-amber-500' : 'text-orange-600') }} uppercase mt-1">
+                        <div class="mkt-surface-alt backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl border mkt-border flex items-center justify-between lg:justify-end gap-4">
+                            <div class="text-left lg:text-right italic">
+                                <p class="text-[8px] md:text-[10px] font-black text-slate-500 uppercase leading-none tracking-widest">Machine Status</p>
+                                <p class="text-xs md:text-sm font-black {{ $machineStatus === 'running' ? 'text-green-500' : ($machineStatus === 'downtime' ? 'text-amber-500' : 'text-orange-600') }} uppercase mt-1.5 tracking-tight">
                                     {{ $machineStatus === 'running' ? 'Optimal Performance' : ($machineStatus === 'downtime' ? 'Machine Downtime' : 'Under Maintenance') }}
                                 </p>
                             </div>
-                            <div class="relative flex">
-                                <span class="animate-ping absolute inline-flex h-3 w-3 rounded-full {{ $machineStatus === 'running' ? 'bg-green-400' : ($machineStatus === 'downtime' ? 'bg-amber-400' : 'bg-orange-400') }} opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-3 w-3 {{ $machineStatus === 'running' ? 'bg-green-500' : ($machineStatus === 'downtime' ? 'bg-amber-500' : 'bg-orange-600') }}"></span>
+                            <div class="relative flex shrink-0">
+                                <span class="animate-ping absolute inline-flex h-4 w-4 rounded-full {{ $machineStatus === 'running' ? 'bg-green-400' : ($machineStatus === 'downtime' ? 'bg-amber-400' : 'bg-orange-400') }} opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-4 w-4 {{ $machineStatus === 'running' ? 'bg-green-500' : ($machineStatus === 'downtime' ? 'bg-amber-500' : 'bg-orange-600') }}"></span>
                             </div>
                         </div>
                     </div>
 
 
                     {{-- WIDGETS --}}
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
-                        <div class="md:col-span-2 mkt-surface p-4 md:p-6 rounded-2xl shadow-lg relative overflow-hidden border mkt-border">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-10">
+                        <div class="md:col-span-2 mkt-surface p-6 md:p-8 rounded-[1.5rem] md:rounded-[3rem] shadow-xl relative overflow-hidden border mkt-border group">
                             <div class="relative z-10 text-left">
-                                <p class="text-[10px] font-black mkt-text-muted uppercase mb-1 italic">Pencapaian Target Shift</p>
-                                <div class="flex justify-between items-end mb-4">
-                                     <h4 class="text-3xl md:text-4xl font-black leading-none italic mkt-text">{{ (float)$progress }}%</h4>
-                                    <div class="text-right leading-none">
-                                        <p class="text-[10px] mkt-text-muted uppercase mb-1">Target: {{ $targetShift }} KG</p>
-                                        <p class="text-sm md:text-base font-black mkt-text italic">{{ (float)$totalKgToday }} / {{ $targetShift }}</p>
+                                <div class="flex justify-between items-start mb-6 md:mb-8">
+                                    <div>
+                                        <p class="text-[9px] md:text-[11px] font-black mkt-text-muted uppercase tracking-[0.2em] mb-1 italic">Shift Achievement</p>
+                                        <h4 class="text-4xl md:text-6xl font-black leading-none italic mkt-text tracking-tighter">{{ (float)$progress }}%</h4>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[8px] md:text-[10px] mkt-text-muted uppercase font-bold tracking-widest mb-1 italic">Target: {{ $targetShift }} KG</p>
+                                        <p class="text-sm md:text-lg font-black mkt-text italic tabular-nums">{{ (float)$totalKgToday }} <span class="text-[10px] opacity-50">/</span> {{ $targetShift }}</p>
                                     </div>
                                 </div>
-                                <div class="relative flex items-center justify-center mt-4 group">
+                                <div class="relative flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
                                     {{-- SVG Gauge with Scale Marks --}}
-                                    <svg class="w-36 h-18 md:w-44 md:h-22" viewBox="0 0 100 50">
-                                        {{-- Background Path --}}
-                                        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--mkt-border)" stroke-width="8" stroke-linecap="round" />
-                                        
-                                        {{-- Progress Path with Glow --}}
+                                    <svg class="w-40 h-20 md:w-56 md:h-28" viewBox="0 0 100 50">
+                                        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="currentColor" class="text-slate-100 dark:text-white/5" stroke-width="8" stroke-linecap="round" />
                                         <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" 
                                             stroke="{{ $progress < 100 ? '#ED1C24' : '#10b981' }}" 
                                             stroke-width="8" stroke-linecap="round" 
                                             stroke-dasharray="{{ $progress * 1.25 }}, 125" 
-                                            class="transition-all duration-1000" />
-
-                                        {{-- Scale Marks (Ticks) --}}
-                                        @foreach(range(0, 10) as $i)
-                                            @php 
-                                                $angle = 180 + ($i * 18); 
-                                                $r1 = 32; $r2 = 38;
-                                                $x1 = 50 + $r1 * cos(deg2rad($angle));
-                                                $y1 = 50 + $r1 * sin(deg2rad($angle));
-                                                $x2 = 50 + $r2 * cos(deg2rad($angle));
-                                                $y2 = 50 + $r2 * sin(deg2rad($angle));
-                                            @endphp
-                                            <line x1="{{ $x1 }}" y1="{{ $y1 }}" x2="{{ $x2 }}" y2="{{ $y2 }}" stroke="var(--mkt-text)" stroke-opacity="0.2" stroke-width="0.5" />
-                                        @endforeach
+                                            class="transition-all duration-1000 shadow-2xl" />
                                     </svg>
                                     
-                                    <div class="absolute bottom-2 text-center">
-                                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">Actual Output</p>
-                                        <p class="text-xl md:text-2xl font-black mkt-text italic leading-none mt-1 drop-shadow-lg">
+                                    <div class="absolute bottom-1 md:bottom-2 text-center">
+                                        <p class="text-[7px] md:text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] leading-none mb-1">Live Output</p>
+                                        <p class="text-xl md:text-3xl font-black mkt-text italic leading-none tabular-nums">
                                             {{ (float)$totalKgToday }} 
-                                            <span class="text-[10px] mkt-text-muted block mt-1">KILOGRAM</span>
                                         </p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="absolute -right-10 -bottom-10 opacity-5 text-[12rem] font-black italic select-none">UNIT</div>
+                            <div class="absolute -right-8 -bottom-8 opacity-5 text-[10rem] md:text-[15rem] font-black italic select-none pointer-events-none">UNIT</div>
                         </div>
 
-                        <div class="space-y-4">
-                            <div class="mkt-surface-alt backdrop-blur-md p-4 rounded-xl border mkt-border shadow-md text-left hover:scale-[1.02] transition-transform duration-300">
-                                <p class="text-[9px] font-black text-slate-400 uppercase italic">Antrean Masuk</p>
-                                <h4 class="text-2xl md:text-3xl font-black mkt-text-muted italic">{{ $totalKnitting }}</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-1 gap-4">
+                            <div class="mkt-surface p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border mkt-border shadow-lg text-left hover:scale-[1.02] transition-transform duration-300 relative overflow-hidden">
+                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest italic leading-none mb-3">Antrean</p>
+                                <h4 class="text-3xl md:text-5xl font-black mkt-text-muted italic leading-none tabular-nums">{{ $totalKnitting }}</h4>
+                                <div class="absolute right-4 bottom-4 w-2 h-2 rounded-full bg-brand-600 animate-pulse"></div>
                             </div>
-                            <div class="mkt-surface-alt backdrop-blur-md p-4 rounded-xl border mkt-border shadow-md text-left hover:scale-[1.02] transition-transform duration-300">
-                                <p class="text-[9px] font-black text-slate-400 uppercase italic">Total Selesai</p>
-                                <h4 class="text-2xl md:text-3xl font-black text-emerald-500 italic">{{ $totalDone }}</h4>
+                            <div class="mkt-surface p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border mkt-border shadow-lg text-left hover:scale-[1.02] transition-transform duration-300 relative overflow-hidden">
+                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest italic leading-none mb-3">Selesai</p>
+                                <h4 class="text-3xl md:text-5xl font-black text-emerald-500 italic leading-none tabular-nums">{{ $totalDone }}</h4>
+                                <div class="absolute right-4 bottom-4 w-2 h-2 rounded-full bg-emerald-500"></div>
                             </div>
                         </div>
                     </div>
 
                     {{-- MACHINE STATUS CONTROL (MOVED TO MIDDLE) --}}
-                    <div class="mkt-surface p-4 md:p-6 rounded-2xl border mkt-border shadow-lg mb-5 flex flex-col md:flex-row items-center justify-between gap-4 relative overflow-hidden">
-                        <div class="relative z-10">
-                            <h3 class="text-sm font-black uppercase italic mkt-text mb-1">Machine Control Center</h3>
-                            <p class="text-[10px] font-bold mkt-text-muted uppercase italic">Kelola status operasional mesin produksi Anda secara real-time</p>
+                    <div class="mkt-surface p-5 md:p-8 rounded-[2rem] md:rounded-[3rem] border mkt-border shadow-2xl mb-6 md:mb-10 flex flex-col xl:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                        <div class="relative z-10 text-center xl:text-left">
+                            <h3 class="text-sm md:text-base font-black uppercase italic mkt-text mb-2 tracking-tight">Machine Control Center</h3>
+                            <p class="text-[9px] md:text-[11px] font-bold mkt-text-muted uppercase italic tracking-wider">Kelola status operasional unit divisi Anda secara real-time</p>
                         </div>
                         
-                        <div class="flex gap-4 relative z-10">
+                        <div class="grid grid-cols-3 gap-3 md:gap-6 relative z-10 w-full xl:w-auto">
                             <button wire:click="setMachineStatus('running')" 
-                                class="flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-all duration-300 min-w-[80px] md:min-w-[100px] {{ $machineStatus === 'running' ? 'bg-gradient-to-br from-green-600/30 to-emerald-600/5 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)] scale-105' : 'mkt-surface-alt mkt-border hover:opacity-80' }} border">
-                                <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center {{ $machineStatus === 'running' ? 'bg-green-600 text-white' : 'mkt-surface-alt text-slate-500' }}">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                class="flex flex-col items-center gap-2 p-4 rounded-2xl md:rounded-[2rem] transition-all duration-500 {{ $machineStatus === 'running' ? 'bg-gradient-to-br from-green-600/30 to-emerald-600/5 border-green-500 shadow-2xl shadow-green-500/20 scale-105' : 'mkt-surface-alt mkt-border hover:opacity-80' }} border group">
+                                <div class="w-10 h-10 md:w-14 md:h-14 rounded-2xl flex items-center justify-center {{ $machineStatus === 'running' ? 'bg-green-600 text-white shadow-xl' : 'mkt-surface-alt text-slate-500' }} transition-all">
+                                    <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                                     </svg>
                                 </div>
-                                <span class="text-[9px] font-black uppercase italic mkt-text">Running</span>
+                                <span class="text-[8px] md:text-[10px] font-black uppercase italic mkt-text tracking-widest">Running</span>
                             </button>
                             
                             <button wire:click="setMachineStatus('downtime')" 
-                                class="flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-all duration-300 min-w-[80px] md:min-w-[100px] {{ $machineStatus === 'downtime' ? 'bg-gradient-to-br from-amber-600/30 to-yellow-600/5 border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.3)] scale-105' : 'mkt-surface-alt mkt-border hover:opacity-80' }} border">
-                                <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center {{ $machineStatus === 'downtime' ? 'bg-amber-500 text-white' : 'mkt-surface-alt text-slate-500' }}">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                class="flex flex-col items-center gap-2 p-4 rounded-2xl md:rounded-[2rem] transition-all duration-500 {{ $machineStatus === 'downtime' ? 'bg-gradient-to-br from-amber-600/30 to-yellow-600/5 border-amber-500 shadow-2xl shadow-amber-500/20 scale-105' : 'mkt-surface-alt mkt-border hover:opacity-80' }} border group">
+                                <div class="w-10 h-10 md:w-14 md:h-14 rounded-2xl flex items-center justify-center {{ $machineStatus === 'downtime' ? 'bg-amber-500 text-white shadow-xl' : 'mkt-surface-alt text-slate-500' }} transition-all">
+                                    <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
                                     </svg>
                                 </div>
-                                <span class="text-[9px] font-black uppercase italic mkt-text">Downtime</span>
+                                <span class="text-[8px] md:text-[10px] font-black uppercase italic mkt-text tracking-widest">Downtime</span>
                             </button>
                             
                             <button wire:click="setMachineStatus('maintenance')" 
-                                class="flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-all duration-300 min-w-[80px] md:min-w-[100px] {{ $machineStatus === 'maintenance' ? 'bg-gradient-to-br from-orange-600/30 to-orange-600/5 border-orange-500 shadow-[0_0_15px_rgba(234,88,12,0.3)] scale-105' : 'mkt-surface-alt mkt-border hover:opacity-80' }} border">
-                                <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center {{ $machineStatus === 'maintenance' ? 'bg-orange-600 text-white' : 'mkt-surface text-slate-500' }}">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                class="flex flex-col items-center gap-2 p-4 rounded-2xl md:rounded-[2rem] transition-all duration-500 {{ $machineStatus === 'maintenance' ? 'bg-gradient-to-br from-orange-600/30 to-orange-600/5 border-orange-500 shadow-2xl shadow-orange-500/20 scale-105' : 'mkt-surface-alt mkt-border hover:opacity-80' }} border group">
+                                <div class="w-10 h-10 md:w-14 md:h-14 rounded-2xl flex items-center justify-center {{ $machineStatus === 'maintenance' ? 'bg-orange-600 text-white shadow-xl' : 'mkt-surface text-slate-500' }} transition-all">
+                                    <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.67 2.67 0 1121 17.25l-5.83-5.83m-3.75 3.75a3.75 3.75 0 11-5.3-5.3 3.75 3.75 0 015.3 5.3z" />
                                     </svg>
                                 </div>
-                                <span class="text-[9px] font-black uppercase italic mkt-text">Repair</span>
+                                <span class="text-[8px] md:text-[10px] font-black uppercase italic mkt-text tracking-widest">Repair</span>
                             </button>
                         </div>
-                        <div class="absolute -right-20 -top-20 text-[15rem] font-black italic opacity-5 select-none tracking-tighter mkt-text">STATUS</div>
+                        <div class="absolute -right-20 -top-20 text-[15rem] font-black italic opacity-5 select-none tracking-tighter mkt-text pointer-events-none hidden lg:block">STATUS</div>
                     </div>
 
                     {{-- SHIFT COMMUNICATION (RESTORED) --}}
