@@ -70,7 +70,7 @@ Route::middleware(['auth', 'verified', 'role'])->prefix('admin')->group(function
 });
 
 // --- OPERATOR ROUTES ---
-Route::middleware(['auth', 'verified', 'operator'])->prefix('operator')
+Route::middleware(['auth', 'verified', 'operator', 'throttle:production'])->prefix('operator')
     ->group(function () {
     
     // 1. DASHBOARD UTAMA

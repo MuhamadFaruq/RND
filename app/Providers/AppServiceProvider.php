@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot() : void
     {
         \Carbon\Carbon::setLocale('id');
+
+        // Configure Rate Limiters
+        $this->configureRateLimiting();
+
         // Cukup gunakan ini untuk bypass Super Admin
         \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
             // Gunakan value yang benar: 'super-admin'
@@ -43,5 +50,30 @@ class AppServiceProvider extends ServiceProvider
         // Daftarkan juga guest-layout jika diperlukan
         Blade::component('layouts.guest', 'guest-layout');
         Blade::component('layouts.app', 'layouts.app');
+    }
+
+    /**
+     * Configure the rate limiters for the application.
+     */
+    protected function configureRateLimiting(): void
+    {
+        // General API rate limiter
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+        // Strict rate limiter for authentication/login
+        RateLimiter::for('auth', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip())->response(function (Request $request, array $headers) {
+                return response('Terlalu banyak percobaan login. Silakan coba lagi nanti.', 429, $headers);
+            });
+        });
+
+        // Rate limiter for high-frequency production updates (Operators)
+        RateLimiter::for('production', function (Request $request) {
+            return $request->user()?->role === 'super-admin'
+                ? Limit::none()
+                : Limit::perMinute(30)->by($request->user()?->id ?: $request->ip());
+        });
     }
 }
