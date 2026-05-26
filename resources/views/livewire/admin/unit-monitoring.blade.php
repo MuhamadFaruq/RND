@@ -206,15 +206,15 @@ new class extends Component {
         {{-- TAB SWITCHER --}}
         <div class="flex flex-wrap gap-4 mb-10">
             <button wire:click="$set('viewMode', 'RAJUT')" 
-                class="flex-grow sm:flex-grow-0 px-12 py-5 rounded-3xl font-black uppercase italic transition-all tracking-widest text-xs {{ $viewMode === 'RAJUT' ? 'bg-brand-600 shadow-xl shadow-brand-900/30 text-white' : 'mkt-surface-alt mkt-text-muted border mkt-border hover:mkt-text' }}">
+                class="flex-grow sm:flex-grow-0 px-12 py-5 rounded-3xl font-black uppercase italic transition-all tracking-widest text-xs {{ $viewMode === 'RAJUT' ? 'bg-blue-600 shadow-xl shadow-blue-900/30 text-white' : 'mkt-surface-alt mkt-text-muted border mkt-border hover:mkt-text' }}">
                 MONITORING RAJUT
             </button>
             <button wire:click="$set('viewMode', 'WARNA')" 
-                class="flex-grow sm:flex-grow-0 px-12 py-5 rounded-3xl font-black uppercase italic transition-all tracking-widest text-xs {{ $viewMode === 'WARNA' ? 'bg-emerald-600 shadow-xl shadow-emerald-900/30 text-white' : 'mkt-surface-alt mkt-text-muted border mkt-border hover:mkt-text' }}">
+                class="flex-grow sm:flex-grow-0 px-12 py-5 rounded-3xl font-black uppercase italic transition-all tracking-widest text-xs {{ $viewMode === 'WARNA' ? 'bg-indigo-600 shadow-xl shadow-indigo-900/30 text-white' : 'mkt-surface-alt mkt-text-muted border mkt-border hover:mkt-text' }}">
                 MONITORING WARNA
             </button>
             <button wire:click="$set('viewMode', 'SELESAI')" 
-                class="flex-grow sm:flex-grow-0 px-12 py-5 rounded-3xl font-black uppercase italic transition-all tracking-widest text-xs {{ $viewMode === 'SELESAI' ? 'bg-brand shadow-xl shadow-brand-900/30 text-white' : 'mkt-surface-alt mkt-text-muted border mkt-border hover:mkt-text' }}">
+                class="flex-grow sm:flex-grow-0 px-12 py-5 rounded-3xl font-black uppercase italic transition-all tracking-widest text-xs {{ $viewMode === 'SELESAI' ? 'bg-emerald-600 shadow-xl shadow-emerald-900/30 text-white' : 'mkt-surface-alt mkt-text-muted border mkt-border hover:mkt-text' }}">
                 ORDER SELESAI
             </button>
         </div>

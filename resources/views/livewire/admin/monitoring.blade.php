@@ -121,16 +121,32 @@ new class extends Component
 
         {{-- QUICK SUMMARY HEADER (3 COLUMNS - SIDE BY SIDE ON MOBILE) --}}
         <div class="grid grid-cols-3 gap-3 md:gap-6 mb-8">
-            {{-- Rajut --}}
-            <div class="mkt-surface border border-brand-600/20 p-3 md:p-5 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1 group hover:bg-brand-950/10 transition-all shadow-sm">
+            {{-- Marketing --}}
+            <div class="mkt-surface border border-brand/20 p-3 md:p-5 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1 group hover:bg-brand-950/10 transition-all shadow-md">
                 <div>
-                    <p class="text-[7px] sm:text-[9px] md:text-[10px] font-black mkt-text-muted uppercase tracking-wider md:tracking-[0.2em] mb-0.5 md:mb-1 italic">RAJUT</p>
+                    <p class="text-[7px] sm:text-[9px] md:text-[10px] font-black text-brand-500 uppercase tracking-wider md:tracking-[0.2em] mb-0.5 md:mb-1 italic">MARKETING</p>
+                    <h4 class="text-sm sm:text-xl md:text-3xl font-black italic tracking-tighter mkt-text leading-none">
+                        {{ (float)$summary['marketing_kg'] }}<span class="text-[7px] sm:text-[9px] md:text-xs mkt-text-muted uppercase ml-0.5">KG</span>
+                    </h4>
+                </div>
+                <div class="lg:text-right mt-1 lg:mt-0 flex items-baseline lg:block gap-1">
+                    <span class="text-xs sm:text-lg md:text-2xl font-black italic text-slate-700 dark:text-slate-200 group-hover:text-brand transition-colors leading-none">
+                        {{ number_format($summary['marketing_mo']) }}
+                    </span>
+                    <span class="text-[7px] sm:text-[9px] font-bold text-slate-500 uppercase italic leading-none">Orders</span>
+                </div>
+            </div>
+
+            {{-- Rajut --}}
+            <div class="mkt-surface border border-blue-600/20 p-3 md:p-5 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1 group hover:bg-blue-950/10 transition-all shadow-sm">
+                <div>
+                    <p class="text-[7px] sm:text-[9px] md:text-[10px] font-black text-blue-500 uppercase tracking-wider md:tracking-[0.2em] mb-0.5 md:mb-1 italic">RAJUT</p>
                     <h4 class="text-sm sm:text-xl md:text-3xl font-black italic tracking-tighter mkt-text leading-none">
                         {{ (float)$summary['rajut_kg'] }}<span class="text-[7px] sm:text-[9px] md:text-xs mkt-text-muted uppercase ml-0.5">KG</span>
                     </h4>
                 </div>
                 <div class="lg:text-right mt-1 lg:mt-0 flex items-baseline lg:block gap-1">
-                    <span class="text-xs sm:text-lg md:text-2xl font-black italic text-slate-700 dark:text-slate-200 group-hover:text-brand-600 transition-colors leading-none">
+                    <span class="text-xs sm:text-lg md:text-2xl font-black italic text-slate-700 dark:text-slate-200 group-hover:text-blue-600 transition-colors leading-none">
                         {{ number_format($summary['rajut_roll']) }}
                     </span>
                     <span class="text-[7px] sm:text-[9px] font-bold text-slate-500 uppercase italic leading-none">Rolls</span>
@@ -138,34 +154,18 @@ new class extends Component
             </div>
 
             {{-- Warna --}}
-            <div class="mkt-surface border border-brand/20 p-3 md:p-5 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1 group hover:bg-brand-950/10 transition-all shadow-sm">
+            <div class="mkt-surface border border-indigo-600/20 p-3 md:p-5 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1 group hover:bg-indigo-950/10 transition-all shadow-sm">
                 <div>
-                    <p class="text-[7px] sm:text-[9px] md:text-[10px] font-black mkt-text-muted uppercase tracking-wider md:tracking-[0.2em] mb-0.5 md:mb-1 italic">WARNA</p>
+                    <p class="text-[7px] sm:text-[9px] md:text-[10px] font-black text-indigo-500 uppercase tracking-wider md:tracking-[0.2em] mb-0.5 md:mb-1 italic">WARNA</p>
                     <h4 class="text-sm sm:text-xl md:text-3xl font-black italic tracking-tighter mkt-text leading-none">
                         {{ (float)$summary['warna_kg'] }}<span class="text-[7px] sm:text-[9px] md:text-xs mkt-text-muted uppercase ml-0.5">KG</span>
                     </h4>
                 </div>
                 <div class="lg:text-right mt-1 lg:mt-0 flex items-baseline lg:block gap-1">
-                    <span class="text-xs sm:text-lg md:text-2xl font-black italic text-slate-700 dark:text-slate-200 group-hover:text-brand transition-colors leading-none">
+                    <span class="text-xs sm:text-lg md:text-2xl font-black italic text-slate-700 dark:text-slate-200 group-hover:text-indigo-500 transition-colors leading-none">
                         {{ number_format($summary['warna_roll']) }}
                     </span>
                     <span class="text-[7px] sm:text-[9px] font-bold text-slate-500 uppercase italic leading-none">Rolls</span>
-                </div>
-            </div>
-
-            {{-- Marketing --}}
-            <div class="mkt-surface border border-emerald-600/20 p-3 md:p-5 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1 group hover:bg-emerald-950/10 transition-all shadow-md">
-                <div>
-                    <p class="text-[7px] sm:text-[9px] md:text-[10px] font-black text-emerald-500 uppercase tracking-wider md:tracking-[0.2em] mb-0.5 md:mb-1 italic">MARKETING</p>
-                    <h4 class="text-sm sm:text-xl md:text-3xl font-black italic tracking-tighter mkt-text leading-none">
-                        {{ (float)$summary['marketing_kg'] }}<span class="text-[7px] sm:text-[9px] md:text-xs mkt-text-muted uppercase ml-0.5">KG</span>
-                    </h4>
-                </div>
-                <div class="lg:text-right mt-1 lg:mt-0 flex items-baseline lg:block gap-1">
-                    <span class="text-xs sm:text-lg md:text-2xl font-black italic text-slate-700 dark:text-slate-200 group-hover:text-emerald-500 transition-colors leading-none">
-                        {{ number_format($summary['marketing_mo']) }}
-                    </span>
-                    <span class="text-[7px] sm:text-[9px] font-bold text-slate-500 uppercase italic leading-none">Orders</span>
                 </div>
             </div>
         </div>
@@ -177,19 +177,19 @@ new class extends Component
                 <p class="text-[8px] md:text-[10px] font-black text-slate-500 uppercase mb-1 md:mb-3 italic tracking-wider md:tracking-widest">Total Output (KG)</p>
                 <div class="flex items-baseline gap-1 md:gap-2">
                     <h3 class="text-lg sm:text-2xl md:text-4xl font-black italic tracking-tighter mkt-text">{{ (float)$todayProduction }}</h3>
-                    <span class="text-[8px] md:text-xs font-bold text-brand-600 uppercase italic">Live</span>
+                    <span class="text-[8px] md:text-xs font-bold text-emerald-600 uppercase italic">Live</span>
                 </div>
-                <div class="absolute left-0 top-0 w-1 h-full bg-brand-600 shadow-[0_0_20px_rgba(79,70,229,0.5)]"></div>
+                <div class="absolute left-0 top-0 w-1 h-full bg-emerald-600 shadow-[0_0_20px_rgba(16,185,129,0.5)]"></div>
             </div>
 
             {{-- Marketing Unit Card --}}
-            <div class="mkt-surface p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[2.5rem] border mkt-border shadow-lg relative overflow-hidden group hover:border-emerald-500/50 transition-all">
+            <div class="mkt-surface p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[2.5rem] border mkt-border shadow-lg relative overflow-hidden group hover:border-brand-500/50 transition-all">
                 <p class="text-[8px] md:text-[10px] font-black text-slate-500 uppercase mb-1 md:mb-3 italic tracking-wider md:tracking-widest">Marketing</p>
                 <div class="flex items-baseline gap-1 md:gap-2">
                     <h3 class="text-lg sm:text-2xl md:text-4xl font-black italic tracking-tighter mkt-text">{{ $summary['marketing_mo'] }}</h3>
-                    <span class="text-[8px] md:text-xs font-bold text-emerald-500 uppercase italic">Orders</span>
+                    <span class="text-[8px] md:text-xs font-bold text-brand uppercase italic">Orders</span>
                 </div>
-                <div class="absolute left-0 top-0 w-1 h-full bg-emerald-600 shadow-[0_0_20px_rgba(16,185,129,0.5)]"></div>
+                <div class="absolute left-0 top-0 w-1 h-full bg-brand shadow-[0_0_20px_rgba(237,28,36,0.5)]"></div>
             </div>
 
             @foreach($divisionStats as $stat)
@@ -227,7 +227,16 @@ new class extends Component
                         <tr class="hover:mkt-surface-alt/50 transition-colors border-b mkt-border last:border-0">
                             <td class="px-8 py-7 font-mono text-emerald-500 font-bold text-sm tracking-tight">{{ $activity->created_at->format('H:i') }}</td>
                             <td class="px-8 py-7">
-                                <span class="px-4 py-1.5 bg-brand/10 mkt-text border border-brand/20 rounded-xl uppercase text-[9px] font-black tracking-widest inline-block shadow-sm">
+                                @php
+                                    $badgeColor = match(strtoupper($activity->division_name)) {
+                                        'KNITTING' => 'bg-blue-600/10 text-blue-500 border-blue-600/20',
+                                        'DYEING', 'WARNA', 'FINISHING', 'STENTER', 'RELAX DRYER', 'COMPACTOR' => 'bg-indigo-600/10 text-indigo-500 border-indigo-600/20',
+                                        'MARKETING' => 'bg-brand/10 text-brand border-brand/20',
+                                        'PENGUJIAN', 'QE' => 'bg-emerald-600/10 text-emerald-500 border-emerald-600/20',
+                                        default => 'bg-brand/10 mkt-text border border-brand/20',
+                                    };
+                                @endphp
+                                <span class="px-4 py-1.5 {{ $badgeColor }} rounded-xl uppercase text-[9px] font-black tracking-widest inline-block shadow-sm">
                                     {{ $activity->division_name }}
                                 </span>
                             </td>
