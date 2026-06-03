@@ -65,7 +65,8 @@ class AppServiceProvider extends ServiceProvider
         // Strict rate limiter for authentication/login
         RateLimiter::for('auth', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip())->response(function (Request $request, array $headers) {
-                return response('Terlalu banyak percobaan login. Silakan coba lagi nanti.', 429, $headers);
+                $seconds = $headers['Retry-After'] ?? 60;
+                return response()->view('errors.429', ['seconds' => $seconds], 429, $headers);
             });
         });
 

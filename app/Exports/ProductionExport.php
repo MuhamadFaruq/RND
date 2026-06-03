@@ -8,9 +8,12 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ProductionExport implements FromCollection, WithHeadings, ShouldAutoSize, WithStyles, WithMapping, WithCustomStartCell
+class ProductionExport implements FromCollection, WithHeadings, ShouldAutoSize, WithStyles, WithMapping, WithCustomStartCell, WithEvents, WithTitle
 {
     protected $start;
     protected $end;
@@ -18,81 +21,76 @@ class ProductionExport implements FromCollection, WithHeadings, ShouldAutoSize, 
     protected $unit;
     protected $operator;
     protected $activities;
+    protected $sheetTitle;
     private $rowNumber = 0;
 
-    public function __construct($start, $end, $mode, $unit, $operator = 'SEMUA')
+    public function __construct($start, $end, $mode, $unit, $operator = 'SEMUA', $sheetTitle = 'Production Data')
     {
         $this->start = $start;
         $this->end = $end;
         $this->mode = $mode;
         $this->unit = $unit;
         $this->operator = $operator;
+        $this->sheetTitle = $sheetTitle;
 
-        // Query data dan simpan dalam collection
         $this->activities = ProductionActivity::query()
             ->with(['marketingOrder', 'user']) 
             ->whereDate('created_at', '>=', $this->start)
             ->whereDate('created_at', '<=', $this->end)
-            ->when($this->mode === 'rajut', function($q) {
-                $q->where('division_name', 'knitting');
-            })
-            ->when($this->mode === 'warna', function($q) {
-                $q->whereIn('division_name', ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece']);
-            })
-            ->when($this->unit !== 'SEMUA', function($q) {
-                $q->whereHas('marketingOrder', fn($sq) => $sq->where('kelompok_kain', $this->unit));
-            })
-            ->when($this->operator !== 'SEMUA', function($q) {
-                $q->where('operator_id', $this->operator);
-            })
-            ->when($this->operator === 'SEMUA', function($q) {
-                $q->whereHas('user', function($u) {
-                    $u->where('name', 'NOT LIKE', '%admin%')
-                      ->where('name', 'NOT LIKE', '%marketing%');
-                });
-            })
+            ->when($this->mode === 'rajut', fn($q) => $q->where('division_name', 'knitting'))
+            ->when($this->mode === 'warna', fn($q) => $q->whereIn('division_name', ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece']))
+            ->when($this->unit !== 'SEMUA', fn($q) => $q->whereHas('marketingOrder', fn($sq) => $sq->where('kelompok_kain', $this->unit)))
+            ->when($this->operator !== 'SEMUA', fn($q) => $q->where('operator_id', $this->operator))
             ->latest()
             ->get();
     }
 
-    /**
-     * @return \Illuminate\Support\Collection
-     */
     public function collection()
     {
         return $this->activities;
     }
 
-    /**
-     * @return string
-     */
+    public function title(): string
+    {
+        return $this->sheetTitle;
+    }
+
     public function startCell(): string
     {
-        return 'A8';
+        return 'A6';
     }
 
     public function headings(): array
     {
+        $modeText = strtoupper($this->mode === 'rajut' ? 'DIVISI KNITTING (RAJUT)' : ($this->mode === 'warna' ? 'DIVISI DYEING & FINISHING' : 'MASTER PIPELINE PRODUKSI'));
+        $periodeLabel = date('d M Y', strtotime($this->start)) . ' - ' . date('d M Y', strtotime($this->end));
+
         return [
-            'NO', 
-            'NO ARTIKEL', 'LEGACY SAP ID', 'TANGGAL & JAM', 'OPERATOR', 'PELANGGAN', 'MKT', 
-            'KEPERLUAN', 'KONSTRUKSI GREIGE', 'MATERIAL', 'BENANG', 
-            'KELOMPOK KAIN', 'TARGET LEBAR', 'BELAH/BULAT', 
-            'TARGET GRAMASI', 'WARNA', 'HANDFEEL', 'TREATMENT KHUSUS', 
-            'ROLL', 'KG', 'KETERANGAN ARTIKEL'
+            ['PT DELTA DUNIA TEKSTILE 2'],
+            ['LAPORAN PRODUKSI HARIAN - ' . $modeText],
+            ['PERIODE: ' . $periodeLabel . ' | KELOMPOK: ' . $this->unit . ' | OPERATOR: ' . strtoupper($this->operator)],
+            ['WAKTU CETAK: ' . now()->format('d/m/Y H:i:s')],
+            [''], // Spacer
+            [
+                'NO', 'NO. ARTIKEL', 'SAP ID', 'WAKTU PRODUKSI', 'TAHAPAN PROSES', 'NAMA OPERATOR', 
+                'PELANGGAN', 'SALES (MKT)', 'KEPERLUAN', 
+                'KONSTRUKSI GREIGE', 'MATERIAL', 'BENANG', 'KELOMPOK KAIN', 
+                'LEBAR (INCH)', 'BENTUK (BLH/BLT)', 'GRAMASI (GSM)', 'WARNA', 'HANDFEEL', 'TREATMENT', 
+                'HASIL (ROLL)', 'HASIL (KG)', 'KETERANGAN / CATATAN'
+            ]
         ];
     }
 
     public function map($activity): array
     {
         $this->rowNumber++;
-
         return [
             $this->rowNumber,
             $activity->marketingOrder->art_no ?? '-',
             $activity->marketingOrder->sap_no ?? '-',
             $activity->created_at->format('d/m/Y H:i'),
-            $activity->user->name ?? '-', 
+            strtoupper(str_replace('-', ' ', $activity->division_name)), 
+            $activity->operator_name ?? ($activity->user->name ?? '-'), 
             $activity->marketingOrder->pelanggan ?? '-', 
             $activity->marketingOrder->mkt ?? '-', 
             $activity->marketingOrder->keperluan ?? '-',
@@ -106,209 +104,112 @@ class ProductionExport implements FromCollection, WithHeadings, ShouldAutoSize, 
             $activity->marketingOrder->warna ?? '-',
             $activity->marketingOrder->handfeel ?? '-',
             $activity->marketingOrder->treatment_khusus ?? '-',
-            $activity->roll,
-            $activity->kg,
+            $activity->roll ?? 0,
+            $activity->kg ?? 0,
             $activity->marketingOrder->keterangan_artikel ?? '-',
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
-        // 1. TULIS TITLE & SUBTITLE
-        $sheet->setCellValue('A1', 'DUNIATEX RND PRODUCTION REPORT: ' . strtoupper($this->mode === 'rajut' ? 'KNITTING' : ($this->mode === 'warna' ? 'DYEING & FINISHING' : 'ALL SECTIONS')));
-        $sheet->mergeCells('A1:U1');
+        $lastRow = 6 + count($this->activities); 
         
-        $periodeLabel = date('d F Y', strtotime($this->start)) . ' s/d ' . date('d F Y', strtotime($this->end));
-        $sheet->setCellValue('A2', 'Periode: ' . $periodeLabel . ' | Unit: ' . $this->unit . ' | Generated: ' . now()->format('d/m/Y H:i'));
-        $sheet->mergeCells('A2:U2');
-        
-        // 2. KARTU KPI
-        // KPI 1: TOTAL INPUT
-        $sheet->setCellValue('B4', 'TOTAL INPUT DATA');
-        $sheet->mergeCells('B4:C4');
-        $sheet->setCellValue('B5', count($this->activities) . ' Data');
-        $sheet->mergeCells('B5:C5');
-        
-        // KPI 2: TOTAL PRODUCTION (KG)
-        $sheet->setCellValue('E4', 'TOTAL PRODUCTION (KG)');
-        $sheet->mergeCells('E4:F4');
-        $sheet->setCellValue('E5', number_format($this->activities->sum('kg'), 2) . ' KG');
-        $sheet->mergeCells('E5:F5');
-        
-        // KPI 3: TOTAL ROLL
-        $sheet->setCellValue('H4', 'TOTAL PRODUCTION (ROLL)');
-        $sheet->mergeCells('H4:I4');
-        $sheet->setCellValue('H5', number_format($this->activities->sum('roll'), 0) . ' Roll');
-        $sheet->mergeCells('H5:I5');
-        
-        // 3. STYLING TITLE & SUBTITLE
-        $sheet->getStyle('A1')->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'size' => 16,
-                'color' => ['rgb' => 'ED1C24'], // Duniatex Red
-            ],
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ]
+        // 1. Header Branding
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(18)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('ED1C24')); // Duniatex Red
+        $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(14)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('1e293b'));
+        $sheet->getStyle('A3:A4')->getFont()->setBold(true)->setSize(10)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('64748b'));
+
+        // 2. Table Header (Row 6) - Industrial Solid Styling
+        $sheet->getStyle('A6:V6')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF'], 'size' => 10],
+            'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '1e293b']], // Slate 800
+            'alignment' => ['horizontal' => 'center', 'vertical' => 'center']
         ]);
-        
-        $sheet->getStyle('A2')->applyFromArray([
-            'font' => [
-                'italic' => true,
-                'size' => 10,
-                'color' => ['rgb' => '4B5563'], // Gray 600
-            ],
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ]
+
+        // Optional: Sub-grouping colors for header (Identity, Specs, Results)
+        $sheet->getStyle('J6:S6')->getFill()->setStartColor(new \PhpOffice\PhpSpreadsheet\Style\Color('334155')); // Slate 700 for Tech Specs
+        $sheet->getStyle('T6:U6')->getFill()->setStartColor(new \PhpOffice\PhpSpreadsheet\Style\Color('b91c1c')); // Red 700 for Results
+
+        // 3. Data Rows Alignment
+        $sheet->getStyle("A7:V{$lastRow}")->applyFromArray([
+            'font' => ['size' => 10],
+            'alignment' => ['vertical' => 'center'],
+            'borders' => ['allBorders' => ['borderStyle' => 'thin', 'color' => ['rgb' => 'cbd5e1']]]
         ]);
-        
-        // 4. STYLING KPI CARDS
-        $kpiCols = ['B4:C5', 'E4:F5', 'H4:I5'];
-        $kpiBg = 'FEF2F2'; // Sangat soft red
-        $kpiBorderColor = 'FCA5A5'; // Soft red border
-        
-        foreach ($kpiCols as $range) {
-            $sheet->getStyle($range)->applyFromArray([
-                'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => $kpiBg],
-                ],
-                'alignment' => [
-                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-                ],
-                'borders' => [
-                    'outline' => [
-                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                        'color' => ['rgb' => $kpiBorderColor],
-                    ],
-                ],
-            ]);
+
+        // Rata Tengah: No, Artikel, SAP, Waktu, Tahapan, Kelompok, Lebar, Bentuk, Gramasi
+        $centerCols = ['A', 'B', 'C', 'D', 'E', 'M', 'N', 'O', 'P'];
+        foreach($centerCols as $col) {
+            $sheet->getStyle("{$col}7:{$col}{$lastRow}")->getAlignment()->setHorizontal('center');
         }
-        
-        // Style untuk Label KPI (Row 4)
-        foreach (['B4', 'E4', 'H4'] as $cell) {
-            $sheet->getStyle($cell)->applyFromArray([
-                'font' => [
-                    'bold' => true,
-                    'size' => 9,
-                    'color' => ['rgb' => 'DC2626'], // Deep Red
-                ]
-            ]);
+
+        // Rata Kiri dengan Indent: Operator, Pelanggan, Sales, Keperluan, Konstruksi, Material, Benang, Warna, Handfeel, Treatment, Keterangan
+        $leftCols = ['F', 'G', 'H', 'I', 'J', 'K', 'L', 'Q', 'R', 'S', 'V'];
+        foreach($leftCols as $col) {
+            $sheet->getStyle("{$col}7:{$col}{$lastRow}")->getAlignment()->setHorizontal('left');
+            $sheet->getStyle("{$col}7:{$col}{$lastRow}")->getAlignment()->setIndent(1);
         }
+
+        // Rata Kanan: Roll, KG
+        $sheet->getStyle("T7:U{$lastRow}")->getAlignment()->setHorizontal('right');
+        $sheet->getStyle("T7:U{$lastRow}")->getAlignment()->setIndent(1);
+        $sheet->getStyle("T7:U{$lastRow}")->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('0f172a')); // Bold Black
         
-        // Style untuk Value KPI (Row 5)
-        foreach (['B5', 'E5', 'H5'] as $cell) {
-            $sheet->getStyle($cell)->applyFromArray([
-                'font' => [
-                    'bold' => true,
-                    'size' => 13,
-                    'color' => ['rgb' => '111827'], // Gray 900
-                ]
-            ]);
-        }
-        
-        // 5. STYLING TABLE HEADERS (Row 8)
-        $headerRange = 'A8:U8';
-        $sheet->getStyle($headerRange)->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'color' => ['rgb' => 'FFFFFF'],
-                'size' => 10,
-            ],
-            'fill' => [
-                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'ED1C24'], // Duniatex Red
-            ],
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ],
-        ]);
-        
-        // Set row heights
-        $sheet->getRowDimension(1)->setRowHeight(35);
-        $sheet->getRowDimension(2)->setRowHeight(20);
-        $sheet->getRowDimension(4)->setRowHeight(18);
-        $sheet->getRowDimension(5)->setRowHeight(25);
-        $sheet->getRowDimension(8)->setRowHeight(30);
-        
-        // 6. STYLE DATA ROWS & ALIGNMENTS
-        $totalRows = count($this->activities);
-        $lastRow = 8 + $totalRows;
-        
-        for ($row = 9; $row <= $lastRow; $row++) {
-            $sheet->getRowDimension($row)->setRowHeight(20);
-            
-            // Zebra striping
-            $bgColor = ($row % 2 === 0) ? 'F9FAFB' : 'FFFFFF';
-            
-            $sheet->getStyle("A{$row}:U{$row}")->applyFromArray([
-                'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => $bgColor],
-                ],
-                'font' => [
-                    'size' => 9,
-                ],
-                'borders' => [
-                    'allBorders' => [
-                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                        'color' => ['rgb' => 'E5E7EB'], // Very light gray border
-                    ]
-                ]
-            ]);
-            
-            // Alignments
-            // Center alignments for short/numeric codes and dates
-            foreach (['A', 'C', 'D', 'L', 'M', 'N', 'O', 'S', 'T'] as $col) {
-                $sheet->getStyle("{$col}{$row}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        // Format Angka
+        $sheet->getStyle("T7:T{$lastRow}")->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle("U7:U{$lastRow}")->getNumberFormat()->setFormatCode('#,##0.00');
+
+        // Zebra Striping (Subtle)
+        for($i=7; $i<=$lastRow; $i++) {
+            if($i % 2 == 0) {
+                $sheet->getStyle("A{$i}:V{$i}")->getFill()->setFillType('solid')->getStartColor()->setRGB('f8fafc');
             }
-            
-            // Number formatting for KG and Roll
-            $sheet->getStyle("S{$row}")->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->getStyle("T{$row}")->getNumberFormat()->setFormatCode('#,##0.00');
         }
-        
-        // 7. TOTALS ROW AT THE BOTTOM
-        $totRow = $lastRow + 1;
-        $sheet->getRowDimension($totRow)->setRowHeight(25);
-        $sheet->setCellValue("A{$totRow}", 'TOTAL SUMMARY');
-        $sheet->mergeCells("A{$totRow}:R{$totRow}");
-        
-        $sheet->setCellValue("S{$totRow}", "=SUM(S9:S{$lastRow})");
-        $sheet->setCellValue("T{$totRow}", "=SUM(T9:T{$lastRow})");
-        
-        $sheet->getStyle("A{$totRow}:U{$totRow}")->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'size' => 10,
-                'color' => ['rgb' => '000000'],
-            ],
-            'fill' => [
-                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'F3F4F6'],
-            ],
-            'borders' => [
-                'top' => [
-                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                    'color' => ['rgb' => '111827'],
-                ],
-                'bottom' => [
-                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOUBLE,
-                    'color' => ['rgb' => '111827'],
-                ]
-            ]
-        ]);
-        
-        $sheet->getStyle("S{$totRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle("T{$totRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        
-        $sheet->getStyle("S{$totRow}")->getNumberFormat()->setFormatCode('#,##0');
-        $sheet->getStyle("T{$totRow}")->getNumberFormat()->setFormatCode('#,##0.00');
+
+        // 4. TOTAL SUMMARY ROW
+        if (count($this->activities) > 0) {
+            $footerRow = $lastRow + 1;
+            $sheet->setCellValue("A{$footerRow}", 'TOTAL AKUMULASI PRODUKSI');
+            $sheet->mergeCells("A{$footerRow}:S{$footerRow}");
+            
+            $sheet->setCellValue("T{$footerRow}", "=SUM(T7:T{$lastRow})");
+            $sheet->setCellValue("U{$footerRow}", "=SUM(U7:U{$lastRow})");
+            
+            $sheet->getStyle("A{$footerRow}:V{$footerRow}")->applyFromArray([
+                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF'], 'size' => 11],
+                'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '0f172a']], // Very Dark Navy
+                'alignment' => ['vertical' => 'center']
+            ]);
+            $sheet->getStyle("T{$footerRow}:U{$footerRow}")->getAlignment()->setHorizontal('right');
+            $sheet->getStyle("U{$footerRow}")->getNumberFormat()->setFormatCode('#,##0.00');
+            $sheet->getStyle("T{$footerRow}")->getNumberFormat()->setFormatCode('#,##0'); // Roll is integer
+        }
+
+        // 5. Column Sizing
+        $sheet->getColumnDimension('A')->setAutoSize(false)->setWidth(5); // No
+        $sheet->getColumnDimension('D')->setAutoSize(false)->setWidth(18); // Waktu
+        foreach(range('B','V') as $col) {
+            if (!in_array($col, ['A', 'D'])) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+        }
+
+        return [];
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function(AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
+                $sheet->freezePane('A7');
+                $sheet->setShowGridlines(false);
+                $sheet->setAutoFilter('A6:V6');
+                
+                // Set row heights
+                $sheet->getRowDimension(1)->setRowHeight(30);
+                $sheet->getRowDimension(6)->setRowHeight(30); // Header row
+            },
+        ];
     }
 }

@@ -95,20 +95,22 @@ new class extends Component { };
                             <label
                                 class="block text-[10px] md:text-[11px] font-black uppercase mkt-text-muted mb-2 tracking-widest leading-none">Tanggal Order</label>
                             <input type="date" wire:model="tanggal"
-                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border">
+                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border @error('tanggal') border-red-500 @enderror">
+                            @error('tanggal') <p class="text-red-500 text-[10px] mt-2 font-bold italic">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
                             <label
                                 class="block text-[10px] md:text-[11px] font-black uppercase mkt-text-muted mb-2 tracking-widest leading-none">Pelanggan</label>
                             <input type="text" wire:model="pelanggan" placeholder="Masukkan Nama Pelanggan"
-                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border">
+                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border @error('pelanggan') border-red-500 @enderror">
+                            @error('pelanggan') <p class="text-red-500 text-[10px] mt-2 font-bold italic">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
                             <label
                                 class="block text-[10px] md:text-[11px] font-black uppercase mkt-text-muted mb-2 tracking-widest leading-none">MKT (Sales)</label>
-                            <input type="text" wire:model="mkt" placeholder="Masukkan Nama Marketing"
+                            <input type="text" wire:model.live="mkt" placeholder="Masukkan Nama Marketing"
                                 class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border">
                             @error('mkt') <p class="text-red-600 text-[10px] mt-2 font-bold uppercase italic">
                             {{ $message }}</p> @enderror
@@ -198,7 +200,8 @@ new class extends Component { };
                             <label
                                 class="block text-[10px] md:text-[11px] font-black uppercase mkt-text-muted mb-2 tracking-widest leading-none">Target Lebar</label>
                             <input type="number" wire:model="target_lebar" placeholder="Masukkan Target Lebar"
-                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border">
+                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border @error('target_lebar') border-red-500 @enderror">
+                            @error('target_lebar') <p class="text-red-500 text-[10px] mt-2 font-bold italic">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
@@ -216,8 +219,9 @@ new class extends Component { };
                             <label
                                 class="block text-[10px] md:text-[11px] font-black uppercase mkt-text-muted mb-2 tracking-widest leading-none">Target Gramasi</label>
                             <input type="text" wire:model="target_gramasi"
-                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border"
+                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border @error('target_gramasi') border-red-500 @enderror"
                                 placeholder="Contoh: 280-290">
+                            @error('target_gramasi') <p class="text-red-500 text-[10px] mt-2 font-bold italic">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
@@ -233,7 +237,7 @@ new class extends Component { };
                             <label
                                 class="block text-[10px] md:text-[11px] font-black uppercase mkt-text-muted mb-2 tracking-widest leading-none">Handfeel</label>
                             <select wire:model="handfeel"
-                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none appearance-none border">
+                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none appearance-none border @error('handfeel') border-red-500 @enderror">
                                 <option value="">Pilih Handfeel</option>
                                 <option value="Super Soft">Super Soft</option>
                                 <option value="Soft">Soft</option>
@@ -241,6 +245,7 @@ new class extends Component { };
                                 <option value="Hard/Stiff">Hard / Stiff</option>
                                 <option value="Ikuti Sample">Ikuti Sample</option>
                             </select>
+                            @error('handfeel') <p class="text-red-500 text-[10px] mt-2 font-bold italic">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
@@ -266,13 +271,15 @@ new class extends Component { };
                             <label
                                 class="block text-[10px] md:text-[11px] font-black uppercase mkt-text-muted mb-2 tracking-widest leading-none">Quantity (Roll)</label>
                             <input type="number" wire:model="roll_target" placeholder="Masukkan Jumlah Roll"
-                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border">
+                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border @error('roll_target') border-red-500 @enderror">
+                            @error('roll_target') <p class="text-red-500 text-[10px] mt-2 font-bold italic">{{ $message }}</p> @enderror
                         </div>
                         <div>
                             <label
                                 class="block text-[10px] md:text-[11px] font-black uppercase mkt-text-muted mb-2 tracking-widest leading-none">Quantity (KG)</label>
                             <input type="number" wire:model="kg_target" placeholder="Masukkan Jumlah KG"
-                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border">
+                                class="w-full px-4 md:px-5 py-4 rounded-2xl mkt-border mkt-input font-bold text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-600 transition-all outline-none border @error('kg_target') border-red-500 @enderror">
+                            @error('kg_target') <p class="text-red-500 text-[10px] mt-2 font-bold italic">{{ $message }}</p> @enderror
                         </div>
                         <div>
                             <label
@@ -284,13 +291,25 @@ new class extends Component { };
                 </div>
 
                 @if ($errors->any())
-                    <div class="bg-red-50 p-4 rounded-2xl mb-6 border border-red-100">
-                        <p class="text-red-600 text-[10px] font-black uppercase italic mb-2">Terjadi Kesalahan Input:</p>
-                        <ul class="list-disc ml-4 text-[10px] text-red-500 font-bold italic">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                    <div class="mb-8 md:mb-10 animate-in slide-in-from-top-4 duration-500">
+                        <div class="bg-red-600/10 border-l-4 border-red-600 p-5 md:p-6 rounded-2xl md:rounded-3xl flex items-start gap-4 shadow-xl shadow-red-600/5">
+                            <div class="bg-red-600 p-2.5 rounded-xl text-white shrink-0 shadow-lg shadow-red-600/30">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-[10px] md:text-xs font-black text-red-600 uppercase tracking-[0.2em] mb-2 italic">Attention: Validation Required</h4>
+                                <ul class="space-y-1.5">
+                                    @foreach ($errors->all() as $error)
+                                        <li class="text-[11px] md:text-xs font-bold text-red-500 flex items-center gap-2">
+                                            <span class="w-1 h-1 bg-red-500 rounded-full shrink-0"></span>
+                                            <span class="truncate">{{ $error }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 @endif
 

@@ -270,21 +270,21 @@
     </div>
 
     {{-- SIDE-OVER DETAIL MODAL --}}
-    <div x-show="openDetail" 
-         class="fixed inset-0 z-[100] overflow-hidden" 
-         x-cloak 
+    <div x-show="openDetail"
+         class="fixed inset-0 z-[100] overflow-hidden print-isolate"
+         x-cloak
          style="display: none;">
-        
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
+
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity no-print"
              x-show="openDetail"
              @click="$wire.closeDetail()"></div>
 
-        <div class="fixed inset-0 sm:inset-y-0 sm:right-0 sm:left-auto pl-0 sm:pl-6 md:pl-10 max-w-full flex w-full sm:w-auto">
-            <div x-show="openDetail" 
-                 class="w-full sm:max-w-2xl md:max-w-5xl lg:max-w-7xl text-left h-full">
-                
-                <div id="print-area" class="h-full flex flex-col mkt-surface shadow-2xl rounded-none sm:rounded-l-[2rem] md:rounded-l-[3rem] overflow-hidden border-0 sm:border-l mkt-border">
-                    <div class="flex-1 overflow-y-auto custom-scrollbar min-h-0">
+        <div class="fixed inset-0 sm:inset-y-0 sm:right-0 sm:left-auto pl-0 sm:pl-6 md:pl-10 max-w-full flex w-full sm:w-auto print-isolate">
+            <div x-show="openDetail"
+                 class="w-full sm:max-w-2xl md:max-w-5xl lg:max-w-7xl text-left h-full print-isolate">
+
+                <div id="print-area" class="h-full flex flex-col mkt-surface shadow-2xl rounded-none sm:rounded-l-[2rem] md:rounded-l-[3rem] overflow-hidden border-0 sm:border-l mkt-border print-isolate">
+                    <div class="flex-1 overflow-y-auto custom-scrollbar min-h-0 print-isolate">
                         @if($showDetail && $selectedOrder)
                             <livewire:order-tracking-detail :order-id="$selectedOrder['id']" :key="$selectedOrder['id']" />
                         @endif
@@ -292,9 +292,12 @@
 
                     {{-- Footer Modal --}}
                     <div class="p-3 sm:p-4 md:p-8 pb-[max(0.75rem,env(safe-area-inset-bottom))] mkt-surface-alt border-t mkt-border flex flex-col gap-2 sm:gap-3 shrink-0 no-print-bg">
-                        <button onclick="window.print()" class="w-full bg-brand text-white px-4 py-3 sm:py-3.5 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand/20">
+                        <a :href="'/marketing/orders/' + selected?.id + '/print'" target="_blank" class="w-full bg-brand text-white px-4 py-3 sm:py-3.5 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand/20">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                            </svg>
                             <span>PRINT SURAT JALAN</span>
-                        </button>
+                        </a>
 
                         <div class="grid grid-cols-2 gap-2 sm:gap-4">
                             <a :href="'/marketing/orders/' + selected?.id + '/edit'" class="mkt-surface mkt-text border mkt-border px-3 py-3 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider hover:bg-brand-600 hover:text-white transition-all flex items-center justify-center">
@@ -325,11 +328,5 @@
 
     <style>
         [x-cloak] { display: none !important; }
-        @media print {
-            body * { visibility: hidden; }
-            #print-area, #print-area * { visibility: visible; }
-            #print-area { position: absolute; left: 0; top: 0; width: 100%; }
-            .no-print, .no-print-bg { display: none !important; }
-        }
     </style>
 </div>

@@ -31,7 +31,7 @@ class OrderForm extends Component
     public function mount($id = null) {
         // Inisialisasi default
         $this->tanggal = now()->format('Y-m-d');
-        $this->mkt = auth()->user()->name; 
+        $this->mkt = ''; 
         $this->keperluan = '';
 
         if ($id) {
@@ -144,23 +144,35 @@ class OrderForm extends Component
 
     public function submit()
     {
-        // Pengaman: Jika field ini null/kosong, isi dengan string kosong atau default agar SQL tidak error 1364
-        $this->mkt = $this->mkt ?: auth()->user()->name;
+        // Pengaman: Jika field ini null/kosong, isi dengan string default agar SQL tidak error 1364
         $this->material = $this->material ?: '-';
         $this->benang = $this->benang ?: '-';
         $this->roll_target = $this->roll_target ?: 0;
-        $this->kg_target = $this->kg_target ?: 0;
+        $this->treatment_khusus = $this->treatment_khusus ?: '-';
+        $this->kelompok_kain = $this->kelompok_kain ?: '-';
 
         $this->validate([
-            'art_no'    => 'required|string', // Tidak lagi unik agar bisa repeat order artikel yang sama
-            'sap_no'    => 'nullable|numeric|unique:marketing_orders,sap_no,' . ($this->orderId ?: 'NULL'), // SAP tetap unik sebagai ID transaksi
+            'art_no'    => 'required|string', 
+            'sap_no'    => 'nullable|numeric|unique:marketing_orders,sap_no,' . ($this->orderId ?: 'NULL'), 
             'tanggal'   => 'required|date',    
             'pelanggan' => 'required|string', 
             'mkt'       => 'required',
             'warna'     => 'required|string',  
-            'kg_target' => 'required|numeric', 
+            'kg_target' => 'required|numeric|min:1', 
             'target_lebar' => 'required|string', 
             'target_gramasi' => 'required|string',
+            'handfeel' => 'required',
+        ], [
+            'art_no.required'    => 'Nomor Artikel wajib diisi sebagai identitas utama.',
+            'sap_no.unique'      => 'Nomor SAP ini sudah digunakan oleh pesanan lain.',
+            'pelanggan.required' => 'Nama Pelanggan harus dicantumkan.',
+            'mkt.required'       => 'Nama Marketing wajib diisi untuk koordinasi sales.',
+            'warna.required'     => 'Target warna kain wajib ditentukan.',
+            'kg_target.required' => 'Target berat (KG) tidak boleh kosong.',
+            'kg_target.min'      => 'Target berat minimal harus 1 KG.',
+            'target_lebar.required' => 'Target lebar kain wajib diisi.',
+            'target_gramasi.required' => 'Target gramasi kain wajib diisi.',
+            'handfeel.required'  => 'Jenis Handfeel wajib dipilih.',
         ]);
 
         try {

@@ -35,6 +35,15 @@ new class extends Component {
 
 <div class="mkt-surface border mkt-border w-full rounded-none sm:rounded-3xl md:rounded-[4rem] overflow-hidden shadow-xl sm:shadow-[0_0_100px_rgba(0,0,0,0.5)] flex flex-col max-h-[100dvh] sm:max-h-[95vh]">
     
+    @if(!$trackingData)
+        <div class="flex-1 flex flex-col items-center justify-center p-20 text-center">
+             <div class="w-20 h-20 bg-red-600/10 rounded-full flex items-center justify-center mb-6">
+                 <span class="text-red-600 text-4xl font-black">!</span>
+             </div>
+             <h3 class="text-2xl font-black mkt-text uppercase italic tracking-tighter">Data Tidak Ditemukan</h3>
+             <p class="text-xs font-bold mkt-text-muted uppercase tracking-widest mt-2">Gagal memuat detail pesanan. Silakan coba beberapa saat lagi.</p>
+        </div>
+    @else
     {{-- HEADER MODAL --}}
     <div class="p-3 sm:p-6 md:p-10 mkt-surface-alt flex flex-col gap-3 border-b mkt-border backdrop-blur-md shrink-0">
         <div class="flex items-start gap-3 sm:gap-6 min-w-0">
@@ -48,6 +57,10 @@ new class extends Component {
                 <h2 class="mkt-text font-black italic uppercase text-lg sm:text-2xl md:text-4xl leading-tight sm:leading-none tracking-tighter">
                     MONITORING <span class="text-brand-600">{{ $isWarna ? 'WARNA' : 'RAJUT' }}</span>
                 </h2>
+                {{-- Label Surat Jalan hanya muncul saat Print --}}
+                <div class="hidden print:block mt-1">
+                    <p class="text-[12px] font-black text-slate-900 border-2 border-slate-900 px-3 py-1 inline-block rounded-lg uppercase tracking-[0.2em] italic">DOKUMEN SURAT JALAN / MONITORING RND</p>
+                </div>
                 <div class="mt-1.5 sm:mt-2 space-y-0.5">
                     <p class="mkt-text-muted text-[7px] sm:text-[10px] font-black uppercase tracking-wide sm:tracking-[0.3em] flex items-center gap-1.5">
                         <span class="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
@@ -1368,4 +1381,5 @@ new class extends Component {
                             </div>
                         </div>
                     @endif
+    @endif
 </div>

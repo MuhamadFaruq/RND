@@ -1,300 +1,254 @@
-<style>
-    body { font-family: sans-serif; color: #333; }
-    .header { border-bottom: 2px solid #ed1c24; padding-bottom: 10px; margin-bottom: 20px; }
-    .title { font-size: 20px; font-weight: bold; text-transform: uppercase; }
-    .kpi-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    .kpi-table td { padding: 15px; border: 1px solid #eee; text-align: center; }
-    .label { font-size: 10px; color: #888; text-transform: uppercase; }
-    .value { font-size: 14px; font-weight: bold; color: #ed1c24; }
-    
-    /* Style untuk Heatmap di PDF */
-    .heatmap-box {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-        margin-top: 10px;
-    }
-    .heatmap-box td {
-        border: 1px solid #fff;
-        height: 25px;
-        text-align: center;
-        font-size: 7px;
-        font-weight: bold;
-        color: #fff;
-    }
-    .hour-label { font-size: 7px; color: #999; text-align: center; margin-top: 4px; }
-    .data-table { 
-        width: 100%; 
-        border-collapse: collapse; 
-        font-size: 8px; 
-        margin-top: 10px; 
-    }
-    .data-table th { 
-        background-color: #f8f9fa; 
-        border: 1px solid #eee; 
-        padding: 8px; 
-        text-align: left; 
-        text-transform: uppercase;
-    }
-    .data-table td { 
-        border: 1px solid #eee; 
-        padding: 6px; 
-    }
-</style>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Production Report - DUNIATEX RND</title>
+    <style>
+        @page { size: A4 portrait; margin: 1cm; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1e293b; font-size: 9px; margin: 0; padding: 0; }
+        
+        /* Typography */
+        h1, h2, h3, p { margin: 0; padding: 0; }
+        .text-brand { color: #ED1C24; }
+        .font-black { font-weight: 900; }
+        .font-bold { font-weight: 700; }
+        .italic { font-style: italic; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .text-xs { font-size: 7px; color: #64748b; }
+        
+        /* Layout */
+        .header-box { border-bottom: 3px solid #1e293b; padding-bottom: 10px; margin-bottom: 20px; }
+        .meta-info { font-size: 8px; color: #475569; margin-top: 4px; text-transform: uppercase; }
+        
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th { font-weight: bold; text-transform: uppercase; padding: 6px; font-size: 8px; border: 1px solid #cbd5e1; }
+        td { padding: 5px 6px; border: 1px solid #e2e8f0; vertical-align: middle; }
+        
+        /* Table Colors */
+        .th-master { background-color: #0f172a; color: #ffffff; }
+        .th-marketing { background-color: #f59e0b; color: #ffffff; }
+        .th-knitting { background-color: #2563eb; color: #ffffff; }
+        .th-dyeing { background-color: #b91c1c; color: #ffffff; }
+        
+        /* KPI Cards */
+        .kpi-container { width: 100%; margin-bottom: 20px; border-collapse: separate; border-spacing: 10px 0; }
+        .kpi-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; text-align: center; }
+        .kpi-title { font-size: 8px; color: #64748b; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; }
+        .kpi-value { font-size: 14px; font-weight: 900; color: #0f172a; }
+        
+        /* Striping & Highlights */
+        tr:nth-child(even) td { background-color: #f8fafc; }
+        .val-highlight { font-weight: bold; color: #000; text-align: right; }
+    </style>
+</head>
+<body>
 
-{{-- HEADER TETAP SAMA SEPERTI MILIK ANDA --}}
-<div class="header">
-    <table style="width: 100%; border: none;">
+    {{-- 1. HEADER DOKUMEN --}}
+    <table style="border: none; margin-bottom: 15px;">
         <tr>
-            <td style="width: 60%; vertical-align: bottom;">
-                <div class="title">Production Report: {{ $selectedDivision == 'all' ? 'Global' : ucfirst($selectedDivision) }}</div>
-                <div style="font-size: 10px; color: #666; margin-top: 5px;">
-                    Periode: {{ ucfirst($period) }} | Dicetak: {{ $generated_at }}
-                </div>
+            <td style="border: none; padding: 0;">
+                <h1 class="font-black italic" style="font-size: 22px;">DUNIATEX <span class="text-brand">RND</span></h1>
+                <h2 class="font-bold" style="font-size: 12px; color: #334155;">PRODUCTION INTELLIGENCE REPORT</h2>
             </td>
-            <td style="width: 40%; text-align: right; vertical-align: top;">
-                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/lg.png'))) }}" style="height: 50px;">
+            <td style="border: none; padding: 0; text-align: right;">
+                <p class="font-black" style="font-size: 14px; text-transform: uppercase;">
+                    DIVISI: {{ $selectedDivision == 'all' ? 'MASTER PIPELINE' : ($selectedDivision == 'marketing' ? 'MARKETING' : ($selectedDivision == 'knitting' ? 'KNITTING (RAJUT)' : 'DYEING & FINISHING')) }}
+                </p>
+                <p class="meta-info">PERIODE: {{ $period }}</p>
+                <p class="meta-info">WAKTU CETAK: {{ $generated_at }}</p>
             </td>
         </tr>
     </table>
-</div>
+    <div style="border-bottom: 2px solid #0f172a; margin-bottom: 20px;"></div>
 
-{{-- KPI SECTION --}}
-<table class="kpi-table">
-    <tr>
-        @foreach($divisionLeadTimes as $div => $time)
-            <td>
-                <div class="label">{{ strtoupper($div) }}</div>
-                <div class="value">{{ $time > 0 ? $time . ' Days' : '0.0' }}</div>
-            </td>
-        @endforeach
-    </tr>
-</table>
-
-{{-- VISUALISASI 1: PRODUCTION TREND (SVG) --}}
-<div style="margin-top: 20px; padding: 15px; border: 1px solid #eee; border-radius: 10px;">
-    <p style="font-size: 11px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">Production Trend Line (KG)</p>
+    {{-- 2. KPI SUMMARY --}}
     @php
-        $maxVal = collect($trends)->max('total') ?: 1;
-        $width = 700; $height = 100;
-        $points = "";
-        foreach($trends as $i => $d) {
-            $x = ($i / (max(count($trends) - 1, 1))) * $width;
-            $y = $height - (($d['total'] / $maxVal) * ($height - 20) + 10);
-            $points .= "$x,$y ";
-        }
+        $totalKg = collect($activities)->sum('kg');
+        $totalRoll = collect($activities)->sum('roll');
+        $totalData = count($activities);
     @endphp
-    <svg width="{{ $width }}" height="{{ $height }}" style="overflow: visible;">
-        <polyline fill="none" stroke="#ed1c24" stroke-width="2" points="{{ $points }}" />
-        @foreach($trends as $i => $d)
-            @php 
-                $cx = ($i / (max(count($trends) - 1, 1))) * $width;
-                $cy = $height - (($d['total'] / $maxVal) * ($height - 20) + 10);
-            @endphp
-            <circle cx="{{ $cx }}" cy="{{ $cy }}" r="3" fill="#ed1c24" />
-        @endforeach
-    </svg>
-    <table style="width: 100%; margin-top: 5px;">
+    <table class="kpi-container">
         <tr>
-            @foreach($trends as $d)
-                <td style="font-size: 8px; color: #999; text-align: center; width: {{ 100/count($trends) }}%;">{{ $d['day'] }}</td>
-            @endforeach
-        </tr>
-    </table>
-</div>
-
-{{-- VISUALISASI 2: HOURLY HEATMAP --}}
-<div style="margin-top: 20px;">
-    <p style="font-size: 11px; font-weight: bold; text-transform: uppercase;">Hourly Activity Heatmap (Kepadatan Input)</p>
-    <table class="heatmap-box">
-        <tr>
-            @php $maxHourly = collect($hourlyActivity)->max() ?: 1; @endphp
-            @for($i = 0; $i < 24; $i++)
-                @php 
-                    $count = $hourlyActivity[$i] ?? 0;
-                    $opacity = $count > 0 ? max(($count / $maxHourly), 0.2) : 0;
-                    $bgColor = $count > 0 ? "rgba(237, 28, 36, $opacity)" : "#f5f5f5";
-                @endphp
-                <td style="background-color: {{ $bgColor }}; color: {{ $count > 0 ? '#fff' : '#ccc' }};">
-                    {{ $count }}
-                </td>
-            @endfor
-        </tr>
-        <tr>
-            @for($i = 0; $i < 24; $i++)
-                <td class="hour-label" style="color: #999; border: none;">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</td>
-            @endfor
-        </tr>
-    </table>
-</div>
-{{-- Di dalam file resources/views/pdf/production-report.blade.php --}}
-
-{{-- LOGIKA TABEL DINAMIS --}}
-@if($selectedDivision == 'knitting')
-    <div style="margin-top: 20px;">
-        <p style="font-size: 11px; font-weight: bold; color: #ed1c24; border-left: 3px solid #ed1c24; padding-left: 10px; text-transform: uppercase;">
-            Detail Teknis Produksi: KNITTING (RAJUT)
-        </p>
-        <table class="data-table"> {{-- Gunakan CSS tabel Anda --}}
-            <thead>
-                <tr>
-                    <th>NO ARTIKEL</th>
-                    <th>LEGACY SAP ID</th>
-                    <th>BENANG 1 & YL</th>
-                    <th>BENANG 2 & YL</th>
-                    <th>TOTAL KG</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($activities as $act)
-                    <tr>
-                        <td style="font-weight: bold;">{{ $act->marketingOrder->art_no ?? '-' }}</td>
-                        <td class="opacity-60">{{ $act->marketingOrder->sap_no ?? '-' }}</td>
-                        <td>{{ $act->technical_data['benang_1'] ?? '-' }} @if(!empty($act->technical_data['benang_1_lot'])) | LOT: {{ $act->technical_data['benang_1_lot'] }} @endif (YL: {{ $act->technical_data['yl_1'] ?? 0 }})</td>
-                        <td>{{ $act->technical_data['benang_2'] ?? '-' }} @if(!empty($act->technical_data['benang_2_lot'])) | LOT: {{ $act->technical_data['benang_2_lot'] }} @endif (YL: {{ $act->technical_data['yl_2'] ?? 0 }})</td>
-                        <td style="font-weight: bold;">{{ number_format($act->kg, 2) }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 10px; color: #888;">Tidak ada data produksi untuk periode ini</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-@elseif($selectedDivision == 'dyeing' || $selectedDivision == 'finishing')
-    <div style="margin-top: 20px;">
-        <p style="font-size: 11px; font-weight: bold; color: #00529b; border-left: 3px solid #00529b; padding-left: 10px; text-transform: uppercase;">
-            Detail Teknis Produksi: WARNA ({{ strtoupper($selectedDivision) }})
-        </p>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>NO ARTIKEL</th>
-                    <th>WARNA / HANDFEEL</th>
-                    <th>TARGET LEBAR/GRAMASI</th>
-                    <th>HASIL KG</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($activities as $act)
-                    <tr>
-                        <td style="font-weight: bold;">{{ $act->marketingOrder->art_no ?? '-' }}</td>
-                        <td>{{ $act->marketingOrder->warna ?? '-' }} / {{ $act->marketingOrder->handfeel ?? '-' }}</td>
-                        <td>{{ $act->marketingOrder->target_lebar ?? '-' }} / {{ $act->marketingOrder->target_gramasi ?? '-' }}</td>
-                        <td style="font-weight: bold;">{{ number_format($act->kg, 2) }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" style="text-align: center; padding: 10px; color: #888;">Tidak ada data produksi untuk periode ini</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-@else {{-- Mode 'ALL' (Tabel Ringkasan) --}}
-    <div style="margin-top: 20px;">
-        <p style="font-size: 11px; font-weight: bold; color: #333; border-left: 3px solid #333; padding-left: 10px; text-transform: uppercase;">
-            Ringkasan Aktivitas Seluruh Unit
-        </p>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>WAKTU</th>
-                    <th>DIVISI</th>
-                    <th>NO ARTIKEL</th>
-                    <th>HASIL (KG)</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($activities->take(50) as $act)
-                    <tr>
-                        <td>{{ $act->created_at->format('H:i') }}</td>
-                        <td>{{ strtoupper($act->division_name) }}</td>
-                        <td style="font-weight: bold;">{{ $act->marketingOrder->art_no ?? '-' }}</td>
-                        <td>{{ number_format($act->kg, 2) }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" style="text-align: center; padding: 10px; color: #888;">Tidak ada data produksi untuk periode ini</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-@endif
-
-@if($selectedDivision == 'knitting' || $selectedDivision == 'all')
-<div style="margin-top: 30px;">
-    <p style="font-size: 12px; font-weight: bold; color: #ed1c24; border-left: 3px solid #ed1c24; padding-left: 10px;">
-        DETAIL PENGGUNAAN BENANG & YARN LENGTH (KNITTING)
-    </p>
-    <table style="width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 10px;">
-        <thead>
-            <tr style="background-color: #f8f9fa;">
-                <th style="border: 1px solid #eee; padding: 8px;">NO ARTIKEL</th>
-                <th style="border: 1px solid #eee; padding: 8px;">LEGACY SAP ID</th>
-                <th style="border: 1px solid #eee; padding: 8px;">BENANG 1 & YL</th>
-                <th style="border: 1px solid #eee; padding: 8px;">BENANG 2 & YL</th>
-                <th style="border: 1px solid #eee; padding: 8px;">BENANG 3 & YL</th>
-                <th style="border: 1px solid #eee; padding: 8px;">BENANG 4 & YL</th>
-                <th style="border: 1px solid #eee; padding: 8px;">TOTAL (KG/ROLL)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($activities->where('division_name', 'knitting') as $act)
-            <tr>
-                <td style="border: 1px solid #eee; padding: 6px; font-weight: bold;">{{ $act->marketingOrder->art_no ?? '-' }}</td>
-                <td style="border: 1px solid #eee; padding: 6px;">
-                    <span style="color: #888; font-size: 7px;">{{ $act->marketingOrder->sap_no ?? '-' }}</span><br>
-                    <span style="color: #666;">{{ $act->marketingOrder->pelanggan ?? '-' }}</span>
-                </td>
-                {{-- Mengambil data dari JSON technical_data --}}
-                <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_1'] ?? '-' }} @if(!empty($act->technical_data['benang_1_lot'])) <br> LOT: {{ $act->technical_data['benang_1_lot'] }} @endif <br> (YL: {{ $act->technical_data['yl_1'] ?? 0 }})</td>
-                <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_2'] ?? '-' }} @if(!empty($act->technical_data['benang_2_lot'])) <br> LOT: {{ $act->technical_data['benang_2_lot'] }} @endif <br> (YL: {{ $act->technical_data['yl_2'] ?? 0 }})</td>
-                <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_3'] ?? '-' }} @if(!empty($act->technical_data['benang_3_lot'])) <br> LOT: {{ $act->technical_data['benang_3_lot'] }} @endif <br> (YL: {{ $act->technical_data['yl_3'] ?? 0 }})</td>
-                <td style="border: 1px solid #eee; padding: 6px;">{{ $act->technical_data['benang_4'] ?? '-' }} @if(!empty($act->technical_data['benang_4_lot'])) <br> LOT: {{ $act->technical_data['benang_4_lot'] }} @endif <br> (YL: {{ $act->technical_data['yl_4'] ?? 0 }})</td>
-                <td style="border: 1px solid #eee; padding: 6px; font-weight: bold;">{{ $act->kg }} KG / {{ $act->roll }} Roll</td>
-            </tr>
-            @empty
-                <tr>
-                    <td colspan="7" style="border: 1px solid #eee; padding: 10px; text-align: center; color: #888;">Tidak ada data benang untuk periode ini</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
-@endif
-
-<p style="font-size: 12px; margin-top: 30px;"><strong>Rincian Volume Produksi (Trend):</strong></p>
-<table style="width: 100%; border-collapse: collapse; font-size: 10px;">
-    <thead>
-        <tr style="background-color: #f8f9fa;">
-            <th style="border: 1px solid #eee; padding: 10px; text-align: left;">Tanggal</th>
-            <th style="border: 1px solid #eee; padding: 10px; text-align: right;">Total Produksi (KG)</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($trends as $t)
-            <tr>
-                <td style="border: 1px solid #eee; padding: 8px;">{{ $t['day'] }}</td>
-                <td style="border: 1px solid #eee; padding: 8px; text-align: right;">{{ number_format($t['total'], 2) }} KG</td>
-            </tr>
-        @endforeach
-    </tbody>
-</table>
-
-<div style="margin-top: 50px; width: 100%;">
-    <table style="width: 100%;">
-        <tr>
-            <td style="width: 70%;"></td>
-            <td style="text-align: center; font-size: 11px;">
-                Dicetak Oleh,<br><br><br><br>
-                <strong>{{ $admin_name }}</strong><br>
-                (System Administrator)
+            <td class="kpi-card" style="border-top: 3px solid #6366f1;">
+                <div class="kpi-title">Total Data Entries</div>
+                <div class="kpi-value">{{ number_format($totalData, 0) }}</div>
+            </td>
+            <td class="kpi-card" style="border-top: 3px solid #10b981;">
+                <div class="kpi-title">Total Production (KG)</div>
+                <div class="kpi-value">{{ number_format($totalKg, 2) }} KG</div>
+            </td>
+            <td class="kpi-card" style="border-top: 3px solid #f59e0b;">
+                <div class="kpi-title">Total Volume (Roll)</div>
+                <div class="kpi-value">{{ number_format($totalRoll, 0) }} ROLL</div>
             </td>
         </tr>
     </table>
-</div>
+
+    {{-- 3. DATA TABLES BERDASARKAN DIVISI --}}
+
+    @if($selectedDivision == 'marketing')
+        {{-- TABEL MARKETING --}}
+        <table>
+            <thead>
+                <tr>
+                    <th class="th-marketing">NO</th>
+                    <th class="th-marketing">TANGGAL</th>
+                    <th class="th-marketing text-left">NO. ARTIKEL</th>
+                    <th class="th-marketing text-left">PELANGGAN</th>
+                    <th class="th-marketing">LEBAR/GSM</th>
+                    <th class="th-marketing">WARNA</th>
+                    <th class="th-marketing text-right">T. ROLL</th>
+                    <th class="th-marketing text-right">T. KG</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($activities as $index => $act)
+                    <tr>
+                        <td class="text-center">{{ $index + 1 }}</td>
+                        <td class="text-center">{{ \Carbon\Carbon::parse($act->tanggal)->format('d/m/Y') }}</td>
+                        <td class="font-bold">{{ $act->art_no }}</td>
+                        <td>{{ $act->pelanggan }}</td>
+                        <td class="text-center">{{ $act->target_lebar ?? '-' }} / {{ $act->target_gramasi ?? '-' }}</td>
+                        <td class="text-center">{{ $act->warna }}</td>
+                        <td class="val-highlight">{{ number_format($act->roll_target ?? 0, 0) }}</td>
+                        <td class="val-highlight">{{ number_format($act->kg_target ?? 0, 2) }}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="8" class="text-center" style="padding: 20px;">Tidak ada data Marketing di periode ini.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+
+    @elseif($selectedDivision == 'knitting')
+        {{-- TABEL KNITTING --}}
+        <table>
+            <thead>
+                <tr>
+                    <th class="th-knitting">NO</th>
+                    <th class="th-knitting">WAKTU PRODUKSI</th>
+                    <th class="th-knitting text-left">NO. ARTIKEL</th>
+                    <th class="th-knitting text-left">PELANGGAN</th>
+                    <th class="th-knitting">MESIN</th>
+                    <th class="th-knitting">BENANG UTAMA (YL)</th>
+                    <th class="th-knitting text-right">ROLL</th>
+                    <th class="th-knitting text-right">KG</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($activities as $index => $act)
+                    @php 
+                        $tech = is_string($act->technical_data) ? json_decode($act->technical_data, true) : $act->technical_data; 
+                        $benang = ($tech['benang_1'] ?? '-') . ' (YL:' . ($tech['yl_1'] ?? '0') . ')';
+                    @endphp
+                    <tr>
+                        <td class="text-center">{{ $index + 1 }}</td>
+                        <td class="text-center">{{ $act->created_at->format('d/m/Y H:i') }}</td>
+                        <td class="font-bold">{{ $act->marketingOrder->art_no ?? '-' }}</td>
+                        <td>{{ $act->marketingOrder->pelanggan ?? '-' }}</td>
+                        <td class="text-center">{{ $tech['no_mesin'] ?? '-' }}</td>
+                        <td class="text-center" style="font-size: 7px;">{{ $benang }}</td>
+                        <td class="val-highlight">{{ number_format($act->roll ?? 0, 0) }}</td>
+                        <td class="val-highlight">{{ number_format($act->kg ?? 0, 2) }}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="8" class="text-center" style="padding: 20px;">Tidak ada data Knitting di periode ini.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+
+    @elseif($selectedDivision == 'dyeing')
+        {{-- TABEL DYEING & FINISHING --}}
+        <table>
+            <thead>
+                <tr>
+                    <th class="th-dyeing">NO</th>
+                    <th class="th-dyeing">WAKTU PRODUKSI</th>
+                    <th class="th-dyeing">TAHAPAN</th>
+                    <th class="th-dyeing text-left">NO. ARTIKEL</th>
+                    <th class="th-dyeing text-left">WARNA KAIN</th>
+                    <th class="th-dyeing">MESIN</th>
+                    <th class="th-dyeing text-right">ROLL</th>
+                    <th class="th-dyeing text-right">KG</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($activities as $index => $act)
+                    @php $tech = is_string($act->technical_data) ? json_decode($act->technical_data, true) : $act->technical_data; @endphp
+                    <tr>
+                        <td class="text-center">{{ $index + 1 }}</td>
+                        <td class="text-center">{{ $act->created_at->format('d/m/Y H:i') }}</td>
+                        <td class="text-center font-bold">{{ strtoupper(str_replace('-', ' ', $act->division_name)) }}</td>
+                        <td class="font-bold">{{ $act->marketingOrder->art_no ?? '-' }}</td>
+                        <td>{{ $act->marketingOrder->warna ?? '-' }}</td>
+                        <td class="text-center">{{ $tech['no_mesin'] ?? '-' }}</td>
+                        <td class="val-highlight">{{ number_format($act->roll ?? 0, 0) }}</td>
+                        <td class="val-highlight">{{ number_format($act->kg ?? 0, 2) }}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="8" class="text-center" style="padding: 20px;">Tidak ada data Dyeing & Finishing di periode ini.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+
+    @else
+        {{-- TABEL MASTER PIPELINE --}}
+        <table>
+            <thead>
+                <tr>
+                    <th class="th-master">NO</th>
+                    <th class="th-master">WAKTU</th>
+                    <th class="th-master">DIVISI / PROSES</th>
+                    <th class="th-master text-left">NO. ARTIKEL</th>
+                    <th class="th-master text-left">PELANGGAN</th>
+                    <th class="th-master">OPERATOR</th>
+                    <th class="th-master text-right">ROLL</th>
+                    <th class="th-master text-right">KG</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($activities->take(200) as $index => $act) {{-- Batasi agar PDF tidak terlalu berat/lambat --}}
+                    <tr>
+                        <td class="text-center">{{ $index + 1 }}</td>
+                        <td class="text-center">{{ $act->created_at->format('d/m/y H:i') }}</td>
+                        <td class="text-center font-bold">{{ strtoupper(str_replace('-', ' ', $act->division_name)) }}</td>
+                        <td class="font-bold">{{ $act->marketingOrder->art_no ?? '-' }}</td>
+                        <td>{{ $act->marketingOrder->pelanggan ?? '-' }}</td>
+                        <td class="text-center">{{ $act->operator_name ?? ($act->user->name ?? '-') }}</td>
+                        <td class="val-highlight">{{ number_format($act->roll ?? 0, 0) }}</td>
+                        <td class="val-highlight">{{ number_format($act->kg ?? 0, 2) }}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="8" class="text-center" style="padding: 20px;">Tidak ada data produksi untuk periode ini.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+        @if(count($activities) > 200)
+            <p class="text-xs text-center" style="margin-top: 5px;">*Menampilkan 200 data terakhir. Unduh format Excel (XLS) untuk melihat seluruh data secara lengkap.</p>
+        @endif
+    @endif
+
+    {{-- FOOTER TANDA TANGAN --}}
+    <table style="border: none; margin-top: 40px; text-align: center;">
+        <tr>
+            <td style="border: none; width: 33%;">
+                <p style="margin-bottom: 60px;">Disiapkan Oleh,</p>
+                <p class="font-bold">{{ $admin_name }}</p>
+                <p class="text-xs">Administrator Sistem</p>
+            </td>
+            <td style="border: none; width: 33%;">
+                <p style="margin-bottom: 60px;">Diketahui Oleh,</p>
+                <p class="font-bold">( ................................ )</p>
+                <p class="text-xs">Kepala Produksi</p>
+            </td>
+            <td style="border: none; width: 33%;">
+                <p style="margin-bottom: 60px;">Disetujui Oleh,</p>
+                <p class="font-bold">( ................................ )</p>
+                <p class="text-xs">Plant Manager</p>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

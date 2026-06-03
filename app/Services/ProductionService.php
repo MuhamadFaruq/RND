@@ -48,12 +48,26 @@ class ProductionService
             $order = MarketingOrder::findOrFail($orderId);
             $nextStatus = $this->getNextRequiredStatus($order, $divisionName);
 
-            $activityData = array_merge([
+            $kg = $extraData['kg'] ?? ($technicalData['kg'] ?? null);
+            $roll = $extraData['roll'] ?? ($technicalData['roll'] ?? null);
+
+            if ($kg === null || $roll === null) {
+                $prevLog = ProductionActivity::where('marketing_order_id', $orderId)->latest('id')->first();
+                if ($prevLog) {
+                    $kg = $kg ?? $prevLog->kg;
+                    $roll = $roll ?? $prevLog->roll;
+                }
+            }
+
+            $activityData = [
                 'marketing_order_id' => $orderId,
-                'operator_id'        => $userId, 
+                'operator_id'        => $userId,
+                'operator_name'      => $technicalData['nama_input'] ?? ($technicalData['operator_manual_name'] ?? null),
                 'division_name'      => $divisionName,
-                'technical_data'     => $technicalData,
-            ], $extraData);
+                'kg'                 => $kg,
+                'roll'               => $roll,
+                'technical_data'     => array_merge($technicalData, $extraData),
+            ];
 
             if ($divisionName === 'knitting') {
                 $existing = $this->activityRepo->findForDivision($orderId, 'knitting');
@@ -69,6 +83,16 @@ class ProductionService
             if ($nextStatus) {
                 $this->orderRepo->updateStatus($orderId, $nextStatus);
             }
+
+            // ADD AUDIT LOG
+            ActivityLog::create([
+                'user_id'     => $userId,
+                'action'      => 'CREATE_PRODUCTION_LOG',
+                'division'    => $divisionName,
+                'art_no'      => $order->art_no,
+                'sap_no'      => $order->sap_no,
+                'description' => "Input data produksi divisi {$divisionName}",
+            ]);
         });
     }
 
@@ -257,6 +281,7 @@ class ProductionService
             $activityData = [
                 'marketing_order_id' => $orderId,
                 'operator_id'        => $userId,
+                'operator_name'      => $operatorManualName,
                 'division_name'      => $divisionName,
                 'shift'              => $shift,
                 'kg'                 => $kg,

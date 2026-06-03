@@ -69,9 +69,14 @@
                                     <span class="text-[10px] font-black mkt-text-muted uppercase">{{ $archive->created_at->format('d M Y H:i') }}</span>
                                 </td>
                                 <td class="px-5 py-4 text-center">
-                                    <button onclick="confirmDestroy({{ $archive->id }}, '{{ $archive->art_no }}')" class="px-3 py-1.5 bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border border-red-600/20">
-                                        Destroy
-                                    </button>
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button onclick="confirmRestore({{ $archive->id }}, '{{ $archive->art_no }}')" class="px-3 py-1.5 bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border border-emerald-600/20">
+                                            Restore
+                                        </button>
+                                        <button onclick="confirmDestroy({{ $archive->id }}, '{{ $archive->art_no }}')" class="px-3 py-1.5 bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border border-red-600/20">
+                                            Destroy
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -116,6 +121,25 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 @this.call('destroyPermanently', id);
+            }
+        });
+    }
+
+    function confirmRestore(id, artNo) {
+        Swal.fire({
+            title: 'KEMBALIKAN DATA?',
+            html: `<div class="text-sm font-bold text-slate-300 mt-2">Data <span class="text-emerald-400">#${artNo}</span> akan dikembalikan ke daftar aktif Marketing Order dan log produksinya akan dipulihkan.</div>`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#334155',
+            confirmButtonText: 'YA, KEMBALIKAN',
+            cancelButtonText: 'BATAL',
+            background: '#1e293b',
+            color: '#fff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                @this.call('restoreOrder', id);
             }
         });
     }

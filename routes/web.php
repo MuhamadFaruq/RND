@@ -30,6 +30,12 @@ Route::middleware(['auth', 'verified', 'marketing'])->prefix('marketing')->group
     Route::get('/orders', OrderList::class)->name('marketing.orders.index');
     Route::get('/orders/create', OrderForm::class)->name('marketing.orders.create');
     Route::get('/orders/{id}/edit', OrderForm::class)->name('marketing.orders.edit');
+    
+    // Route Khusus Print Surat Jalan
+    Route::get('/orders/{id}/print', function($id) {
+        $order = \App\Models\MarketingOrder::findOrFail($id);
+        return view('marketing.print', compact('order'));
+    })->name('marketing.orders.print');
 });
 
 // --- ADMIN / MONITORING ROUTES ---

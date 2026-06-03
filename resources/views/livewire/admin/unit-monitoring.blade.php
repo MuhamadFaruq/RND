@@ -13,7 +13,7 @@ new class extends Component {
     public $startDate;
     public $endDate;
 
-    public $showExportMenu = false;
+    public $showExportModal = false;
     public $selectedIdentifier = null;
     public $showTrackingModal = false;
     public $trackingLogs = [];
@@ -92,12 +92,12 @@ new class extends Component {
 
     public function export($format, $modeOverride = null)
     {
-        $this->showExportMenu = false; // Tutup menu setelah klik
+        $this->showExportModal = false;
 
         // Redirect ke route export sesuai format
         return redirect()->route('admin.export', [
-            'format' => $format, // 'pdf' atau 'excel'
-            'mode' => $modeOverride ?: $this->viewMode,
+            'format' => $format,
+            'mode' => $modeOverride ?: strtolower($this->viewMode),
             'start' => $this->startDate,
             'end' => $this->endDate,
             'unit' => $this->selectedUnit
@@ -172,26 +172,11 @@ new class extends Component {
                 </div>
 
                 <div class="relative flex-grow sm:flex-grow-0">
-                    <button wire:click="$toggle('showExportMenu')" 
+                    <button wire:click="$toggle('showExportModal')" 
                         class="w-full flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-3xl font-black uppercase italic shadow-xl shadow-emerald-900/20 transition-all transform hover:scale-[1.02] text-[10px] tracking-widest">
                         GENERATE REPORT
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                     </button>
-
-                    {{-- DROPDOWN MENU --}}
-                    @if($showExportMenu)
-                        <div class="absolute right-0 mt-3 w-full sm:w-72 mkt-surface border mkt-border rounded-3xl shadow-2xl z-50 overflow-hidden backdrop-blur-md">
-                            <button wire:click="export('pdf')" class="w-full text-left px-6 py-4 text-[10px] font-black italic hover:mkt-surface-alt mkt-text transition-colors flex items-center gap-3 border-b mkt-border">
-                                <span class="p-2 bg-red-500/10 text-red-500 rounded-lg">PDF</span> DOWNLOAD TAB AKTIF (PDF)
-                            </button>
-                            <button wire:click="export('excel')" class="w-full text-left px-6 py-4 text-[10px] font-black italic hover:mkt-surface-alt mkt-text transition-colors flex items-center gap-3 border-b mkt-border">
-                                <span class="p-2 bg-emerald-500/10 text-emerald-500 rounded-lg">XLS</span> DOWNLOAD TAB AKTIF (EXCEL)
-                            </button>
-                            <button wire:click="export('excel', 'master')" class="w-full text-left px-6 py-4 text-[10px] font-black italic hover:mkt-surface-alt text-amber-500 transition-colors flex items-center gap-3">
-                                <span class="p-2 bg-amber-500/10 text-amber-500 rounded-lg">XLS</span> DOWNLOAD MASTER PIPELINE (SEMUA PROSES)
-                            </button>
-                        </div>
-                    @endif
                 </div>
 
                 {{-- FILTER TANGGAL --}}
@@ -1455,6 +1440,103 @@ new class extends Component {
                                                                                                                     </div>
                                                     @endif
                                                 @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- MODAL EXPORT REPORT --}}
+    @if($showExportModal)
+        <div class="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6">
+            <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" wire:click="$set('showExportModal', false)"></div>
+            <div class="relative bg-white dark:bg-slate-900 w-full max-w-4xl rounded-[2rem] sm:rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                
+                {{-- Modal Header --}}
+                <div class="p-6 md:p-8 border-b mkt-border flex justify-between items-center bg-slate-50 dark:bg-slate-900">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black italic mkt-text dark:text-white uppercase tracking-tighter leading-none">EXPORT CENTER</h3>
+                            <p class="text-[10px] font-bold mkt-text-muted dark:text-slate-400 uppercase tracking-widest mt-1">Pilih Cakupan Laporan</p>
+                        </div>
+                    </div>
+                    <button wire:click="$set('showExportModal', false)" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:bg-red-500 hover:text-white dark:hover:text-white transition-all">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                {{-- Modal Body - Export Options --}}
+                <div class="p-6 md:p-8 bg-slate-50/50 dark:bg-slate-950">
+                    <p class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-6 italic flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Export akan menggunakan filter tanggal: {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                        
+                        {{-- 1. MASTER PIPELINE --}}
+                        <div class="mkt-surface border mkt-border p-6 rounded-3xl hover:border-amber-500 transition-colors group flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-3 mb-3">
+                                    <span class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center font-black text-xs">M</span>
+                                    <h4 class="text-sm font-black mkt-text dark:text-slate-200 uppercase tracking-wider">SELURUHNYA (MASTER PIPELINE)</h4>
+                                </div>
+                                <p class="text-[10px] font-bold mkt-text-muted dark:text-slate-400 leading-relaxed mb-6">Mencakup data dari awal Marketing hingga produk selesai di Packing.</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button wire:click="export('pdf', 'master')" class="w-full py-2.5 rounded-xl border-2 border-red-500 text-red-500 font-black text-[9px] uppercase tracking-wider hover:bg-red-500 hover:text-white transition-all">PDF</button>
+                                <button wire:click="export('excel', 'master')" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-black text-[9px] uppercase tracking-wider hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20">EXCEL (XLS)</button>
+                            </div>
+                        </div>
+
+                        {{-- 2. MARKETING --}}
+                        <div class="mkt-surface border mkt-border p-6 rounded-3xl hover:border-blue-500 transition-colors group flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-3 mb-3">
+                                    <span class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center font-black text-xs">MK</span>
+                                    <h4 class="text-sm font-black mkt-text dark:text-slate-200 uppercase tracking-wider">DIVISI MARKETING</h4>
+                                </div>
+                                <p class="text-[10px] font-bold mkt-text-muted dark:text-slate-400 leading-relaxed mb-6">Data input awal pesanan, target produksi, dan spesifikasi R&D.</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button disabled class="w-full py-2.5 rounded-xl border-2 border-slate-300 dark:border-slate-700 text-slate-400 dark:text-slate-600 font-black text-[9px] uppercase tracking-wider cursor-not-allowed opacity-50">PDF (N/A)</button>
+                                <button wire:click="export('excel', 'marketing')" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-black text-[9px] uppercase tracking-wider hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20">EXCEL (XLS)</button>
+                            </div>
+                        </div>
+
+                        {{-- 3. KNITTING --}}
+                        <div class="mkt-surface border mkt-border p-6 rounded-3xl hover:border-brand-600 transition-colors group flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-3 mb-3">
+                                    <span class="w-8 h-8 rounded-lg bg-brand-600/10 text-brand-600 flex items-center justify-center font-black text-xs">KN</span>
+                                    <h4 class="text-sm font-black mkt-text dark:text-slate-200 uppercase tracking-wider">DIVISI KNITTING (RAJUT)</h4>
+                                </div>
+                                <p class="text-[10px] font-bold mkt-text-muted dark:text-slate-400 leading-relaxed mb-6">Riwayat rajut kain, aktual berat/roll, dan detail mesin rajut.</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button wire:click="export('pdf', 'rajut')" class="w-full py-2.5 rounded-xl border-2 border-red-500 text-red-500 font-black text-[9px] uppercase tracking-wider hover:bg-red-500 hover:text-white transition-all">PDF</button>
+                                <button wire:click="export('excel', 'rajut')" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-black text-[9px] uppercase tracking-wider hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20">EXCEL (XLS)</button>
+                            </div>
+                        </div>
+
+                        {{-- 4. DYEING & FINISHING --}}
+                        <div class="mkt-surface border mkt-border p-6 rounded-3xl hover:border-indigo-500 transition-colors group flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-3 mb-3">
+                                    <span class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-black text-xs">DF</span>
+                                    <h4 class="text-sm font-black mkt-text dark:text-slate-200 uppercase tracking-wider">DIVISI DYEING (WARNA & FINISHING)</h4>
+                                </div>
+                                <p class="text-[10px] font-bold mkt-text-muted dark:text-slate-400 leading-relaxed mb-6">Seluruh inputan pasca rajut (Warna, Stenter, Compactor, Fleece, dll).</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button wire:click="export('pdf', 'warna')" class="w-full py-2.5 rounded-xl border-2 border-red-500 text-red-500 font-black text-[9px] uppercase tracking-wider hover:bg-red-500 hover:text-white transition-all">PDF</button>
+                                <button wire:click="export('excel', 'warna')" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-black text-[9px] uppercase tracking-wider hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20">EXCEL (XLS)</button>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
