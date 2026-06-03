@@ -22,6 +22,10 @@ class MarketingDashboard extends Component
      */
     public function mount()
     {
+        if (!auth()->check() || (auth()->user()->role !== 'marketing' && !auth()->user()->isSuperAdmin())) {
+            abort(403, 'Akses Ditolak.');
+        }
+
         $this->currentMenu = request()->query('menu', 'dashboard');
         
         // Allowed menus

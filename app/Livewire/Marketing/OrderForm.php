@@ -29,6 +29,10 @@ class OrderForm extends Component
     public $exists = false;
 
     public function mount($id = null) {
+        if (!auth()->check() || (auth()->user()->role !== 'marketing' && !auth()->user()->isSuperAdmin())) {
+            abort(403, 'Akses Ditolak.');
+        }
+
         // Inisialisasi default
         $this->tanggal = now()->format('Y-m-d');
         $this->mkt = ''; 

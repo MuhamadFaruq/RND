@@ -32,6 +32,10 @@ class KnittingForm extends Component
 
     public function mount($artikel = null)
     {
+        if (auth()->user()->role !== 'knitting' && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Akses Ditolak: Anda tidak terdaftar di divisi Knitting.');
+        }
+
         $this->tanggal = now()->format('Y-m-d');
 
         // LOGIKA INPUT/EDIT: Ambil Artikel dari Route atau Query String

@@ -40,12 +40,25 @@ class ProductionChart extends Component
         $targetDate = \Carbon\Carbon::parse($this->selectedDate);
         
         // 1. Ambil data aktivitas per jam untuk HEATMAP (Tetap sesuai tanggal yang dipilih)
-        $this->hourlyActivity = ProductionActivity::selectRaw('HOUR(created_at) as hour, SUM(kg) as total_kg')
+        $driver = \Illuminate\Support\Facades\DB::connection()->getDriverName();
+        if ($driver === 'sqlite') {
+            $selectRaw = 'strftime("%H", created_at) as hour, SUM(kg) as total_kg';
+            $groupBy = 'strftime("%H", created_at)';
+        } else {
+            $selectRaw = 'HOUR(created_at) as hour, SUM(kg) as total_kg';
+            $groupBy = 'HOUR(created_at)';
+        }
+
+        $hourlyRaw = ProductionActivity::selectRaw($selectRaw)
             ->whereDate('created_at', $targetDate->format('Y-m-d'))
             ->when($this->selectedDivision !== 'all', fn($q) => $q->where('division_name', $this->selectedDivision))
-            ->groupByRaw('HOUR(created_at)')
+            ->groupByRaw($groupBy)
             ->pluck('total_kg', 'hour')
             ->all();
+
+        $this->hourlyActivity = collect($hourlyRaw)->mapWithKeys(function($val, $key) {
+            return [(int)$key => $val];
+        })->all();
 
         // Sinkronisasi data untuk Line Chart JS
         $this->chartData = [];

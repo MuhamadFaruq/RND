@@ -22,6 +22,10 @@ class PengujianForm extends Component
 
     public function mount($artikel = null)
     {
+        if (auth()->user()->role !== 'pengujian' && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Akses Ditolak: Anda tidak terdaftar di divisi Pengujian.');
+        }
+
         if ($artikel) {
             $this->artikelNo = $artikel;
             $this->loadOrder($artikel);

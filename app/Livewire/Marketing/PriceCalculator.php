@@ -117,6 +117,10 @@ class PriceCalculator extends Component
 
     public function mount()
     {
+        if (!auth()->check() || (auth()->user()->role !== 'marketing' && !auth()->user()->isSuperAdmin())) {
+            abort(403, 'Akses Ditolak.');
+        }
+
         $this->calculate();
     }
 

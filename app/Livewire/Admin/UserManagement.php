@@ -23,6 +23,13 @@ class UserManagement extends Component
     public $search = '';
     public $isModalOpen = false;
 
+    public function mount()
+    {
+        if (!auth()->check() || (auth()->user()->role !== 'admin' && auth()->user()->role !== 'super-admin')) {
+            abort(403, 'Akses Ditolak.');
+        }
+    }
+
     protected $rules = [
         'name' => 'required|string|max:255',
         'role' => 'required', 

@@ -21,6 +21,10 @@ class QEForm extends Component
 
     public function mount($artikel = null)
     {
+        if (auth()->user()->role !== 'qe' && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Akses Ditolak: Anda tidak terdaftar di divisi QE.');
+        }
+
         if ($artikel) {
             $this->artikelNo = $artikel;
             $this->loadOrder($artikel);

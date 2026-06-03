@@ -21,6 +21,13 @@ class OrderList extends Component
     public $dateRange = 'semua'; 
     public $startDate, $endDate;
 
+    public function mount()
+    {
+        if (!auth()->check() || (auth()->user()->role !== 'marketing' && !auth()->user()->isSuperAdmin())) {
+            abort(403, 'Akses Ditolak.');
+        }
+    }
+
     // Properties for Detail Modal
     public $selectedOrder;
     public $activitiesLogs = [];

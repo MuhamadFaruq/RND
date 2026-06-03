@@ -35,11 +35,11 @@ class DashboardController extends Controller
      */
     public function impersonate($id)
     {
-        $userToImpersonate = User::findOrFail($id);
-
         if (auth()->user()->role !== 'super-admin') {
             abort(403);
         }
+
+        $userToImpersonate = User::findOrFail($id);
 
         session()->put('impersonator_id', auth()->id());
         auth()->login($userToImpersonate);

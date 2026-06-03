@@ -12,6 +12,13 @@ class RecycleBin extends Component
 
     public $search = '';
 
+    public function mount()
+    {
+        if (!auth()->check() || auth()->user()->role !== 'super-admin') {
+            abort(403, 'Akses Ditolak.');
+        }
+    }
+
     public function updatedSearch()
     {
         $this->resetPage();

@@ -104,9 +104,9 @@ class AdminManagementTest extends TestCase
             'original_data' => ['test' => true]
         ]);
 
-        Livewire::actingAs($this->admin)
-            ->test(RecycleBin::class)
-            ->call('destroyPermanently', $archived->id);
+        $this->actingAs($this->admin)
+            ->get(route('admin.recycle-bin'))
+            ->assertStatus(403);
 
         $this->assertDatabaseHas('archived_orders', ['id' => $archived->id]);
     }

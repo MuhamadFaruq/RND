@@ -1,15 +1,18 @@
 <?php
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 use App\Models\Setting;
 use App\Models\ActivityLog;
 
 new class extends Component {
+    use WithFileUploads;
 
     protected $listeners = [
         'purge-logs-confirmed' => 'purgeOldLogs',
         'maintenance-confirmed' => 'toggleMaintenance'
     ];
     public $shift_duration, $max_capacity, $target_minimal, $is_maintenance;
+    public $legacy_excel;
 
     public function mount() {
         $this->shift_duration = Setting::where('key', 'shift_duration')->first()->value ?? '8';
@@ -87,6 +90,25 @@ new class extends Component {
         }
         $this->dispatch('show-success-toast', message: "Status Maintenance Berhasil Diperbarui.");
     }
+
+    public function importLegacyData() {
+        if (auth()->user()->role !== 'super-admin') return;
+
+        $this->validate([
+            'legacy_excel' => 'required|file|mimes:xlsx,xls,csv|max:10240', // 10MB max
+        ]);
+
+        try {
+            $filePath = $this->legacy_excel->getRealPath();
+            $import = new \App\Imports\LegacyDataImport(auth()->id());
+            $results = $import->import($filePath);
+
+            $this->dispatch('show-success-toast', message: "Impor Sukses! Baru: {$results['imported']}, Diperbarui: {$results['updated']}");
+            $this->legacy_excel = null;
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: "Gagal Mengimpor: " . $e->getMessage());
+        }
+    }
 }; ?>
 
 <div class="min-h-screen mkt-bg mkt-text p-4 md:p-8 transition-colors duration-300 font-sans italic">
@@ -96,39 +118,70 @@ new class extends Component {
         </h1>
  
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-            {{-- Production Parameters --}}
-            <div class="lg:col-span-2 mkt-surface border mkt-border p-5 md:p-10 rounded-2xl md:rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col justify-between">
-                <div>
-                    <h3 class="text-lg md:text-2xl font-black italic uppercase text-brand-600 mb-6 md:mb-8 flex items-center gap-3">
-                        <span class="w-1.5 h-6 md:w-2 md:h-8 bg-brand-600 rounded-full"></span>
-                        Production Parameters
-                    </h3>
+            <div class="lg:col-span-2 space-y-6 md:space-y-8">
+                {{-- Production Parameters --}}
+                <div class="mkt-surface border mkt-border p-5 md:p-10 rounded-2xl md:rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg md:text-2xl font-black italic uppercase text-brand-600 mb-6 md:mb-8 flex items-center gap-3">
+                            <span class="w-1.5 h-6 md:w-2 md:h-8 bg-brand-600 rounded-full"></span>
+                            Production Parameters
+                        </h3>
+                        
+                        <form wire:submit.prevent="saveParameters" class="space-y-5 md:space-y-8 relative z-10">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                                <div>
+                                    <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">Durasi Shift (Jam)</label>
+                                    <input type="number" wire:model="shift_duration"
+                                        class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 transition-all outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">Kapasitas Mesin Maksimal (KG)</label>
+                                    <input type="number" wire:model="max_capacity"
+                                        class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 transition-all outline-none">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">Target Minimal per Shift (KG)</label>
+                                    <input type="number" wire:model="target_minimal"
+                                        class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 transition-all outline-none">
+                                </div>
+                            </div>
+     
+                            <button type="submit" class="w-full bg-brand-600 hover:bg-black text-white py-4 md:py-6 rounded-xl md:rounded-2xl font-black uppercase italic tracking-[0.15em] md:tracking-[0.2em] text-xs md:text-sm shadow-xl shadow-brand-900/20 transition-all transform hover:-translate-y-0.5">
+                                SAVE PRODUCTION PARAMETERS                     </button>
+                        </form>
+                    </div>
                     
-                    <form wire:submit.prevent="saveParameters" class="space-y-5 md:space-y-8 relative z-10">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                            <div>
-                                <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">Durasi Shift (Jam)</label>
-                                <input type="number" wire:model="shift_duration"
-                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 transition-all outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">Kapasitas Mesin Maksimal (KG)</label>
-                                <input type="number" wire:model="max_capacity"
-                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 transition-all outline-none">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">Target Minimal per Shift (KG)</label>
-                                <input type="number" wire:model="target_minimal"
-                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-black text-sm md:text-xl italic focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 transition-all outline-none">
-                            </div>
-                        </div>
- 
-                        <button type="submit" class="w-full bg-brand-600 hover:bg-black text-white py-4 md:py-6 rounded-xl md:rounded-2xl font-black uppercase italic tracking-[0.15em] md:tracking-[0.2em] text-xs md:text-sm shadow-xl shadow-brand-900/20 transition-all transform hover:-translate-y-0.5">
-                            SAVE PRODUCTION PARAMETERS                     </button>
-                    </form>
+                    <div class="absolute -right-20 -bottom-20 opacity-[0.02] text-[15rem] font-black italic pointer-events-none hidden md:block">UNIT</div>
                 </div>
-                
-                <div class="absolute -right-20 -bottom-20 opacity-[0.02] text-[15rem] font-black italic pointer-events-none hidden md:block">UNIT</div>
+
+                {{-- Import Legacy Excel --}}
+                <div class="mkt-surface border mkt-border p-5 md:p-10 rounded-2xl md:rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg md:text-2xl font-black italic uppercase text-brand-600 mb-6 md:mb-8 flex items-center gap-3">
+                            <span class="w-1.5 h-6 md:w-2 md:h-8 bg-brand-600 rounded-full"></span>
+                            Import Legacy Pipeline (Excel)
+                        </h3>
+                        
+                        <form wire:submit.prevent="importLegacyData" class="space-y-5 md:space-y-8 relative z-10">
+                            <div>
+                                <label class="block text-[8px] md:text-[10px] font-black uppercase text-slate-500 mb-2 md:mb-3 tracking-[0.2em]">PILIH FILE EXCEL (.XLSX / .XLS)</label>
+                                <input type="file" wire:model="legacy_excel"
+                                    class="w-full mkt-input mkt-border rounded-xl md:rounded-2xl p-4 md:p-5 mkt-text font-bold text-sm italic focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 transition-all outline-none">
+                                <div wire:loading wire:target="legacy_excel" class="text-xs text-brand-600 mt-2 font-bold italic animate-pulse">Mengunggah file ke server...</div>
+                            </div>
+
+                            @error('legacy_excel')
+                                <div class="text-red-500 text-xs font-bold italic">{{ $message }}</div>
+                            @enderror
+
+                            <button type="submit" wire:loading.attr="disabled"
+                                class="w-full bg-slate-900 hover:bg-brand-600 text-white py-4 md:py-6 rounded-xl md:rounded-2xl font-black uppercase italic tracking-[0.15em] md:tracking-[0.2em] text-xs md:text-sm shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                                <span wire:loading wire:target="importLegacyData" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                                <span>IMPORT EXCEL DATA</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
  
             {{-- System Health & Actions --}}

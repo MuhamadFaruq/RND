@@ -144,6 +144,17 @@ class SingleOperatorForm extends Component
 
     public function mount(?string $artikel = null): void
     {
+        $user = auth()->user();
+        if (!$user) {
+            abort(403, 'Akses Ditolak.');
+        }
+
+        // Hanya super-admin dan 7 operator divisi di pipeline yang diizinkan mengakses form ini
+        $allowedRoles = ['super-admin', 'stenter', 'dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'tumbler', 'fleece'];
+        if (!$user->isSuperAdmin() && !in_array(strtolower($user->role), $allowedRoles)) {
+            abort(403, 'Akses Ditolak: Anda tidak terdaftar di divisi operator yang valid untuk formulir ini.');
+        }
+
         $this->initializeFormFields();
 
         // Jika Artikel dipassing via URL (mendukung 'artikel' atau legacy 'sap'), otomatis lookup
@@ -251,6 +262,17 @@ class SingleOperatorForm extends Component
             $this->currentStepIndex = count($this->activeSteps) - 1;
         }
 
+        // Cek otorisasi untuk langkah aktif
+        if (!empty($this->activeSteps)) {
+            $activeKey = $this->activeSteps[$this->currentStepIndex]['key'];
+            if (!$this->authorizeDivisionAccess($activeKey)) {
+                $this->artikelError = "Akses Ditolak: Anda tidak memiliki wewenang untuk mengakses/mengisi tahap " . ($this->activeSteps[$this->currentStepIndex]['label'] ?? $activeKey) . ".";
+                $this->order = null;
+                $this->activeSteps = [];
+                return;
+            }
+        }
+
         // Load data or prefill defaults for the currently active step
         if (!empty($this->activeSteps)) {
             $activeKey = $this->activeSteps[$this->currentStepIndex]['key'];
@@ -311,6 +333,11 @@ class SingleOperatorForm extends Component
 
     public function goToStep(string $key): void
     {
+        if (!$this->authorizeDivisionAccess($key)) {
+            $this->dispatch('show-toast', message: "Akses Ditolak: Anda tidak memiliki wewenang untuk melihat/mengakses tahap " . $key . ".", type: 'error');
+            return;
+        }
+
         foreach ($this->activeSteps as $index => $step) {
             if ($step['key'] === $key) {
                 $this->currentStepIndex = $index;
@@ -328,6 +355,13 @@ class SingleOperatorForm extends Component
     public function toggleWorkflowFlag(string $flag): void
     {
         if (!$this->order) return;
+
+        // Otorisasi: Hanya super-admin atau role 'stenter' (yang mengelola 6 stenter-path) yang boleh mengubah alur finishing
+        $user = auth()->user();
+        if (!$user || (!$user->isSuperAdmin() && strtolower($user->role) !== 'stenter')) {
+            $this->dispatch('show-toast', message: "Akses Ditolak: Anda tidak memiliki wewenang untuk mengubah alur proses finishing.", type: 'error');
+            return;
+        }
         
         $currentVal = (bool) $this->order->{$flag};
         $newVal = !$currentVal;
@@ -556,6 +590,11 @@ class SingleOperatorForm extends Component
 
     protected function saveDivision(string $divisionKey, array $techData): void
     {
+        if (!$this->authorizeDivisionAccess($divisionKey)) {
+            $this->dispatch('show-toast', message: "Akses Ditolak: Anda tidak berwenang mengisi data divisi {$divisionKey}.", type: 'error');
+            return;
+        }
+
         if (in_array($divisionKey, $this->savedDivisions)) {
             $this->dispatch('show-toast', message: "Divisi {$divisionKey} sudah tersimpan.", type: 'warning');
             return;
@@ -771,5 +810,26 @@ class SingleOperatorForm extends Component
             'canSubmitAll' => $this->canSubmitAll(),
             'currentStep'  => $this->activeSteps[$this->currentStepIndex] ?? null,
         ]);
+    }
+
+    protected function authorizeDivisionAccess(string $divisionKey): bool
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
+        $userRole = strtolower($user->role);
+        $stenterPath = ['stenter', 'compactor', 'heat-setting', 'relax-dryer', 'tumbler', 'fleece'];
+
+        if ($userRole === 'stenter' && in_array($divisionKey, $stenterPath)) {
+            return true;
+        }
+
+        return $userRole === $divisionKey;
     }
 }

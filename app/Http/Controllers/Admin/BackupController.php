@@ -32,7 +32,7 @@ class BackupController extends Controller
 
         // Gunakan format --password= agar tidak ada prompt interaktif
         // Perhatikan: Tidak ada spasi antara --password= dan nilai passwordnya
-        $command = "{$mysqldumpPath} --user={$dbUser} --password='{$dbPass}' {$dbName} > {$path} 2>&1";
+        $command = escapeshellcmd($mysqldumpPath) . ' --user=' . escapeshellarg($dbUser) . ' --password=' . escapeshellarg($dbPass) . ' ' . escapeshellarg($dbName) . ' > ' . escapeshellarg($path) . ' 2>&1';
 
         exec($command, $output, $resultCode);
 
