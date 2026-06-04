@@ -257,7 +257,7 @@ class MarketingDashboard extends Component
     public function render()
     {   
         // 1. Inisialisasi Query & Jalankan Filter
-        $orderQuery = MarketingOrder::query();
+        $orderQuery = MarketingOrder::with('productionActivities');
         $this->applyTimeFilter($orderQuery);
 
         // 2. Terapkan Filter Search (Penting agar input "HALLO" berfungsi)
@@ -272,21 +272,34 @@ class MarketingDashboard extends Component
         $maxCapacity = \App\Models\Setting::where('key', 'max_capacity')->first()->value ?? 1000;
 
         // 4. Kembalikan View dengan data yang sudah terfilter
+        // Prepare recent orders with deviation flags
+        $recentOrders = $orderQuery->latest()->take(10)->get();
+        $recentOrders = $recentOrders->map(function($order) {
+            $activity = $order->productionActivities->sortByDesc('created_at')->first();
+            $kgTarget = $order->kg_target;
+            $rollTarget = $order->roll_target;
+            $kgDeviation = $kgTarget > 0 && $activity && is_numeric($activity->kg) && $activity->kg > 0 && (abs($activity->kg - $kgTarget) / $kgTarget) > 0.1;
+            $rollDeviation = $rollTarget > 0 && $activity && is_numeric($activity->roll) && $activity->roll > 0 && (abs($activity->roll - $rollTarget) / $rollTarget) > 0.1;
+            $order->deviation = $kgDeviation || $rollDeviation;
+            $order->overdue = $order->created_at->diffInDays(now()) > 3;
+            return $order;
+        });
+
         return view('livewire.marketing.marketing-dashboard', [
-            'totalOrder'     => (clone $orderQuery)->count(), 
+            'totalOrder'     => (clone $orderQuery)->count(),
             'allOrders'      => (clone $orderQuery)->latest()->paginate(10),
-            
+
             // HANYA GUNAKAN SATU recentOrders (mengambil dari $orderQuery yang sudah difilter)
-            'recentOrders'   => $orderQuery->latest()->take(10)->get(), 
-            
+            'recentOrders'   => $recentOrders,
+
             'knittingOrder'  => MarketingOrder::where('status', 'knitting')->count(),
             'activeOrder'    => MarketingOrder::whereNotIn('status', ['knitting', 'finished'])->count(),
             'completedOrder' => MarketingOrder::where('status', 'finished')->count(),
-            
+
             'stuckOrders'    => MarketingOrder::where('status', 'knitting')
-                                ->where('created_at', '<=', now()->subDays(2))
-                                ->count(),
-            
+                                    ->where('created_at', '<=', now()->subDays(2))
+                                    ->count(),
+
             'stages'         => $stages,
             'factoryLoad'    => collect($stages)->avg('percentage'),
             'maxCapacity'    => $maxCapacity,

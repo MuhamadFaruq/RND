@@ -372,7 +372,14 @@ new class extends Component
                                     {{ $activity->technical_data['no_mesin'] ?? '-' }}
                                 </span>
                             </td>
-                            <td class="px-8 py-7 text-right font-black text-2xl mkt-text tracking-tighter">{{ (float)$activity->kg }}</td>
+                            @php
+                                $orderTargetKg = $activity->marketingOrder->kg_target ?? 0;
+                                $orderTargetRoll = $activity->marketingOrder->roll_target ?? 0;
+                                $kgDev = $orderTargetKg > 0 && is_numeric($activity->kg) && $activity->kg > 0 && (abs($activity->kg - $orderTargetKg) / $orderTargetKg) > 0.1;
+                                $rollDev = $orderTargetRoll > 0 && is_numeric($activity->roll) && $activity->roll > 0 && (abs($activity->roll - $orderTargetRoll) / $orderTargetRoll) > 0.1;
+                                $deviation = $kgDev || $rollDev;
+                            @endphp
+                            <td class="px-8 py-7 text-right font-black text-2xl mkt-text tracking-tighter">{{ (float)$activity->kg }} @if($deviation)<span class="ml-1 inline-block px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full text-[8px] font-black uppercase">Deviasi</span>@endif</td>
                         </tr>
                         @empty
                         <tr><td colspan="6" class="p-20 text-center mkt-text-muted font-black uppercase text-xs italic">Data Tidak Ditemukan</td></tr>

@@ -203,6 +203,12 @@
                                         @else
                                             <span class="inline-block max-w-full px-1.5 py-0.5 bg-amber-100 text-amber-600 rounded-full text-[7px] font-black uppercase border border-amber-200 truncate">{{ $order->status }}</span>
                                         @endif
+                                        @if($order->deviation)
+                                            <span class="inline-block mt-1 px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full text-[7px] font-black uppercase">Deviasi</span>
+                                        @endif
+                                        @if($order->overdue)
+                                            <span class="inline-block mt-1 px-1.5 py-0.5 bg-yellow-100 text-yellow-600 rounded-full text-[7px] font-black uppercase">Overdue</span>
+                                        @endif
                                     </div>
                                     <span class="text-[7px] font-black mkt-text-muted uppercase italic pt-0.5">
                                         <span wire:loading.remove wire:target="openDetail({{ $order->id }})">Detail →</span>
@@ -252,13 +258,19 @@
                                             <td class="px-4 py-4 text-[10px] font-black uppercase italic mkt-text">{{ $order->warna }}</td>
                                             <td class="px-4 py-4">
                                                 @if($order->status === 'knitting')
-                                                    <span class="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-[9px] font-black uppercase italic border border-gray-200">Menunggu Knitting</span>
+                                                    <span class="inline-block max-w-full px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded-full text-[9px] font-black uppercase italic border border-gray-200 truncate">Knitting</span>
                                                 @elseif($order->status === 'dyeing')
-                                                    <span class="px-3 py-1 bg-brand-100 text-brand rounded-full text-[9px] font-black uppercase italic border border-brand-200">🧶 Proses Dyeing</span>
+                                                    <span class="inline-block max-w-full px-1.5 py-0.5 bg-brand-100 text-brand rounded-full text-[9px] font-black uppercase italic border border-brand-200 truncate">🧶 Proses Dyeing</span>
                                                 @elseif($order->status === 'finished')
-                                                    <span class="px-3 py-1 bg-green-100 text-green-600 rounded-full text-[9px] font-black uppercase italic border border-green-200">✅ Ready</span>
+                                                    <span class="inline-block max-w-full px-1.5 py-0.5 bg-green-100 text-green-600 rounded-full text-[9px] font-black uppercase italic border border-green-200 truncate">✅ Ready</span>
                                                 @else
-                                                    <span class="px-3 py-1 bg-amber-100 text-amber-600 rounded-full text-[9px] font-black uppercase italic border border-amber-200">{{ $order->status }}</span>
+                                                    <span class="inline-block max-w-full px-1.5 py-0.5 bg-amber-100 text-amber-600 rounded-full text-[9px] font-black uppercase italic border border-amber-200 truncate">{{ $order->status }}</span>
+                                                @endif
+                                                @if($order->deviation)
+                                                    <span class="ml-1 inline-block px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full text-[8px] font-black uppercase">Deviasi</span>
+                                                @endif
+                                                @if($order->overdue)
+                                                    <span class="ml-1 inline-block px-1.5 py-0.5 bg-yellow-100 text-yellow-600 rounded-full text-[8px] font-black uppercase">Overdue</span>
                                                 @endif
                                             </td>
                                             <td class="px-4 py-4 rounded-r-[1.5rem] text-right">

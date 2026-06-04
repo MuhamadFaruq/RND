@@ -199,7 +199,6 @@ class KnittingForm extends Component
                 'cancelButtonText' => 'Periksa Kembali',
                 'callback' => 'submitForm'
             ]);
-            return;
         }
 
         $this->submitForm();

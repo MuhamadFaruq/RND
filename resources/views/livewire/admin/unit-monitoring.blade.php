@@ -212,6 +212,12 @@ new class extends Component {
                     $latestActivity = $wip->productionActivities->sortByDesc('created_at')->first();
                     $actualRoll = $latestActivity ? $latestActivity->roll : 0;
                     $actualKg = $latestActivity ? $latestActivity->kg : 0;
+
+                    $orderTargetKg = $wip->kg_target ?? 0;
+                    $orderTargetRoll = $wip->roll_target ?? 0;
+                    $kgDev = $orderTargetKg > 0 && is_numeric($actualKg) && $actualKg > 0 && (abs($actualKg - $orderTargetKg) / $orderTargetKg) > 0.1;
+                    $rollDev = $orderTargetRoll > 0 && is_numeric($actualRoll) && $actualRoll > 0 && (abs($actualRoll - $orderTargetRoll) / $orderTargetRoll) > 0.1;
+                    $deviation = $kgDev || $rollDev;
                 @endphp
                 <div class="mkt-surface p-4 rounded-2xl border mkt-border shadow-md relative overflow-hidden flex flex-col gap-3">
                     <div class="absolute left-0 top-0 w-1.5 h-full bg-brand-600"></div>
@@ -266,7 +272,7 @@ new class extends Component {
                         <div class="flex justify-between items-center bg-slate-950/10 dark:bg-slate-950/20 p-2 rounded-xl border mkt-border mt-1">
                             <div class="flex flex-col">
                                 <span class="text-[8px] font-black text-slate-500 uppercase italic">HASIL (ROLL / KG)</span>
-                                <span class="mkt-text font-black text-xs mt-0.5">{{ $actualRoll ?: '0' }} ROLL / {{ $actualKg ? (float)$actualKg . ' KG' : '0.0 KG' }}</span>
+                                <span class="mkt-text font-black text-xs mt-0.5">{{ $actualRoll ?: '0' }} ROLL / {{ $actualKg ? (float)$actualKg . ' KG' : '0.0 KG' }} @if($deviation)<span class="ml-1 inline-block px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full text-[7px] font-black uppercase">Deviasi</span>@endif @if($wip->created_at->diffInDays(now()) > 3)<span class="ml-1 inline-block px-1.5 py-0.5 bg-yellow-100 text-yellow-600 rounded-full text-[7px] font-black uppercase">Overdue</span>@endif</span>
                             </div>
                             <div class="text-right">
                                 <div class="flex gap-1 items-center justify-end flex-wrap max-w-[120px]">
@@ -391,14 +397,22 @@ new class extends Component {
                                         </div>
                                     @endif
                                 @php
-                                    $actualRoll = $wip->productionActivities->sum('roll');
-                                    $actualKg = $wip->productionActivities->sum('kg');
+                                    $latestActivity = $wip->productionActivities->sortByDesc('created_at')->first();
+                                    $actualRoll = $latestActivity ? $latestActivity->roll : 0;
+                                    $actualKg = $latestActivity ? $latestActivity->kg : 0;
                                 @endphp
                                 <td class="px-8 py-7 text-center">
                                     <span class="mkt-text font-black text-sm">{{ $actualRoll ?: '-' }}</span>
                                 </td>
                                 <td class="px-8 py-7 text-center">
-                                    <span class="mkt-text font-black text-sm">{{ $actualKg ? (float)$actualKg . ' KG' : '-' }}</span>
+@php
+    $orderTargetKg = $wip->kg_target ?? 0;
+    $orderTargetRoll = $wip->roll_target ?? 0;
+    $kgDev = $orderTargetKg > 0 && is_numeric($actualKg) && $actualKg > 0 && (abs($actualKg - $orderTargetKg) / $orderTargetKg) > 0.1;
+    $rollDev = $orderTargetRoll > 0 && is_numeric($actualRoll) && $actualRoll > 0 && (abs($actualRoll - $orderTargetRoll) / $orderTargetRoll) > 0.1;
+    $deviation = $kgDev || $rollDev;
+@endphp
+<span class="mkt-text font-black text-sm">{{ $actualKg ? (float)$actualKg . ' KG' : '-' }} @if($deviation)<span class="ml-1 inline-block px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full text-[8px] font-black uppercase">Deviasi</span>@endif @if($wip->created_at->diffInDays(now()) > 3)<span class="ml-1 inline-block px-1.5 py-0.5 bg-yellow-100 text-yellow-600 rounded-full text-[8px] font-black uppercase">Overdue</span>@endif</span>
                                 </td>
                                 <td class="px-8 py-7 text-right">
                                     <div class="flex flex-col items-end gap-1">
