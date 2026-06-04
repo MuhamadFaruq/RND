@@ -4,6 +4,8 @@ namespace App\Livewire\Marketing;
 
 use Livewire\Component;
 use App\Models\MarketingOrder;
+use App\Models\ActivityLog;
+use App\Services\MarketingOrderService;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
@@ -92,12 +94,62 @@ class MarketingDashboard extends Component
 
     public function loadTrackingLogs($artNo)
     {
-        $this->activitiesLogs = \App\Models\ProductionActivity::with('operator')
-            ->whereHas('marketingOrder', fn($q) => $q->where('art_no', $artNo))
-            ->orderBy('created_at', 'asc')
-            ->get()
-            ->groupBy('division_name')
-            ->toArray();
+        $service = app(MarketingOrderService::class);
+        $this->activitiesLogs = $service->getTrackingLogs($artNo);
+    }
+
+    public function deleteOrder($id)
+    {
+        try {
+            $order = MarketingOrder::findOrFail($id);
+            $artNo = $order->art_no;
+            $sapNo = $order->sap_no;
+            
+            $user = auth()->user();
+            
+            // Check if production has already started (there are production activities recorded)
+            $productionCount = $order->productionActivities()->count();
+            
+            if ($productionCount > 0) {
+                // If not Superadmin, block it completely
+                if (!$user->isSuperAdmin()) {
+                    $this->dispatch('show-error-toast', message: 'Order tidak dapat dihapus karena sudah masuk tahap produksi. Hubungi Plant Manager / Superadmin.');
+                    return;
+                }
+            }
+            
+            // SIMPAN KE COLD STORAGE (ARCHIVE)
+            \App\Models\ArchivedOrder::create([
+                'original_order_id' => $order->id,
+                'sap_no' => $sapNo,
+                'art_no' => $artNo,
+                'tanggal' => $order->tanggal,
+                'pelanggan' => $order->pelanggan,
+                'mkt' => $order->mkt,
+                'original_data' => $order->toArray(),
+                'production_logs' => $order->productionActivities->toArray(),
+                'deleted_by' => $user->id,
+                'reason' => "Dihapus dari Marketing Dashboard",
+            ]);
+
+            $order->forceDelete(); // Menghapus secara permanen agar data di tabel berelasi juga terhapus (cascade) dan nomor artikel/SAP bisa dipakai ulang
+            // LOGGING AUDIT TRAIL
+            ActivityLog::create([
+                'user_id'     => auth()->id(),
+                'action'      => 'DELETE_ORDER',
+                'division'    => $user->role ?? 'MARKETING',
+                'art_no'      => $artNo,
+                'sap_no'      => $sapNo,
+                'description' => "Menghapus Order Artikel: {$artNo}. Alasan: Dihapus oleh " . $user->name . ($productionCount > 0 ? " (Order sudah berjalan produksi)" : " (Order belum berjalan produksi)"),
+            ]);
+
+            if ($this->selectedOrder && ($this->selectedOrder['id'] ?? null) == $id) {
+                $this->closeDetail();
+            }
+            $this->dispatch('show-toast', message: 'Order berhasil dihapus & dicatat di log sistem.', type: 'success');
+        } catch (\Exception $e) {
+            $this->dispatch('show-error-toast', message: 'Gagal menghapus order: ' . $e->getMessage());
+        }
     }
 
     public function exportExcel()
@@ -139,33 +191,63 @@ class MarketingDashboard extends Component
     }
 
     /**
-     * Mendapatkan Data Beban Kerja Mesin (9 Divisi)
+     * Mendapatkan Data Beban Kerja Mesin (5 Divisi Terpadu)
      */
     protected function getMachineWorkload()
     {
         $stages = [
-            ['name' => 'Knitting', 'unit' => 'Weaving Unit', 'color' => 'brand', 'icon' => '', 'status' => 'knitting'],
-            ['name' => 'Dyeing', 'unit' => 'Coloring Unit', 'color' => 'amber', 'icon' => '', 'status' => 'dyeing'],
-            ['name' => 'Relax Dryer', 'unit' => 'Drying Unit', 'color' => 'cyan', 'icon' => '', 'status' => 'relax-dryer'],
-            ['name' => 'Compactor', 'unit' => 'Compactor Unit', 'color' => 'green', 'icon' => '', 'status' => 'compactor'],
-            ['name' => 'Heat Setting', 'unit' => 'Heat Setting Unit', 'color' => 'brand', 'icon' => '', 'status' => 'heat-setting'],
-            ['name' => 'Stenter', 'unit' => 'Stenter Unit', 'color' => 'rose', 'icon' => '', 'status' => 'stenter'],
-            ['name' => 'Tumbler', 'unit' => 'Tumbler Unit', 'color' => 'orange', 'icon' => '', 'status' => 'tumbler'],
-            ['name' => 'Fleece', 'unit' => 'Fleece Unit', 'color' => 'rose', 'icon' => '', 'status' => 'fleece'],
-            ['name' => 'Pengujian', 'unit' => 'Testing Unit', 'color' => 'emerald', 'icon' => '', 'status' => 'pengujian'],
-            ['name' => 'QE', 'unit' => 'QE Unit', 'color' => 'green', 'icon' => '', 'status' => 'qe'],
+            [
+                'name' => 'Knitting',
+                'unit' => 'Weaving Unit',
+                'color' => 'brand',
+                'icon' => '',
+                'statuses' => ['knitting'],
+                'desc_name' => 'Knitting'
+            ],
+            [
+                'name' => 'Dyeing',
+                'unit' => 'Dyeing & Finishing Unit',
+                'color' => 'indigo',
+                'icon' => '',
+                'statuses' => ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'finishing'],
+                'desc_name' => 'Dyeing & Finishing'
+            ],
+            [
+                'name' => 'Pengujian',
+                'unit' => 'Testing Unit',
+                'color' => 'amber',
+                'icon' => '',
+                'statuses' => ['pengujian'],
+                'desc_name' => 'Pengujian'
+            ],
+            [
+                'name' => 'QE',
+                'unit' => 'QE Unit',
+                'color' => 'cyan',
+                'icon' => '',
+                'statuses' => ['qe'],
+                'desc_name' => 'QE'
+            ],
+            [
+                'name' => 'Finished',
+                'unit' => 'Completed Unit',
+                'color' => 'emerald',
+                'icon' => '',
+                'statuses' => ['finished'],
+                'desc_name' => 'Selesai Produksi'
+            ],
         ];
 
         $maxCapacity = \App\Models\Setting::where('key', 'max_capacity')->first()->value ?? 1000;
 
         foreach ($stages as &$stage) {
-            $stage['load_count'] = MarketingOrder::where('status', $stage['status'])->count();
+            $stage['load_count'] = MarketingOrder::whereIn('status', $stage['statuses'])->count();
             // Load dihitung berdasarkan total KG antrean dibandingkan kapasitas mesin
-            $totalKgInQueue = MarketingOrder::where('status', $stage['status'])->sum('kg_target');
+            $totalKgInQueue = MarketingOrder::whereIn('status', $stage['statuses'])->sum('kg_target');
             
             $stage['load_kg'] = $totalKgInQueue;
             $stage['percentage'] = $maxCapacity > 0 ? min(($totalKgInQueue / $maxCapacity) * 100, 100) : 0;
-            $stage['desc'] = "Antrean di " . $stage['name'];
+            $stage['desc'] = "Antrean di " . $stage['desc_name'];
             $stage['is_full'] = $stage['percentage'] >= 90;
         }
 

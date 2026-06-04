@@ -58,7 +58,56 @@ new class extends Component
                         $mo->where('sap_no', 'like', '%'.$this->search.'%');
                     })->orWhere('warna', 'like', '%'.$this->search.'%');
                 });
+            })
+            ->when($this->selectedOperator !== 'SEMUA', function($q) {
+                $q->where('operator_id', $this->selectedOperator);
             });
+
+        // Ambil semua aktivitas untuk kalkulasi
+        $activities = (clone $query)->get();
+
+        // Alur Rajut (Knitting) - Unik per order
+        $rajutActivities = $activities->filter(function ($act) {
+            return strtoupper($act->division_name) === 'KNITTING';
+        })->groupBy('marketing_order_id')->map(function ($group) {
+            return $group->sortByDesc('created_at')->first();
+        });
+        $rajutKg = $rajutActivities->sum('kg');
+        $rajutRoll = $rajutActivities->sum('roll');
+
+        // Alur Warna (Dyeing & Finishing) - Unik per order
+        $warnaDivs = ['DYEING', 'RELAX-DRYER', 'COMPACTOR', 'HEAT-SETTING', 'STENTER', 'TUMBLER', 'FLEECE', 'FINISHING'];
+        $warnaActivities = $activities->filter(function ($act) use ($warnaDivs) {
+            return in_array(strtoupper($act->division_name), $warnaDivs);
+        })->groupBy('marketing_order_id')->map(function ($group) {
+            return $group->sortByDesc('created_at')->first();
+        });
+        $warnaKg = $warnaActivities->sum('kg');
+        $warnaRoll = $warnaActivities->sum('roll');
+
+        // Total Output adalah gabungan unik dari Rajut dan Warna
+        $todayProduction = $rajutKg + $warnaKg;
+
+        // Hitung total KG dan Roll untuk order yang berstatus finished hari ini
+        $finishedOrders = \App\Models\MarketingOrder::whereDate('created_at', $targetDateString)
+            ->where('status', 'finished')
+            ->get();
+
+        $finishedKg = 0;
+        $finishedRoll = 0;
+        foreach ($finishedOrders as $fo) {
+            $latestAct = \App\Models\ProductionActivity::where('marketing_order_id', $fo->id)
+                ->whereNull('deleted_at')
+                ->latest('id')
+                ->first();
+            if ($latestAct) {
+                $finishedKg += $latestAct->kg;
+                $finishedRoll += $latestAct->roll;
+            } else {
+                $finishedKg += $fo->kg_target;
+                $finishedRoll += $fo->roll_target;
+            }
+        }
 
         return [
             'operators'       => $operators,
@@ -66,13 +115,15 @@ new class extends Component
             'maxCapacity'     => $maxCapacity,
             'isToday'         => $isToday,
             'currentTime'     => \Carbon\Carbon::now()->format('H:i:s'),
-            'todayProduction' => (clone $query)->sum('kg'),
+            'todayProduction' => $todayProduction,
             
             'summary' => [
-                'rajut_kg'   => (clone $query)->where('division_name', 'KNITTING')->sum('kg'),
-                'rajut_roll' => (clone $query)->where('division_name', 'KNITTING')->sum('roll'),
-                'warna_kg'   => (clone $query)->whereIn('division_name', ['DYEING', 'FINISHING', 'STENTER'])->sum('kg'),
-                'warna_roll' => (clone $query)->whereIn('division_name', ['DYEING', 'FINISHING', 'STENTER'])->sum('roll'),
+                'rajut_kg'   => $rajutKg,
+                'rajut_roll' => $rajutRoll,
+                'warna_kg'   => $warnaKg,
+                'warna_roll' => $warnaRoll,
+                'finished_kg' => $finishedKg,
+                'finished_roll' => $finishedRoll,
                 // Data Monitoring Marketing
                 'marketing_mo' => $marketingOrderQuery->count(),
                 'marketing_kg' => $marketingOrderQuery->sum('kg_target'),
@@ -80,10 +131,68 @@ new class extends Component
 
             'latestActivities' => (clone $query)->with(['marketingOrder', 'user'])->latest()->take(10)->get(),
 
-            'divisionStats' => \App\Models\Division::whereNotIn('name', ['ADMIN', 'MARKETING', 'IT']) 
-                ->withCount(['productionActivities' => function($q) use ($targetDateString) {
-                    $q->whereDate('created_at', $targetDateString);
-                }])->get(),
+            'divisionStats' => collect([
+                [
+                    'name'  => 'KNITTING',
+                    'count' => \App\Models\MarketingOrder::whereDate('created_at', $targetDateString)
+                        ->where('status', 'knitting')
+                        ->when($this->search, function($q) {
+                            $q->where(function($sub) {
+                                $sub->where('sap_no', 'like', '%'.$this->search.'%')
+                                   ->orWhere('art_no', 'like', '%'.$this->search.'%')
+                                   ->orWhere('warna', 'like', '%'.$this->search.'%');
+                            });
+                        })
+                        ->count(),
+                    'color' => 'bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.5)]',
+                    'label' => 'Orders',
+                ],
+                [
+                    'name'  => 'DYEING',
+                    'count' => \App\Models\MarketingOrder::whereDate('created_at', $targetDateString)
+                        ->whereIn('status', ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece', 'finishing'])
+                        ->when($this->search, function($q) {
+                            $q->where(function($sub) {
+                                $sub->where('sap_no', 'like', '%'.$this->search.'%')
+                                   ->orWhere('art_no', 'like', '%'.$this->search.'%')
+                                   ->orWhere('warna', 'like', '%'.$this->search.'%');
+                            });
+                        })
+                        ->count(),
+                    'color' => 'bg-indigo-600 shadow-[0_0_20px_rgba(79,70,229,0.5)]',
+                    'label' => 'Orders',
+                ],
+                [
+                    'name'  => 'PENGUJIAN',
+                    'count' => \App\Models\MarketingOrder::whereDate('created_at', $targetDateString)
+                        ->where('status', 'pengujian')
+                        ->when($this->search, function($q) {
+                            $q->where(function($sub) {
+                                $sub->where('sap_no', 'like', '%'.$this->search.'%')
+                                   ->orWhere('art_no', 'like', '%'.$this->search.'%')
+                                   ->orWhere('warna', 'like', '%'.$this->search.'%');
+                            });
+                        })
+                        ->count(),
+                    'color' => 'bg-amber-600 shadow-[0_0_20px_rgba(217,119,6,0.5)]',
+                    'label' => 'Orders',
+                ],
+                [
+                    'name'  => 'QE',
+                    'count' => \App\Models\MarketingOrder::whereDate('created_at', $targetDateString)
+                        ->where('status', 'qe')
+                        ->when($this->search, function($q) {
+                            $q->where(function($sub) {
+                                $sub->where('sap_no', 'like', '%'.$this->search.'%')
+                                   ->orWhere('art_no', 'like', '%'.$this->search.'%')
+                                   ->orWhere('warna', 'like', '%'.$this->search.'%');
+                            });
+                        })
+                        ->count(),
+                    'color' => 'bg-cyan-600 shadow-[0_0_20px_rgba(8,145,178,0.5)]',
+                    'label' => 'Orders',
+                ],
+            ])->map(fn($item) => (object)$item),
         ];
     }
 };
@@ -119,8 +228,8 @@ new class extends Component
             </div>
         </div>
 
-        {{-- QUICK SUMMARY HEADER (3 COLUMNS - SIDE BY SIDE ON MOBILE) --}}
-        <div class="grid grid-cols-3 gap-3 md:gap-6 mb-8">
+        {{-- QUICK SUMMARY HEADER (4 COLUMNS - RESPONSIVE) --}}
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8">
             {{-- Marketing --}}
             <div class="mkt-surface border border-brand/20 p-3 md:p-5 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1 group hover:bg-brand-950/10 transition-all shadow-md">
                 <div>
@@ -168,6 +277,22 @@ new class extends Component
                     <span class="text-[7px] sm:text-[9px] font-bold text-slate-500 uppercase italic leading-none">Rolls</span>
                 </div>
             </div>
+
+            {{-- Finished --}}
+            <div class="mkt-surface border border-emerald-600/20 p-3 md:p-5 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1 group hover:bg-emerald-950/10 transition-all shadow-sm">
+                <div>
+                    <p class="text-[7px] sm:text-[9px] md:text-[10px] font-black text-emerald-500 uppercase tracking-wider md:tracking-[0.2em] mb-0.5 md:mb-1 italic">FINISHED</p>
+                    <h4 class="text-sm sm:text-xl md:text-3xl font-black italic tracking-tighter mkt-text leading-none">
+                        {{ (float)$summary['finished_kg'] }}<span class="text-[7px] sm:text-[9px] md:text-xs mkt-text-muted uppercase ml-0.5">KG</span>
+                    </h4>
+                </div>
+                <div class="lg:text-right mt-1 lg:mt-0 flex items-baseline lg:block gap-1">
+                    <span class="text-xs sm:text-lg md:text-2xl font-black italic text-slate-700 dark:text-slate-200 group-hover:text-emerald-500 transition-colors leading-none">
+                        {{ number_format($summary['finished_roll']) }}
+                    </span>
+                    <span class="text-[7px] sm:text-[9px] font-bold text-slate-500 uppercase italic leading-none">Rolls</span>
+                </div>
+            </div>
         </div>
 
         {{-- WIDGETS STATISTIK (2-COLUMN GRID ON MOBILE FOR COMPACTNESS) --}}
@@ -196,10 +321,10 @@ new class extends Component
             <div class="mkt-surface p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[2.5rem] border mkt-border shadow-lg relative overflow-hidden">
                 <p class="text-[8px] md:text-[10px] font-black text-slate-500 uppercase mb-1 md:mb-3 italic tracking-wider md:tracking-widest">{{ $stat->name }}</p>
                 <div class="flex items-baseline gap-1 md:gap-2">
-                    <h3 class="text-lg sm:text-2xl md:text-4xl font-black italic tracking-tighter mkt-text">{{ $stat->production_activities_count }}</h3>
-                    <span class="text-[8px] md:text-xs font-bold text-brand uppercase italic">Units</span>
+                    <h3 class="text-lg sm:text-2xl md:text-4xl font-black italic tracking-tighter mkt-text">{{ $stat->count }}</h3>
+                    <span class="text-[8px] md:text-xs font-bold text-brand uppercase italic">{{ $stat->label }}</span>
                 </div>
-                <div class="absolute left-0 top-0 w-1 h-full bg-brand shadow-[0_0_20px_rgba(37,99,235,0.5)]"></div>
+                <div class="absolute left-0 top-0 w-1 h-full {{ $stat->color }}"></div>
             </div>
             @endforeach
         </div>

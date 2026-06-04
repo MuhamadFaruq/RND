@@ -62,7 +62,7 @@
                         <div class="flex justify-end gap-3 mt-1.5 pt-2 border-t mkt-border">
                             @if(auth()->user()->role === 'super-admin' && auth()->id() !== $user->id)
                                 <a href="{{ route('admin.impersonate', $user->id) }}" 
-                                class="px-3 py-2 bg-amber-500/10 text-amber-600 dark:text-amber-500 rounded-xl border border-amber-500/20 hover:bg-amber-500 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest shadow-sm">
+                                class="px-3 py-2 bg-amber-500/10 text-amber-600 dark:text-amber-500 rounded-xl border border-amber-500/20 hover:bg-amber-500 hover:text-white dark:hover:text-white transition-all text-[8px] font-black uppercase tracking-widest shadow-sm">
                                     Masuk
                                 </a>
                             @endif
@@ -131,7 +131,7 @@
                                 <div class="flex gap-4 justify-end items-center">
                                     @if(auth()->user()->role === 'super-admin' && auth()->id() !== $user->id)
                                         <a href="{{ route('admin.impersonate', $user->id) }}" 
-                                        class="px-4 py-2.5 bg-amber-500/10 text-amber-600 dark:text-amber-500 rounded-2xl border border-amber-500/20 hover:bg-amber-500 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest shadow-sm">
+                                        class="px-4 py-2.5 bg-amber-500/10 text-amber-600 dark:text-amber-500 rounded-2xl border border-amber-500/20 hover:bg-amber-500 hover:text-white dark:hover:text-white transition-all text-[9px] font-black uppercase tracking-widest shadow-sm">
                                             Masuk
                                         </a>
                                     @endif

@@ -165,6 +165,11 @@ class SingleOperatorForm extends Component
         }
     }
 
+    public function goBack()
+    {
+        return redirect()->route('operator.logbook');
+    }
+
     protected function initializeFormFields(): void
     {
         $this->dyeing_tanggal    = now()->format('Y-m-d');
@@ -356,9 +361,10 @@ class SingleOperatorForm extends Component
     {
         if (!$this->order) return;
 
-        // Otorisasi: Hanya super-admin atau role 'stenter' (yang mengelola 6 stenter-path) yang boleh mengubah alur finishing
+        // Otorisasi: Hanya super-admin atau role operator dalam pipeline yang boleh mengubah alur finishing
         $user = auth()->user();
-        if (!$user || (!$user->isSuperAdmin() && strtolower($user->role) !== 'stenter')) {
+        $allowedRoles = ['stenter', 'dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'tumbler', 'fleece'];
+        if (!$user || (!$user->isSuperAdmin() && !in_array(strtolower($user->role), $allowedRoles))) {
             $this->dispatch('show-toast', message: "Akses Ditolak: Anda tidak memiliki wewenang untuk mengubah alur proses finishing.", type: 'error');
             return;
         }
@@ -595,11 +601,6 @@ class SingleOperatorForm extends Component
             return;
         }
 
-        if (in_array($divisionKey, $this->savedDivisions)) {
-            $this->dispatch('show-toast', message: "Divisi {$divisionKey} sudah tersimpan.", type: 'warning');
-            return;
-        }
-
         $this->validate($this->rulesFor($divisionKey));
 
         $service = app(\App\Services\ProductionService::class);
@@ -617,7 +618,9 @@ class SingleOperatorForm extends Component
             default        => null,
         };
 
-        $this->savedDivisions[] = $divisionKey;
+        if (!in_array($divisionKey, $this->savedDivisions)) {
+            $this->savedDivisions[] = $divisionKey;
+        }
         $this->dispatch('show-toast', message: "Data {$divisionKey} berhasil disimpan!", type: 'success');
 
         if ($this->currentStepIndex < count($this->activeSteps) - 1) {
@@ -812,6 +815,14 @@ class SingleOperatorForm extends Component
         ]);
     }
 
+    public function determineShift(): int
+    {
+        $hour = (int) date('H');
+        if ($hour >= 7 && $hour < 15) return 1;
+        if ($hour >= 15 && $hour < 23) return 2;
+        return 3;
+    }
+
     protected function authorizeDivisionAccess(string $divisionKey): bool
     {
         $user = auth()->user();
@@ -824,12 +835,8 @@ class SingleOperatorForm extends Component
         }
 
         $userRole = strtolower($user->role);
-        $stenterPath = ['stenter', 'compactor', 'heat-setting', 'relax-dryer', 'tumbler', 'fleece'];
+        $allowedRoles = ['stenter', 'dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'tumbler', 'fleece'];
 
-        if ($userRole === 'stenter' && in_array($divisionKey, $stenterPath)) {
-            return true;
-        }
-
-        return $userRole === $divisionKey;
+        return in_array($userRole, $allowedRoles);
     }
 }

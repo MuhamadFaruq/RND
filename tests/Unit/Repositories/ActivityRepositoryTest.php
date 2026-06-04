@@ -70,4 +70,38 @@ class ActivityRepositoryTest extends TestCase
         $history = $this->repository->getOperatorHistory($user->id);
         $this->assertEquals(2, $history->total());
     }
+
+    public function test_get_operator_history_by_role_includes_imported_logs()
+    {
+        $user = User::factory()->create(['role' => 'knitting']);
+        $adminUser = User::factory()->create(['role' => 'super-admin']);
+        $order1 = MarketingOrder::factory()->create();
+        $order2 = MarketingOrder::factory()->create();
+
+        // 1. Log manual milik user
+        ProductionActivity::factory()->create([
+            'operator_id' => $user->id,
+            'marketing_order_id' => $order1->id,
+            'division_name' => 'knitting'
+        ]);
+
+        // 2. Log impor milik admin untuk divisi knitting
+        ProductionActivity::factory()->create([
+            'operator_id' => $adminUser->id,
+            'marketing_order_id' => $order2->id,
+            'division_name' => 'knitting'
+        ]);
+
+        // 3. Log impor milik admin untuk divisi lain (tidak boleh muncul)
+        ProductionActivity::factory()->create([
+            'operator_id' => $adminUser->id,
+            'marketing_order_id' => $order2->id,
+            'division_name' => 'dyeing'
+        ]);
+
+        $history = $this->repository->getOperatorHistory($user->id, 'knitting');
+        
+        // Seharusnya mengembalikan 2 log (1 manual knitting + 1 impor knitting)
+        $this->assertEquals(2, $history->total());
+    }
 }

@@ -48,36 +48,57 @@ class ProductionService
             $order = MarketingOrder::findOrFail($orderId);
             $nextStatus = $this->getNextRequiredStatus($order, $divisionName);
 
+            $existing = $this->activityRepo->findForDivision($orderId, $divisionName);
+
             $kg = $extraData['kg'] ?? ($technicalData['kg'] ?? null);
             $roll = $extraData['roll'] ?? ($technicalData['roll'] ?? null);
 
-            if ($kg === null || $roll === null) {
-                $prevLog = ProductionActivity::where('marketing_order_id', $orderId)->latest('id')->first();
+            if ($kg === null || $roll === null || $kg == 0 || $roll == 0) {
+                $prevLog = ProductionActivity::where('marketing_order_id', $orderId)
+                    ->whereNull('deleted_at')
+                    ->when($existing, function ($q) use ($existing) {
+                        $q->where('id', '!=', $existing->id);
+                    })
+                    ->latest('id')
+                    ->first();
                 if ($prevLog) {
-                    $kg = $kg ?? $prevLog->kg;
-                    $roll = $roll ?? $prevLog->roll;
+                    $kg = $kg ?: $prevLog->kg;
+                    $roll = $roll ?: $prevLog->roll;
                 }
             }
+
+            if ($kg === null || $roll === null || $kg == 0 || $roll == 0) {
+                $kg = $kg ?: $order->kg_target;
+                $roll = $roll ?: $order->roll_target;
+            }
+
+            $operatorName = $technicalData['operator']
+                ?? $technicalData['nama_input']
+                ?? $technicalData['operator_manual_name']
+                ?? $technicalData['raising']['operator']
+                ?? $technicalData['brushing']['operator']
+                ?? $technicalData['shearing']['operator']
+                ?? null;
 
             $activityData = [
                 'marketing_order_id' => $orderId,
                 'operator_id'        => $userId,
-                'operator_name'      => $technicalData['nama_input'] ?? ($technicalData['operator_manual_name'] ?? null),
+                'operator_name'      => $operatorName,
                 'division_name'      => $divisionName,
                 'kg'                 => $kg,
                 'roll'               => $roll,
                 'technical_data'     => array_merge($technicalData, $extraData),
             ];
 
-            if ($divisionName === 'knitting') {
-                $existing = $this->activityRepo->findForDivision($orderId, 'knitting');
-                if ($existing) {
-                    $existing->update($activityData);
-                } else {
-                    $this->activityRepo->log($activityData);
-                }
+            $existing = $this->activityRepo->findForDivision($orderId, $divisionName);
+            if ($existing) {
+                $existing->update($activityData);
+                $action = 'EDIT_PRODUCTION_DATA';
+                $description = "Update data produksi divisi {$divisionName}";
             } else {
                 $this->activityRepo->log($activityData);
+                $action = 'CREATE_PRODUCTION_LOG';
+                $description = "Input data produksi divisi {$divisionName}";
             }
 
             if ($nextStatus) {
@@ -87,11 +108,11 @@ class ProductionService
             // ADD AUDIT LOG
             ActivityLog::create([
                 'user_id'     => $userId,
-                'action'      => 'CREATE_PRODUCTION_LOG',
+                'action'      => $action,
                 'division'    => $divisionName,
                 'art_no'      => $order->art_no,
                 'sap_no'      => $order->sap_no,
-                'description' => "Input data produksi divisi {$divisionName}",
+                'description' => $description,
             ]);
         });
     }

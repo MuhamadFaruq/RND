@@ -35,22 +35,7 @@ new class extends Component
     public function with()
     {
         $maxCapacity = Setting::where('key', 'max_capacity')->value('value') ?? 1000;
-        $targetDate = Carbon::parse($this->selectedDate);
-
-        // Hitung total input untuk logika Heatmap
         $totalInput = collect($this->hourlyActivity)->sum();
-
-        // Logika Chart Data harian
-        $productionByHour = ProductionActivity::whereDate('created_at', $targetDate)
-            ->selectRaw('HOUR(created_at) as hour, SUM(kg) as total_kg')
-            ->groupBy('hour')
-            ->pluck('total_kg', 'hour')
-            ->toArray();
-
-        $this->chartData = [];
-        for ($i = 0; $i < 24; $i++) { 
-            $this->chartData[] = (float)($productionByHour[$i] ?? 0); 
-        }
 
         return [
             'chartData'         => $this->chartData,
@@ -74,28 +59,67 @@ new class extends Component
         }
         $this->dispatch('chart-updated');
 
-        // 2. Heatmap mengikuti $targetDate (bukan hari ini saja)
-        $this->hourlyActivity = ProductionActivity::selectRaw('HOUR(created_at) as hour, SUM(kg) as total_kg')
-            ->whereDate('created_at', $targetDate)
-            ->when($this->selectedDivision !== 'all', fn($q) => $q->where('division_name', $this->selectedDivision))
-            ->groupByRaw('HOUR(created_at)')
-            ->pluck('total_kg', 'hour')
-            ->all();
+        // 2. Heatmap & Hourly Chart (Unik per order per alur)
+        $activitiesQuery = ProductionActivity::whereDate('created_at', $targetDate->format('Y-m-d'));
+        if ($this->selectedDivision !== 'all') {
+            $activitiesQuery->where('division_name', $this->selectedDivision);
+        }
+        $activities = $activitiesQuery->get();
 
-        // 3. Tren Produksi disesuaikan agar berakhir di $targetDate
+        $knitting = $activities->filter(fn($act) => strtoupper($act->division_name) === 'KNITTING')
+            ->groupBy('marketing_order_id')->map(fn($group) => $group->sortByDesc('created_at')->first());
+
+        $warnaDivs = ['DYEING', 'RELAX-DRYER', 'COMPACTOR', 'HEAT-SETTING', 'STENTER', 'TUMBLER', 'FLEECE', 'FINISHING'];
+        $warna = $activities->filter(fn($act) => in_array(strtoupper($act->division_name), $warnaDivs))
+            ->groupBy('marketing_order_id')->map(fn($group) => $group->sortByDesc('created_at')->first());
+
+        $others = $activities->filter(fn($act) => 
+            strtoupper($act->division_name) !== 'KNITTING' && 
+            !in_array(strtoupper($act->division_name), $warnaDivs)
+        )->groupBy('marketing_order_id')->map(fn($group) => $group->sortByDesc('created_at')->first());
+
+        $uniqueActivities = $knitting->concat($warna)->concat($others);
+
+        $this->hourlyActivity = array_fill(0, 24, 0);
+        foreach ($uniqueActivities as $act) {
+            $hour = (int)$act->created_at->format('H');
+            $this->hourlyActivity[$hour] += $act->kg;
+        }
+
+        $this->chartData = [];
+        for ($i = 0; $i < 24; $i++) { 
+            $this->chartData[] = (float)($this->hourlyActivity[$i] ?? 0); 
+        }
+
+        // 3. Tren Produksi disesuaikan agar berakhir di $targetDate (Unik per order per alur)
         $this->trends = collect(range($days - 1, 0))->map(function($i) use ($targetDate) {
-            $date = $targetDate->copy()->subDays($i); // Mundur dari tanggal terpilih
+            $date = $targetDate->copy()->subDays($i); 
             $date->settings(['locale' => 'id']);
-            $query = ProductionActivity::whereDate('created_at', $date->format('Y-m-d'));
             
+            $query = ProductionActivity::whereDate('created_at', $date->format('Y-m-d'));
             if ($this->selectedDivision !== 'all') {
                 $query->where('division_name', $this->selectedDivision);
             }
+            $dayActivities = $query->get();
+
+            $knitting = $dayActivities->filter(fn($act) => strtoupper($act->division_name) === 'KNITTING')
+                ->groupBy('marketing_order_id')->map(fn($group) => $group->sortByDesc('created_at')->first());
+
+            $warnaDivs = ['DYEING', 'RELAX-DRYER', 'COMPACTOR', 'HEAT-SETTING', 'STENTER', 'TUMBLER', 'FLEECE', 'FINISHING'];
+            $warna = $dayActivities->filter(fn($act) => in_array(strtoupper($act->division_name), $warnaDivs))
+                ->groupBy('marketing_order_id')->map(fn($group) => $group->sortByDesc('created_at')->first());
+
+            $others = $dayActivities->filter(fn($act) => 
+                strtoupper($act->division_name) !== 'KNITTING' && 
+                !in_array(strtoupper($act->division_name), $warnaDivs)
+            )->groupBy('marketing_order_id')->map(fn($group) => $group->sortByDesc('created_at')->first());
+
+            $dayTotal = $knitting->sum('kg') + $warna->sum('kg') + $others->sum('kg');
 
             return [
                 'day'   => $date->format('d/m'),
                 'label' => $date->translatedFormat('D'), 
-                'total' => (float) ($query->sum('kg') ?: 0)
+                'total' => (float)$dayTotal
             ];
         })->all();
     }

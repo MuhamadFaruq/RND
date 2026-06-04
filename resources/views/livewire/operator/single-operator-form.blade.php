@@ -22,7 +22,7 @@
                                 class="bg-brand-600 px-6 py-3 rounded-xl text-[10px] font-black uppercase text-white hover:bg-brand-500 hover:scale-105 transition-all shadow-[0_10px_30px_rgba(237, 28, 36,0.3)] flex items-center gap-2">
                                 DETAIL ORDER
                             </button>
-                            <button wire:click="$set('order', null)"
+                            <button wire:click="goBack"
                                 class="bg-white dark:bg-slate-800 px-6 py-3 rounded-xl text-[9px] font-black uppercase text-slate-400 hover:text-white transition-all border border-white/10 shadow-sm flex items-center gap-2">
                                 KEMBALI
                             </button>
@@ -2043,7 +2043,7 @@
                         <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             {{-- NEW HIGH-FIDELITY HEADER CARD --}}
                             @php
-                                $operatorActual = !empty($history['technical_data']['nama_input']) ? $history['technical_data']['nama_input'] : ($history['operator']['name'] ?? 'UNKNOWN');
+                                $operatorActual = $history['operator_name'] ?? $history['technical_data']['operator'] ?? $history['technical_data']['nama_input'] ?? ($history['operator']['name'] ?? 'UNKNOWN');
                             @endphp
                             <div class="flex items-center justify-between p-6 mkt-surface-alt border mkt-border rounded-3xl group hover:border-emerald-500/50 transition-all duration-500">
                                 <div class="flex items-center gap-5">

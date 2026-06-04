@@ -270,7 +270,7 @@ new class extends Component {
                                 $isDone = ($step['div'] === 'marketing') ? true : ($log ? true : false);
                                 $isCurrent = $trackingData->status === $step['div'];
                                 $techData = $log ? (is_array($log->technical_data) ? $log->technical_data : json_decode($log->technical_data, true)) : [];
-                                $operatorActual = $techData['nama_input'] ?? $techData['operator'] ?? $log->operator->name ?? 'UNKNOWN';
+                                $operatorActual = $log->operator_name ?? $techData['operator'] ?? $techData['nama_input'] ?? ($log->operator->name ?? 'UNKNOWN');
                             @endphp
                             
                             <div class="relative pl-12 sm:pl-16 pb-8 sm:pb-12 last:pb-0 group">
@@ -511,7 +511,7 @@ new class extends Component {
                                         @php 
                                             $log = $trackingLogs->where('division_name', $expandedLog)->first();
                                             $techData = $log ? (is_array($log->technical_data) ? $log->technical_data : json_decode($log->technical_data, true)) : [];
-                                            $operatorActual = $techData['nama_input'] ?? $techData['operator'] ?? $log->operator->name ?? 'UNKNOWN';
+                                            $operatorActual = $log->operator_name ?? $techData['operator'] ?? $techData['nama_input'] ?? ($log->operator->name ?? 'UNKNOWN');
                                         @endphp
                                         @if($log)
                                             <div class="space-y-8">

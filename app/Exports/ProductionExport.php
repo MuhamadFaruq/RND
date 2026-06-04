@@ -84,6 +84,60 @@ class ProductionExport implements FromCollection, WithHeadings, ShouldAutoSize, 
     public function map($activity): array
     {
         $this->rowNumber++;
+        $tech = is_string($activity->technical_data) ? json_decode($activity->technical_data, true) : ($activity->technical_data ?? []);
+
+        // Lebar
+        $actualLebar = null;
+        if (isset($tech['lebar']) && $tech['lebar'] !== '') {
+            $actualLebar = $tech['lebar'];
+        } elseif (isset($tech['hasil_lebar']) && $tech['hasil_lebar'] !== '') {
+            $actualLebar = $tech['hasil_lebar'];
+        } elseif (isset($tech['finishing']['lebar']) && $tech['finishing']['lebar'] !== '') {
+            $actualLebar = $tech['finishing']['lebar'];
+        } elseif (isset($tech['finishing']['hasil_lebar']) && $tech['finishing']['hasil_lebar'] !== '') {
+            $actualLebar = $tech['finishing']['hasil_lebar'];
+        } elseif (isset($tech['drying']['lebar']) && $tech['drying']['lebar'] !== '') {
+            $actualLebar = $tech['drying']['lebar'];
+        } elseif (isset($tech['preset']['lebar']) && $tech['preset']['lebar'] !== '') {
+            $actualLebar = $tech['preset']['lebar'];
+        }
+
+        // Gramasi
+        $actualGramasi = null;
+        if (isset($tech['gramasi']) && $tech['gramasi'] !== '') {
+            $actualGramasi = $tech['gramasi'];
+        } elseif (isset($tech['hasil_gramasi']) && $tech['hasil_gramasi'] !== '') {
+            $actualGramasi = $tech['hasil_gramasi'];
+        } elseif (isset($tech['finishing']['gramasi']) && $tech['finishing']['gramasi'] !== '') {
+            $actualGramasi = $tech['finishing']['gramasi'];
+        } elseif (isset($tech['finishing']['hasil_gramasi']) && $tech['finishing']['hasil_gramasi'] !== '') {
+            $actualGramasi = $tech['finishing']['hasil_gramasi'];
+        } elseif (isset($tech['drying']['gramasi']) && $tech['drying']['gramasi'] !== '') {
+            $actualGramasi = $tech['drying']['gramasi'];
+        } elseif (isset($tech['preset']['gramasi']) && $tech['preset']['gramasi'] !== '') {
+            $actualGramasi = $tech['preset']['gramasi'];
+        }
+
+        // Warna
+        $actualWarna = null;
+        if (isset($tech['warna']) && $tech['warna'] !== '') {
+            $actualWarna = $tech['warna'];
+        }
+
+        // Handfeel
+        $actualHandfeel = null;
+        if (isset($tech['handfeel']) && $tech['handfeel'] !== '') {
+            $actualHandfeel = $tech['handfeel'];
+        }
+
+        // Treatment
+        $actualTreatment = null;
+        if (isset($tech['treatment']) && $tech['treatment'] !== '') {
+            $actualTreatment = $tech['treatment'];
+        } elseif (isset($tech['chemical']) && $tech['chemical'] !== '') {
+            $actualTreatment = $tech['chemical'];
+        }
+
         return [
             $this->rowNumber,
             $activity->marketingOrder->art_no ?? '-',
@@ -98,12 +152,12 @@ class ProductionExport implements FromCollection, WithHeadings, ShouldAutoSize, 
             $activity->marketingOrder->material ?? '-',
             $activity->marketingOrder->benang ?? '-', 
             $activity->marketingOrder->kelompok_kain ?? '-',
-            $activity->marketingOrder->target_lebar ?? '-',
+            $actualLebar ?? $activity->marketingOrder->target_lebar ?? '-',
             $activity->marketingOrder->belah_bulat ?? '-',
-            $activity->marketingOrder->target_gramasi ?? '-',
-            $activity->marketingOrder->warna ?? '-',
-            $activity->marketingOrder->handfeel ?? '-',
-            $activity->marketingOrder->treatment_khusus ?? '-',
+            $actualGramasi ?? $activity->marketingOrder->target_gramasi ?? '-',
+            $actualWarna ?? $activity->marketingOrder->warna ?? '-',
+            $actualHandfeel ?? $activity->marketingOrder->handfeel ?? '-',
+            $actualTreatment ?? $activity->marketingOrder->treatment_khusus ?? '-',
             $activity->roll ?? 0,
             $activity->kg ?? 0,
             $activity->marketingOrder->keterangan_artikel ?? '-',

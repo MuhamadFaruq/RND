@@ -105,22 +105,54 @@ new class extends Component
                 $adminName = $impersonator ? $impersonator->name : 'Super Admin';
             }
 
-            // 1. Simpan ke Riwayat Penghapusan (Audit Trail)
-            \App\Models\ActivityLog::create([
-                'user_id' => $isImpersonating ? session('impersonator_id') : auth()->id(),
-                'action' => 'DELETE_PRODUCTION_LOG',
-                'division' => $role,
-                'art_no' => $order->art_no,
-                'details' => "Menghapus data: {$log->kg} KG / {$log->roll} Roll. Alasan: Dihapus oleh Admin " . $adminName,
-            ]);
+            $dyeingFinishingDivisions = ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece'];
 
-            // 2. Kembalikan Status Order ke Antrean Divisi Saat Ini
-            if ($order) {
-                $order->update(['status' => $role]);
+            // 1. Simpan ke Riwayat Penghapusan (Audit Trail) & Hapus Data
+            if (in_array($log->division_name, $dyeingFinishingDivisions)) {
+                // Catat audit log untuk penghapusan massal
+                \App\Models\ActivityLog::create([
+                    'user_id' => $isImpersonating ? session('impersonator_id') : auth()->id(),
+                    'action' => 'DELETE_PRODUCTION_LOG',
+                    'division' => $role,
+                    'art_no' => $order->art_no,
+                    'details' => "Menghapus seluruh log alur Dyeing & Finishing untuk Artikel #{$order->art_no}. Alasan: Dihapus oleh Admin " . $adminName,
+                ]);
+
+                // Hapus semua log alur Dyeing & Finishing untuk pesanan ini
+                ProductionActivity::where('marketing_order_id', $log->marketing_order_id)
+                    ->whereIn('division_name', $dyeingFinishingDivisions)
+                    ->delete();
+
+                // Kembalikan status ke 'dyeing'
+                if ($order) {
+                    $order->update([
+                        'status' => 'dyeing',
+                        'processing_by' => null,
+                        'processing_at' => null,
+                    ]);
+                }
+            } else {
+                // Catat audit log untuk penghapusan satu divisi (knitting, dll)
+                \App\Models\ActivityLog::create([
+                    'user_id' => $isImpersonating ? session('impersonator_id') : auth()->id(),
+                    'action' => 'DELETE_PRODUCTION_LOG',
+                    'division' => $role,
+                    'art_no' => $order->art_no,
+                    'details' => "Menghapus data divisi {$log->division_name}: {$log->kg} KG / {$log->roll} Roll. Alasan: Dihapus oleh Admin " . $adminName,
+                ]);
+
+                // Hapus log
+                $log->delete();
+
+                // Kembalikan status ke divisi log tersebut
+                if ($order) {
+                    $order->update([
+                        'status' => $log->division_name,
+                        'processing_by' => null,
+                        'processing_at' => null,
+                    ]);
+                }
             }
-
-            // 3. Hapus Data
-            $log->delete();
 
             session()->flash('message', "Log Artikel #{$order->art_no} berhasil dihapus & dicatat di sistem.");
             
@@ -371,7 +403,7 @@ new class extends Component
             'totalKnitting' => $totalKnitting,
             'totalDone' => ProductionActivity::where('operator_id', $user->id)->count(),
             'workQueue' => $workQueue,
-            'activities' => $activityRepo->getOperatorHistory($user->id, $this->search),
+            'activities' => $activityRepo->getOperatorHistory($user->id, $user->role, $this->search),
             'recentNotes' => ProductionNote::with('user')->latest()->take(3)->get(),
             'allNotes' => ProductionNote::with('user')->latest()->paginate(10),
             'suggestions' => empty($this->search) ? [] : MarketingOrder::where('art_no', 'like', '%'.$this->search.'%')->take(5)->get(),
@@ -749,7 +781,7 @@ new class extends Component
                                         <p class="text-[9px] text-brand-600 font-bold mt-1 uppercase italic tracking-widest">ARTIKEL NO: {{ $item->marketingOrder->art_no ?? 'N/A' }}</p>
                                         {{-- Info Operator --}}
                                         <p class="text-[8px] text-slate-400 mt-1 uppercase">
-                                            PIC: {{ $item->technical_data['nama_input'] ?? 'OPERATOR' }}
+                                            PIC: {{ $item->operator_name ?? $item->technical_data['operator'] ?? $item->technical_data['nama_input'] ?? ($item->user->name ?? 'OPERATOR') }}
                                         </p>
                                     </div>
                                 </div>
@@ -1024,7 +1056,7 @@ new class extends Component
                                                     DIVISI: {{ strtoupper($history->division_name) }}
                                                 </span>
                                                 <h4 class="text-sm font-black mkt-text mt-2 uppercase italic tracking-tight">
-                                                    {{ $history->operator->name ?? $history->technical_data['operator_manual_name'] ?? 'Unknown Operator' }}
+                                                    {{ $history->operator_name ?? $history->technical_data['operator'] ?? $history->operator->name ?? $history->technical_data['operator_manual_name'] ?? 'Unknown Operator' }}
                                                 </h4>
                                             </div>
                                             <div class="text-right">
@@ -1188,7 +1220,7 @@ new class extends Component
                                              <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OPERATOR</p>
-                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $techData['operator'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $selectedLog->operator_name ?? $techData['operator'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TANGGAL</p>
@@ -1222,7 +1254,7 @@ new class extends Component
                                              <div class="grid grid-cols-2 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OPERATOR</p>
-                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $techData['operator'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $selectedLog->operator_name ?? $techData['operator'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TANGGAL</p>
@@ -1283,7 +1315,7 @@ new class extends Component
                                              <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OPERATOR</p>
-                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $techData['operator'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $selectedLog->operator_name ?? $techData['operator'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TANGGAL</p>
@@ -1359,7 +1391,7 @@ new class extends Component
                                              <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OPERATOR</p>
-                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $techData['operator'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $selectedLog->operator_name ?? $techData['operator'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TANGGAL</p>
@@ -1428,7 +1460,7 @@ new class extends Component
                                              <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OPERATOR</p>
-                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $techData['operator'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $selectedLog->operator_name ?? $techData['operator'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">NO MESIN</p>
@@ -1585,7 +1617,7 @@ new class extends Component
                                              <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OPERATOR</p>
-                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $techData['operator'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase">{{ $selectedLog->operator_name ?? $techData['operator'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TANGGAL</p>
@@ -1718,7 +1750,7 @@ new class extends Component
                                              <div class="grid grid-cols-2 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OPERATOR PENGUJI</p>
-                                                     <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['operator'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase italic">{{ $selectedLog->operator_name ?? $techData['operator'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">TANGGAL UJI</p>
@@ -1770,7 +1802,7 @@ new class extends Component
                                              <div class="grid grid-cols-2 gap-6 mkt-surface border mkt-border p-6 rounded-2xl font-bold text-xs">
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">OPERATOR QE</p>
-                                                     <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['operator'] ?? '-' }}</p>
+                                                     <p class="text-[11px] font-black mkt-text uppercase italic">{{ $selectedLog->operator_name ?? $techData['operator'] ?? '-' }}</p>
                                                  </div>
                                                  <div>
                                                      <p class="text-[7px] text-slate-400 font-black uppercase mb-1">FABRIC NAME</p>

@@ -61,8 +61,12 @@ class OrderRepository
 
         if ($role === 'knitting') {
             $query->where('status', 'knitting');
-        } elseif (in_array($role, ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'finishing', 'stenter', 'tumbler', 'fleece'])) {
-            $query->whereIn('status', ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece']);
+        } elseif ($role === 'dyeing') {
+            $query->where('status', 'dyeing');
+        } elseif ($role === 'finishing') {
+            $query->whereIn('status', ['relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece']);
+        } elseif (in_array($role, ['relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece'])) {
+            $query->where('status', $role);
         } elseif ($role === 'pengujian') {
             $query->where('status', 'pengujian');
         } elseif ($role === 'qe') {

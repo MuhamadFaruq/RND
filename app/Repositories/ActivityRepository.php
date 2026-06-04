@@ -28,14 +28,35 @@ class ActivityRepository
     /**
      * Get production history for an operator.
      */
-    public function getOperatorHistory(int $userId, ?string $search = null): LengthAwarePaginator
+    public function getOperatorHistory(int $userId, ?string $role = null, ?string $search = null): LengthAwarePaginator
     {
+        $divisions = [];
+        if ($role === 'knitting') {
+            $divisions = ['knitting'];
+        } elseif (in_array($role, ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'finishing', 'stenter', 'tumbler', 'fleece'])) {
+            $divisions = ['dyeing', 'relax-dryer', 'compactor', 'heat-setting', 'stenter', 'tumbler', 'fleece'];
+        } elseif ($role === 'pengujian') {
+            $divisions = ['pengujian'];
+        } elseif ($role === 'qe') {
+            $divisions = ['qe'];
+        }
+
         return ProductionActivity::with('marketingOrder')
-            ->where('operator_id', $userId)
-            ->whereIn('id', function ($query) use ($userId) {
+            ->where(function ($query) use ($userId, $divisions) {
+                $query->where('operator_id', $userId)
+                      ->when(!empty($divisions), function ($q) use ($divisions) {
+                          $q->orWhereIn('division_name', $divisions);
+                      });
+            })
+            ->whereIn('id', function ($query) use ($userId, $divisions) {
                 $query->selectRaw('MAX(id)')
                       ->from('production_activities')
-                      ->where('operator_id', $userId)
+                      ->where(function ($q2) use ($userId, $divisions) {
+                          $q2->where('operator_id', $userId)
+                             ->when(!empty($divisions), function ($q) use ($divisions) {
+                                 $q->orWhereIn('division_name', $divisions);
+                             });
+                      })
                       ->whereNull('deleted_at')
                       ->groupBy('marketing_order_id');
             })

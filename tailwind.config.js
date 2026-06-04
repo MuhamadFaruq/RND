@@ -45,7 +45,7 @@ export default {
     },
     safelist: [
         {
-        pattern: /(bg|text|border)-(brand|amber|cyan|orange|rose|emerald|green|slate)-(50|100|200|400|500|600|700|800|900|950)/,
+        pattern: /(bg|text|border)-(brand|amber|cyan|orange|rose|emerald|green|slate|indigo)-(50|100|200|400|500|600|700|800|900|950)/,
         },
     ],
     plugins: [forms],

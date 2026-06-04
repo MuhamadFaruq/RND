@@ -613,7 +613,7 @@ new class extends Component {
                                             </div>
                                             @if($knitLog)
                                                 <div class="mt-3 sm:mt-6 pt-3 sm:pt-4 border-t mkt-border flex flex-col sm:flex-row sm:justify-between gap-1 text-[7px] sm:text-[8px] font-bold mkt-text-muted italic uppercase">
-                                                    <span class="truncate">OP: {{ $knitLog->operator->name ?? 'N/A' }}</span>
+                                                    <span class="truncate">OP: {{ $knitLog->operator_name ?? ($knitLog->operator->name ?? 'N/A') }}</span>
                                                     <span class="text-emerald-500 shrink-0">{{ $knitLog->created_at->format('H:i | d/m') }}</span>
                                                 </div>
                                             @endif
@@ -670,12 +670,12 @@ new class extends Component {
 
                                             @foreach($steps as $index => $step)
                                                 @php 
-                                                                                            $log = $trackingLogs->where('division_name', $step['div'])->first();
+                                                    $log = $trackingLogs->where('division_name', $step['div'])->first();
                                                     // Marketing is always "done" if we are here
                                                     $isDone = ($step['div'] === 'marketing') ? true : ($log ? true : false);
                                                     $isCurrent = $trackingData->status === $step['div'];
                                                     $techData = $log ? (is_array($log->technical_data) ? $log->technical_data : json_decode($log->technical_data, true)) : [];
-                                                    $operatorActual = $techData['nama_input'] ?? $techData['operator'] ?? $log->operator->name ?? 'UNKNOWN';
+                                                    $operatorActual = $log->operator_name ?? $techData['operator'] ?? $techData['nama_input'] ?? ($log->operator->name ?? 'UNKNOWN');
                                                 @endphp
 
                                                 <div class="relative pl-12 sm:pl-16 pb-8 sm:pb-12 last:pb-0 group">
@@ -706,7 +706,7 @@ new class extends Component {
                                                                 {{ $step['label'] }}
                                                             </p>
 
-                                                            @if($log && $log->operator)
+                                                            @if($log && ($log->operator || $log->operator_name))
                                                                 <div class="flex items-center gap-2 mt-2 sm:mt-3 mkt-surface-alt px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border mkt-border max-w-full">
                                                                     <div class="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0"></div>
                                                                     <p class="text-[7px] mkt-text-muted font-black uppercase tracking-wide truncate">
@@ -741,9 +741,6 @@ new class extends Component {
                                                 </div>
                                             @endforeach
                                         </div>
-
-                                        {{-- NESTED POPUP FOR LOG DETAIL --}}
-
 
                                         {{-- FINAL STATUS BADGE --}}
                                         <div class="mt-4 sm:mt-6 md:mt-10 p-4 sm:p-6 mkt-surface-alt rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border mkt-border text-center">
@@ -923,133 +920,133 @@ new class extends Component {
                         </div>
                       @else
                                                     @php 
-                                                                                                            $log = $trackingLogs->where('division_name', $expandedLog)->first();
+                                                        $log = $trackingLogs->where('division_name', $expandedLog)->first();
                                                         $techData = $log ? (is_array($log->technical_data) ? $log->technical_data : json_decode($log->technical_data, true)) : [];
-                                                        $operatorActual = $techData['nama_input'] ?? $techData['operator'] ?? $log->operator->name ?? 'UNKNOWN';
+                                                        $operatorActual = $log->operator_name ?? $techData['operator'] ?? $techData['nama_input'] ?? ($log->operator->name ?? 'UNKNOWN');
                                                     @endphp
                                                     @if($log)
-                                                                                                                    <div class="space-y-8">
-                                                                                                                        <div class="flex items-center justify-between p-6 mkt-surface-alt border mkt-border rounded-3xl group hover:border-emerald-500/50 transition-all duration-500">
-                                                                                                                            <div class="flex items-center gap-5">
-                                                                                                                                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                                                                                                                                    <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                                                                                                                </div>
-                                                                                                                                <div>
-                                                                                                                                    <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-1 italic">ACTUAL OPERATOR</p>
-                                                                                                                                    <p class="text-xl font-black mkt-text italic tracking-tighter">{{ strtoupper($operatorActual) }}</p>
-                                                                                                                                </div>
-                                                                                                                            </div>
-                                                                                                                            <div class="text-right">
-                                                                                                                                <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-1">MACHINE UNIT</p>
-                                                                                                                                <p class="text-3xl font-black mkt-text italic leading-none">{{ $log->machine_no ?? 'M-01' }}</p>
-                                                                                                                            </div>
-                                                                                                                        </div>
+                                                        <div class="space-y-8">
+                                                            <div class="flex items-center justify-between p-6 mkt-surface-alt border mkt-border rounded-3xl group hover:border-emerald-500/50 transition-all duration-500">
+                                                                <div class="flex items-center gap-5">
+                                                                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                                                                        <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                                                    </div>
+                                                                    <div>
+                                                                        <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-1 italic">ACTUAL OPERATOR</p>
+                                                                        <p class="text-xl font-black mkt-text italic tracking-tighter">{{ strtoupper($operatorActual) }}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="text-right">
+                                                                    <p class="text-[8px] mkt-text-muted font-black uppercase tracking-widest mb-1">MACHINE UNIT</p>
+                                                                    <p class="text-3xl font-black mkt-text italic leading-none">{{ $log->machine_no ?? 'M-01' }}</p>
+                                                                </div>
+                                                            </div>
 
-                                                                                                                        @if($expandedLog === 'knitting')
-                                                                                                                            {{-- HIGH FIDELITY LAYOUT FOR KNITTING (UNIFIED WITH MARKETING STYLE) --}}
-                                                                                                                            <div class="space-y-10 animate-in fade-in duration-700">
+                                                            @if($expandedLog === 'knitting')
+                                                                {{-- HIGH FIDELITY LAYOUT FOR KNITTING (UNIFIED WITH MARKETING STYLE) --}}
+                                                                <div class="space-y-10 animate-in fade-in duration-700">
 
-                                                                                                                                {{-- I. SPESIFIKASI MESIN --}}
-                                                                                                                                <div class="space-y-4">
-                                                                                                                                    <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">I. IDENTITAS & SPESIFIKASI MESIN</p>
-                                                                                                                                    <div class="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl">
-                                                                                                                                        <div class="col-span-2 border-r mkt-border pr-6">
-                                                                                                                                            <div class="grid grid-cols-2 gap-4">
-                                                                                                                                                <div>
-                                                                                                                                                    <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">LEGACY SAP ID</p>
-                                                                                                                                                    <p class="text-[11px] font-black mkt-text italic opacity-60">{{ $techData['sap_no'] ?? ($trackingData->sap_no ?? '-') }}</p>
-                                                                                                                                                </div>
-                                                                                                                                                <div>
-                                                                                                                                                    <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TGL PRODUKSI</p>
-                                                                                                                                                    <p class="text-[11px] font-black mkt-text">{{ !empty($techData['tgl_input']) ? date('d/m/Y', strtotime($techData['tgl_input'])) : $log->created_at->format('d/m/Y') }}</p>
-                                                                                                                                                </div>
-                                                                                                                                            </div>
-                                                                                                                                        </div>
-                                                                                                                                        <div>
-                                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">NO MESIN / TYPE</p>
-                                                                                                                                            <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['no_mesin'] ?? '-' }} / {{ $techData['type_mesin'] ?? '-' }}</p>
-                                                                                                                                        </div>
-                                                                                                                                        <div>
-                                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">GAUGE / INCH</p>
-                                                                                                                                            <p class="text-[11px] font-black mkt-text uppercase">{{ $techData['gauge_inch'] ?? '-' }}</p>
-                                                                                                                                        </div>
-                                                                                                                                        <div class="col-span-2">
-                                                                                                                                        </div>
-                                                                                                                                        <div>
-                                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">JML FEEDER</p>
-                                                                                                                                            <p class="text-[11px] font-black mkt-text uppercase mkt-text">{{ $techData['jml_feeder'] ?? '0' }} <span class="text-[8px] mkt-text-muted">FDR</span></p>
-                                                                                                                                        </div>
-                                                                                                                                        <div>
-                                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">JML JARUM</p>
-                                                                                                                                            <p class="text-[11px] font-black mkt-text uppercase mkt-text">{{ $techData['jml_jarum'] ?? '0' }} <span class="text-[8px] mkt-text-muted">JRM</span></p>
-                                                                                                                                        </div>
-                                                                                                                                    </div>
-                                                                                                                                </div>
+                                                                    {{-- I. SPESIFIKASI MESIN --}}
+                                                                    <div class="space-y-4">
+                                                                        <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">I. IDENTITAS & SPESIFIKASI MESIN</p>
+                                                                        <div class="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl">
+                                                                            <div class="col-span-2 border-r mkt-border pr-6">
+                                                                                <div class="grid grid-cols-2 gap-4">
+                                                                                    <div>
+                                                                                        <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">LEGACY SAP ID</p>
+                                                                                        <p class="text-[11px] font-black mkt-text italic opacity-60">{{ $techData['sap_no'] ?? ($trackingData->sap_no ?? '-') }}</p>
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TGL PRODUKSI</p>
+                                                                                        <p class="text-[11px] font-black mkt-text">{{ !empty($techData['tgl_input']) ? date('d/m/Y', strtotime($techData['tgl_input'])) : $log->created_at->format('d/m/Y') }}</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div>
+                                                                                <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">NO MESIN / TYPE</p>
+                                                                                <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['no_mesin'] ?? '-' }} / {{ $techData['type_mesin'] ?? '-' }}</p>
+                                                                            </div>
+                                                                            <div>
+                                                                                <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">GAUGE / INCH</p>
+                                                                                <p class="text-[11px] font-black mkt-text uppercase">{{ $techData['gauge_inch'] ?? '-' }}</p>
+                                                                            </div>
+                                                                            <div class="col-span-2">
+                                                                            </div>
+                                                                            <div>
+                                                                                <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">JML FEEDER</p>
+                                                                                <p class="text-[11px] font-black mkt-text uppercase mkt-text">{{ $techData['jml_feeder'] ?? '0' }} <span class="text-[8px] mkt-text-muted">FDR</span></p>
+                                                                            </div>
+                                                                            <div>
+                                                                                <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">JML JARUM</p>
+                                                                                <p class="text-[11px] font-black mkt-text uppercase mkt-text">{{ $techData['jml_jarum'] ?? '0' }} <span class="text-[8px] mkt-text-muted">JRM</span></p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                                                                                                {{-- II. HASIL PRODUKSI --}}
-                                                                                                                                <div class="space-y-4">
-                                                                                                                                    <p class="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em] border-l-4 border-emerald-500 pl-3">II. HASIL PRODUKSI GREIGE</p>
-                                                                                                                                    <div class="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl">
-                                                                                                                                        <div>
-                                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">LEBAR / GRAMASI</p>
-                                                                                                                                            <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['lebar'] ?? '-' }} x {{ $techData['gramasi'] ?? '-' }}</p>
-                                                                                                                                        </div>
-                                                                                                                                        <div>
-                                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TOTAL OUTPUT</p>
-                                                                                                                                            <p class="text-[11px] font-black text-emerald-500 uppercase">{{ $log->roll }} ROLL</p>
-                                                                                                                                        </div>
-                                                                                                                                        <div class="col-span-2 bg-emerald-500/5 p-4 rounded-xl border border-emerald-500/10">
-                                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1 italic">ACTUAL WEIGHT (KG)</p>
-                                                                                                                                            <p class="text-2xl font-black text-emerald-500 italic">{{ $log->kg }} <span class="text-[10px] mkt-text-muted">KG</span></p>
-                                                                                                                                        </div>
-                                                                                                                                    </div>
-                                                                                                                                </div>
+                                                                    {{-- II. HASIL PRODUKSI --}}
+                                                                    <div class="space-y-4">
+                                                                        <p class="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em] border-l-4 border-emerald-500 pl-3">II. HASIL PRODUKSI GREIGE</p>
+                                                                        <div class="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl">
+                                                                            <div>
+                                                                                <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">LEBAR / GRAMASI</p>
+                                                                                <p class="text-[11px] font-black mkt-text uppercase italic">{{ $techData['lebar'] ?? '-' }} x {{ $techData['gramasi'] ?? '-' }}</p>
+                                                                            </div>
+                                                                            <div>
+                                                                                <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TOTAL OUTPUT</p>
+                                                                                <p class="text-[11px] font-black text-emerald-500 uppercase">{{ $log->roll }} ROLL</p>
+                                                                            </div>
+                                                                            <div class="col-span-2 bg-emerald-500/5 p-4 rounded-xl border border-emerald-500/10">
+                                                                                <p class="text-[7px] mkt-text-muted font-black uppercase mb-1 italic">ACTUAL WEIGHT (KG)</p>
+                                                                                <p class="text-2xl font-black text-emerald-500 italic">{{ $log->kg }} <span class="text-[10px] mkt-text-muted">KG</span></p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                                                                                                {{-- III. PENGGUNAAN BENANG & YL --}}
-                                                                                                                                <div class="space-y-4">
-                                                                                                                                    <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">III. PENGGUNAAN BENANG & YL</p>
-                                                                                                                                    <div class="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl">
-                                                                                                                                        @foreach(range(1, 4) as $i)
-                                                                                                                                            @if(!empty($techData['benang_' . $i]))
-                                                                                                                                                <div class="space-y-2 border-l border-red-500/20 pl-4 group/item hover:bg-white/5 p-2 rounded-lg transition-all">
-                                                                                                                                                    <p class="text-[7px] mkt-text-muted font-black uppercase mb-0.5">SLOT {{ $i }}</p>
-                                                                                                                                                    <p class="text-[10px] font-black mkt-text uppercase leading-tight truncate">
-                                                                                                                                                        {{ $techData['benang_' . $i] }}
-                                                                                                                                                    </p>
-                                                                                                                                                    @if(!empty($techData['benang_' . $i . '_lot']))
-                                                                                                                                                        <p class="text-[9px] font-black text-slate-500 uppercase leading-none">LOT: {{ $techData['benang_' . $i . '_lot'] }}</p>
-                                                                                                                                                    @endif
-                                                                                                                                                    @if(!empty($techData['benang_' . $i . '_percent']))
-                                                                                                                                                        <p class="text-[11px] font-black mkt-text tracking-tighter">{{ $techData['benang_' . $i . '_percent'] }}</p>
-                                                                                                                                                    @endif
-                                                                                                                                                    <div class="pt-2 border-t border-white/5">
-                                                                                                                                                        <p class="text-[7px] mkt-text-muted font-bold uppercase">YL</p>
-                                                                                                                                                        <p class="text-[11px] font-bold mkt-text tracking-tighter">{{ $techData['yl_' . $i] ?? '-' }}</p>
-                                                                                                                                                    </div>
-                                                                                                                                                </div>
-                                                                                                                                            @endif
-                                                                                                                                        @endforeach
-                                                                                                                                    </div>
-                                                                                                                                </div>
+                                                                    {{-- III. PENGGUNAAN BENANG & YL --}}
+                                                                    <div class="space-y-4">
+                                                                        <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">III. PENGGUNAAN BENANG & YL</p>
+                                                                        <div class="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl">
+                                                                            @foreach(range(1, 4) as $i)
+                                                                                @if(!empty($techData['benang_' . $i]))
+                                                                                    <div class="space-y-2 border-l border-red-500/20 pl-4 group/item hover:bg-white/5 p-2 rounded-lg transition-all">
+                                                                                        <p class="text-[7px] mkt-text-muted font-black uppercase mb-0.5">SLOT {{ $i }}</p>
+                                                                                        <p class="text-[10px] font-black mkt-text uppercase leading-tight truncate">
+                                                                                            {{ $techData['benang_' . $i] }}
+                                                                                        </p>
+                                                                                        @if(!empty($techData['benang_' . $i . '_lot']))
+                                                                                            <p class="text-[9px] font-black text-slate-500 uppercase leading-none">LOT: {{ $techData['benang_' . $i . '_lot'] }}</p>
+                                                                                        @endif
+                                                                                        @if(!empty($techData['benang_' . $i . '_percent']))
+                                                                                            <p class="text-[11px] font-black mkt-text tracking-tighter">{{ $techData['benang_' . $i . '_percent'] }}</p>
+                                                                                        @endif
+                                                                                        <div class="pt-2 border-t border-white/5">
+                                                                                            <p class="text-[7px] mkt-text-muted font-bold uppercase">YL</p>
+                                                                                            <p class="text-[11px] font-bold mkt-text tracking-tighter">{{ $techData['yl_' . $i] ?? '-' }}</p>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                @endif
+                                                                            @endforeach
+                                                                        </div>
+                                                                    </div>
 
-                                                                                                                                {{-- IV. NOTE & TARGET --}}
-                                                                                                                                <div class="space-y-4">
-                                                                                                                                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] border-l-4 border-slate-500 pl-3">IV. NOTE & TARGET</p>
-                                                                                                                                    <div class="grid grid-cols-3 gap-6 bg-white/5 p-6 rounded-2xl">
-                                                                                                                                        <div class="col-span-2">
-                                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">OPERATOR NOTES / KETERANGAN</p>
-                                                                                                                                            <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                                                                                                                                                <p class="text-[10px] font-bold text-slate-400 italic leading-relaxed">"{{ $techData['note'] ?? 'Tidak ada catatan tambahan dari operator.' }}"</p>
-                                                                                                                                            </div>
-                                                                                                                                        </div>
-                                                                                                                                        <div class="text-right flex flex-col justify-center">
-                                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TARGET PRODUKSI / DAY</p>
-                                                                                                                                            <p class="text-2xl font-black text-emerald-400 italic tracking-tighter">{{ $techData['produksi_per_day'] ?? '0' }} <span class="text-sm mkt-text-muted">KG</span></p>
-                                                                                                                                        </div>
-                                                                                                                                    </div>
-                                                                                                                                </div>
-                                                                                                                            </div>
-                                                                                                                        @elseif($expandedLog === 'stenter')
+                                                                    {{-- IV. NOTE & TARGET --}}
+                                                                    <div class="space-y-4">
+                                                                        <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] border-l-4 border-slate-500 pl-3">IV. NOTE & TARGET</p>
+                                                                        <div class="grid grid-cols-3 gap-6 bg-white/5 p-6 rounded-2xl">
+                                                                            <div class="col-span-2">
+                                                                                <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">OPERATOR NOTES / KETERANGAN</p>
+                                                                                <div class="bg-black/20 p-4 rounded-xl border border-white/5">
+                                                                                    <p class="text-[10px] font-bold text-slate-400 italic leading-relaxed">"{{ $techData['note'] ?? 'Tidak ada catatan tambahan dari operator.' }}"</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="text-right flex flex-col justify-center">
+                                                                                <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TARGET PRODUKSI / DAY</p>
+                                                                                <p class="text-2xl font-black text-emerald-400 italic tracking-tighter">{{ $techData['produksi_per_day'] ?? '0' }} <span class="text-sm mkt-text-muted">KG</span></p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            @elseif($expandedLog === 'stenter')
                                                             @php
                                                                 $preset = $techData['preset'] ?? [];
                                                                 $drying = $techData['drying'] ?? [];
@@ -1080,7 +1077,7 @@ new class extends Component {
                                                                     <div class="grid grid-cols-2 md:grid-cols-3 gap-6 bg-white/5 p-6 rounded-2xl">
                                                                         <div>
                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">OPERATOR</p>
-                                                                            <p class="text-[11px] font-black text-slate-100 uppercase">{{ $techData['operator'] ?? $log->operator->name ?? $log->operator ?? '-' }}</p>
+                                                                            <p class="text-[11px] font-black text-slate-100 uppercase">{{ $log->operator_name ?? $techData['operator'] ?? ($log->operator->name ?? ($log->operator ?? '-')) }}</p>
                                                                         </div>
                                                                         <div>
                                                                             <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">NO MESIN</p>
@@ -1169,160 +1166,6 @@ new class extends Component {
                                                                 </div>
                                                             </div>
                                                         @elseif($expandedLog === 'tumbler')
-                                                                                                            <div class="space-y-10 animate-in fade-in duration-700">
-                                                                                                                {{-- I. IDENTITAS & WAKTU --}}
-                                                                                                                <div class="space-y-4">
-                                                                                                                    <p class="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em] border-l-4 border-emerald-500 pl-3">I. IDENTITAS & WAKTU (TUMBLER DRY)</p>
-                                                                                                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-6 bg-white/5 p-6 rounded-2xl">
-                                                                                                                        <div>
-                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">OPERATOR</p>
-                                                                                                                            <p class="text-[11px] font-black text-slate-100 uppercase">{{ $techData['operator'] ?? '-' }}</p>
-                                                                                                                        </div>
-                                                                                                                        <div>
-                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TANGGAL</p>
-                                                                                                                            <p class="text-[11px] font-black text-slate-100">{{ !empty($techData['tanggal']) ? date('d/m/Y', strtotime($techData['tanggal'])) : '-' }}</p>
-                                                                                                                        </div>
-                                                                                                                        <div>
-                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">NO MESIN</p>
-                                                                                                                            <p class="text-[11px] font-black text-slate-100 uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
-                                                                                                                        </div>
-                                                                                                                    </div>
-                                                                                                                </div>
-
-                                                                                                                {{-- II. PARAMETER MESIN --}}
-                                                                                                                <div class="space-y-4">
-                                                                                                                    <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. PARAMETER SETTING MESIN</p>
-                                                                                                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 bg-white/5 p-6 rounded-2xl">
-                                                                                                                        <div>
-                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TEMPERATURE</p>
-                                                                                                                            <p class="text-[11px] font-black mkt-text">{{ $techData['suhu'] ?? '-' }}°C</p>
-                                                                                                                        </div>
-                                                                                                                        <div>
-                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">STEAM INJECT</p>
-                                                                                                                            <p class="text-[11px] font-black mkt-text">{{ $techData['steam_inject'] ?? '-' }}</p>
-                                                                                                                        </div>
-                                                                                                                        <div>
-                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">HOTWIND</p>
-                                                                                                                            <p class="text-[11px] font-black mkt-text">{{ $techData['hotwind'] ?? '-' }}</p>
-                                                                                                                        </div>
-                                                                                                                        <div>
-                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">COLDWIND</p>
-                                                                                                                            <p class="text-[11px] font-black mkt-text">{{ $techData['coldwind'] ?? '-' }}</p>
-                                                                                                                        </div>
-                                                                                                                    </div>
-                                                                                                                </div>
-
-                                                                                                                {{-- III. HASIL FISIK & OUTCOME --}}
-                                                                                                                <div class="space-y-4">
-                                                                                                                    <p class="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em] border-l-4 border-emerald-500 pl-3">III. HASIL FISIK & OUTCOME</p>
-                                                                                                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-6 bg-white/5 p-6 rounded-2xl">
-                                                                                                                        <div>
-                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">LEBAR</p>
-                                                                                                                            <p class="text-[11px] font-black text-emerald-400 italic">{{ $techData['lebar'] ?? '-' }}</p>
-                                                                                                                        </div>
-                                                                                                                        <div>
-                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">GRAMASI</p>
-                                                                                                                            <p class="text-[11px] font-black text-emerald-400 italic">{{ $techData['gramasi'] ?? '-' }}</p>
-                                                                                                                        </div>
-                                                                                                                        <div>
-                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">SHRINKAGE (V x H)</p>
-                                                                                                                            <p class="text-[11px] font-black text-emerald-400 italic">{{ $techData['shrinkage'] ?? '-' }}</p>
-                                                                                                                        </div>
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                        @elseif($expandedLog === 'fleece')
-                                                                                                            <div class="space-y-10 animate-in fade-in duration-700">
-                                                                                                                {{-- I. GLOBAL INFO --}}
-                                                                                                                <div class="space-y-4">
-                                                                                                                    <p class="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em] border-l-4 border-emerald-500 pl-3">I. IDENTITAS MESIN (FLEECE)</p>
-                                                                                                                    <div class="bg-white/5 p-6 rounded-2xl">
-                                                                                                                        <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">NO MESIN</p>
-                                                                                                                        <p class="text-[11px] font-black text-slate-100 uppercase italic">{{ $techData['no_mesin'] ?? '-' }}</p>
-                                                                                                                    </div>
-                                                                                                                </div>
-
-                                                                                                                {{-- II. DETIL PROSES SIDE-BY-SIDE --}}
-                                                                                                                <div class="space-y-4">
-                                                                                                                    <p class="text-[9px] font-black mkt-text-muted uppercase tracking-[0.3em] border-l-4 border-mkt-border pl-3">II. DETAIL PARAMETER PROSES (SIDE-BY-SIDE)</p>
-                                                                                                                    <div class="overflow-x-auto">
-                                                                                                                        <div class="min-w-[800px] space-y-4">
-                                                                                                                            {{-- TABLE HEADER --}}
-                                                                                                                            <div class="grid grid-cols-12 gap-6 bg-white/5 px-6 py-4 rounded-2xl items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                                                                                                                <div class="col-span-3">PARAMETER</div>
-                                                                                                                                <div class="col-span-3 text-center text-amber-400">RAISING</div>
-                                                                                                                                <div class="col-span-3 text-center text-sky-400">BRUSHING</div>
-                                                                                                                                <div class="col-span-3 text-center text-emerald-400">SHEARING</div>
-                                                                                                                            </div>
-
-                                                                                                                            @php
-                                                                                                                                $raising = $techData['raising'] ?? [];
-                                                                                                                                $brushing = $techData['brushing'] ?? [];
-                                                                                                                                $shearing = $techData['shearing'] ?? [];
-
-                                                                                                                                $fleeceParams = [
-                                                                                                                                    ['label' => 'OPERATOR', 'r' => $raising['operator'] ?? '-', 'b' => $brushing['operator'] ?? '-', 's' => $shearing['operator'] ?? '-'],
-                                                                                                                                    ['label' => 'TANGGAL', 'r' => !empty($raising['tanggal']) ? date('d/m/Y', strtotime($raising['tanggal'])) : '-', 'b' => !empty($brushing['tanggal']) ? date('d/m/Y', strtotime($brushing['tanggal'])) : '-', 's' => !empty($shearing['tanggal']) ? date('d/m/Y', strtotime($shearing['tanggal'])) : '-'],
-                                                                                                                                    ['label' => 'STANDAR BULU', 'r' => $raising['standar_bulu'] ?? '-', 'b' => $brushing['standar_bulu'] ?? '-', 's' => '-'],
-                                                                                                                                    ['label' => 'SPEED / CLOTH SPEED', 'r' => $raising['speed'] ?? '-', 'b' => $brushing['cloth_speed'] ?? '-', 's' => $shearing['speed'] ?? '-'],
-                                                                                                                                    ['label' => 'CLOTH OUT', 'r' => $raising['cloth_out'] ?? '-', 'b' => $brushing['cloth_out'] ?? '-', 's' => $shearing['cloth_out'] ?? '-'],
-                                                                                                                                    ['label' => 'BEND PIN', 'r' => $raising['bend_pin'] ?? '-', 'b' => '-', 's' => '-'],
-                                                                                                                                    ['label' => 'STRIGHT PIN', 'r' => $raising['stright_pin'] ?? '-', 'b' => '-', 's' => '-'],
-                                                                                                                                    ['label' => 'RPM DRUM', 'r' => $raising['rpm_drum'] ?? '-', 'b' => $brushing['rpm_drum'] ?? '-', 's' => '-'],
-                                                                                                                                    ['label' => 'DRUM BRUSH', 'r' => $raising['drum_brush'] ?? '-', 'b' => '-', 's' => '-'],
-                                                                                                                                    ['label' => 'LEFT BRUSH', 'r' => '-', 'b' => $brushing['left_brush'] ?? '-', 's' => '-'],
-                                                                                                                                    ['label' => 'RIGHT BRUSH', 'r' => '-', 'b' => $brushing['right_brush'] ?? '-', 's' => '-'],
-                                                                                                                                    ['label' => 'TENSION 1/2/3', 'r' => '-', 'b' => $brushing['tension'] ?? '-', 's' => '-'],
-                                                                                                                                    ['label' => 'EXPENDING', 'r' => '-', 'b' => '-', 's' => $shearing['expending'] ?? '-'],
-                                                                                                                                    ['label' => 'SHEAR', 'r' => '-', 'b' => '-', 's' => $shearing['shear'] ?? '-'],
-                                                                                                                                    ['label' => 'LEBAR / GRAMASI', 'r' => $raising['lebar_gsm'] ?? '-', 'b' => $brushing['lebar_gramasi'] ?? '-', 's' => $shearing['lebar_gramasi'] ?? '-'],
-                                                                                                                                ];
-                                                                                                                            @endphp
-
-                                                                                                                            <div class="space-y-3">
-                                                                                                                                @foreach($fleeceParams as $param)
-                                                                                                                                    <div class="grid grid-cols-12 gap-6 bg-white/[0.02] border border-white/5 hover:border-brand-500/30 px-6 py-5 rounded-[1.5rem] items-center transition-all duration-300">
-                                                                                                                                        <div class="col-span-3">
-                                                                                                                                            <span class="text-xs font-black text-slate-300 tracking-wider">
-                                                                                                                                                {{ $param['label'] }}
-                                                                                                                                            </span>
-                                                                                                                                        </div>
-                                                                                                                                        <div class="col-span-3 text-center">
-                                                                                                                                            <span class="text-xs font-black text-amber-400 italic">
-                                                                                                                                                {{ $param['r'] }}
-                                                                                                                                            </span>
-                                                                                                                                        </div>
-                                                                                                                                        <div class="col-span-3 text-center">
-                                                                                                                                            <span class="text-xs font-black text-sky-400 italic">
-                                                                                                                                                {{ $param['b'] }}
-                                                                                                                                            </span>
-                                                                                                                                        </div>
-                                                                                                                                        <div class="col-span-3 text-center">
-                                                                                                                                            <span class="text-xs font-black text-emerald-400 italic">
-                                                                                                                                                {{ $param['s'] }}
-                                                                                                                                            </span>
-                                                                                                                                        </div>
-                                                                                                                                    </div>
-                                                                                                                                @endforeach
-                                                                                                                            </div>
-                                                                                                                        </div>
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                        @elseif($expandedLog === 'pengujian')
-                                                                                                            <div class="space-y-10 animate-in fade-in duration-700">
-                                                                                                                {{-- I. IDENTITAS & WAKTU --}}
-                                                                                                                <div class="space-y-4">
-                                                                                                                    <p class="text-[9px] font-black text-cyan-500 uppercase tracking-[0.3em] border-l-4 border-cyan-500 pl-3">I. IDENTITAS & WAKTU (PENGUJIAN QC & LAB)</p>
-                                                                                                                    <div class="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl">
-                                                                                                                        <div>
-                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">OPERATOR PENGUJI</p>
-                                                                                                                            <p class="text-[11px] font-black text-slate-100 uppercase italic">{{ $techData['operator'] ?? '-' }}</p>
-                                                                                                                        </div>
-                                                                                                                        <div>
-                                                                                                                            <p class="text-[7px] mkt-text-muted font-black uppercase mb-1">TANGGAL UJI</p>
-                                                                                                                            <p class="text-[11px] font-black text-slate-100 italic">{{ !empty($techData['tanggal']) ? date('d/m/Y', strtotime($techData['tanggal'])) : '-' }}</p>
-                                                                                                                        </div>
                                                                                                                     </div>
                                                                                                                 </div>
 
