@@ -2,6 +2,7 @@
 
 use Livewire\Volt\Component;
 use App\Models\ActivityLog;
+use App\Models\ProductionActivity;
 use App\Models\User;
 use App\Models\Division;
 use App\Models\Setting;
@@ -16,8 +17,20 @@ new class extends Component {
         $countLogsToday = ActivityLog::whereDate('created_at', Carbon::today())->count();
         $limitCapacity = Setting::where('key', 'max_capacity')->value('value') ?? 1000;
         
-        // Asumsi nilai output 0 sampai Logbook Produksi dibuat
-        $currentWeight = 0; 
+        // Hitung Output Hari Ini dari ProductionActivity (deduplicated per order per alur)
+        $warnaDivs = ['DYEING', 'RELAX-DRYER', 'COMPACTOR', 'HEAT-SETTING', 'STENTER', 'TUMBLER', 'FLEECE', 'FINISHING'];
+        $todayActivities = ProductionActivity::whereDate('created_at', Carbon::today())->get();
+
+        $knitting = $todayActivities->filter(fn($a) => strtoupper($a->division_name) === 'KNITTING')
+            ->groupBy('marketing_order_id')->map(fn($g) => $g->sortByDesc('created_at')->first());
+        $warna = $todayActivities->filter(fn($a) => in_array(strtoupper($a->division_name), $warnaDivs))
+            ->groupBy('marketing_order_id')->map(fn($g) => $g->sortByDesc('created_at')->first());
+        $others = $todayActivities->filter(fn($a) =>
+            strtoupper($a->division_name) !== 'KNITTING' &&
+            !in_array(strtoupper($a->division_name), $warnaDivs)
+        )->groupBy('marketing_order_id')->map(fn($g) => $g->sortByDesc('created_at')->first());
+
+        $currentWeight = $knitting->sum('kg') + $warna->sum('kg') + $others->sum('kg');
         $pct = ($limitCapacity > 0) ? ($currentWeight / $limitCapacity) * 100 : 0;
 
         return [
