@@ -115,7 +115,7 @@ new class extends Component
                     'action' => 'DELETE_PRODUCTION_LOG',
                     'division' => $role,
                     'art_no' => $order->art_no,
-                    'details' => "Menghapus seluruh log alur Dyeing & Finishing untuk Artikel #{$order->art_no}. Alasan: Dihapus oleh Admin " . $adminName,
+                    'description' => "Menghapus seluruh log alur Dyeing & Finishing untuk Artikel #{$order->art_no}. Alasan: Dihapus oleh Admin " . $adminName,
                 ]);
 
                 // Hapus semua log alur Dyeing & Finishing untuk pesanan ini
@@ -138,7 +138,7 @@ new class extends Component
                     'action' => 'DELETE_PRODUCTION_LOG',
                     'division' => $role,
                     'art_no' => $order->art_no,
-                    'details' => "Menghapus data divisi {$log->division_name}: {$log->kg} KG / {$log->roll} Roll. Alasan: Dihapus oleh Admin " . $adminName,
+                    'description' => "Menghapus data divisi {$log->division_name}: {$log->kg} KG / {$log->roll} Roll. Alasan: Dihapus oleh Admin " . $adminName,
                 ]);
 
                 // Hapus log
